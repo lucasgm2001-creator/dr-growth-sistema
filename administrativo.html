@@ -293,7 +293,7 @@ function switchTab(name, btn) {
   if (name==='clientes') { mb.textContent='+ Cliente'; mb.onclick=openClientModal; mb.style.display=''; }
   else if (name==='tarefas') { mb.style.display='none'; }
   else { mb.style.display='none'; }
-  if (name==='relatorio') initRelatorio();
+  if (name==='relatorio') renderRelatorio();
 }
 
 async function loadData() {
