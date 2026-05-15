@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financeiro — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Financeiro</h1>
+      <p id="fin-subtitle">MRR, contratos e recebimentos</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-divider"></div>
+        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="main-action-btn" onclick="openModal()">+ Lançamento</button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="sector-header">
+      <div class="sector-title">
+        <div class="sector-icon" style="background:rgba(34,197,94,0.15)">💰</div>
+        <div>
+          <div class="sector-name" style="color:#22c55e">Financeiro</div>
+          <div class="text-muted">Andar 02 · MRR, Contratos & Recebimentos</div>
+        </div>
+      </div>
+      <div class="sector-tabs" style="--tab-color:#22c55e">
+        <button class="sector-tab active" onclick="switchTab('visao', this)">📊 Visão Geral</button>
+        <button class="sector-tab" onclick="switchTab('receber', this)">📋 Contas a Receber</button>
+        <button class="sector-tab" onclick="switchTab('contratos', this)">📝 Contratos</button>
+      </div>
+    </div>
+
+    <!-- TAB: Visão Geral -->
+    <div class="tab-panel active" id="tab-visao">
+
+      <!-- Alerta de atraso -->
+      <div id="overdue-alert" style="display:none" class="overdue-alert animate-in">
+        <div class="overdue-alert-icon">⚠️</div>
+        <div class="overdue-alert-text">
+          <strong id="overdue-msg"></strong>
+          <span id="overdue-detail"></span>
+        </div>
+        <a href="#" onclick="switchTab('receber', document.querySelectorAll('.sector-tab')[1]);return false" class="btn btn-danger btn-sm" style="margin-left:auto">Ver →</a>
+      </div>
+
+      <!-- KPIs -->
+      <div class="financial-overview animate-in">
+        <div class="fin-card" style="border-color:rgba(34,197,94,0.35)">
+          <div class="fin-card-label">MRR Total</div>
+          <div class="fin-card-value" id="fin-mrr" style="color:var(--green)">—</div>
+          <div class="fin-card-sub">receita recorrente mensal</div>
+        </div>
+        <div class="fin-card" style="border-color:rgba(34,197,94,0.25)">
+          <div class="fin-card-label">Recebido (mês)</div>
+          <div class="fin-card-value" id="fin-received" style="color:var(--green)">—</div>
+          <div class="fin-card-sub">pagamentos confirmados</div>
+        </div>
+        <div class="fin-card" style="border-color:rgba(234,179,8,0.3)">
+          <div class="fin-card-label">A Receber</div>
+          <div class="fin-card-value" id="fin-pending" style="color:var(--yellow)">—</div>
+          <div class="fin-card-sub">faturas pendentes</div>
+        </div>
+        <div class="fin-card" style="border-color:rgba(239,68,68,0.3)">
+          <div class="fin-card-label">Em Atraso</div>
+          <div class="fin-card-value" id="fin-overdue" style="color:var(--red)">—</div>
+          <div class="fin-card-sub">cobranças vencidas</div>
+        </div>
+      </div>
+
+      <!-- MRR por cliente -->
+      <div class="card animate-in mt-3">
+        <div class="card-header">
+          <span class="card-title">MRR por Cliente</span>
+          <span class="text-muted text-sm" id="mrr-total-label"></span>
+        </div>
+        <div class="card-body" id="mrr-breakdown"></div>
+      </div>
+    </div>
+
+    <!-- TAB: Contas a Receber -->
+    <div class="tab-panel" id="tab-receber">
+      <div class="filter-bar animate-in" style="margin-top:4px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-pay" placeholder="Buscar cliente…" oninput="filterPayments()">
+        </div>
+        <select class="filter-select" id="filter-status" onchange="filterPayments()">
+          <option value="">Todos os status</option>
+          <option value="paid">Pago</option>
+          <option value="pending">Pendente</option>
+          <option value="overdue">Atrasado</option>
+        </select>
+      </div>
+      <div class="table-container animate-in mt-3">
+        <table>
+          <thead>
+            <tr><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Vencimento</th><th>Pagamento</th><th>Status</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="payments-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Contratos -->
+    <div class="tab-panel" id="tab-contratos">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:4px" id="contracts-grid" class="animate-in"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Novo Lançamento</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pay-id">
+      <div class="grid-2">
+        <div class="form-group"><label>Cliente *</label><input type="text" class="form-control" id="pay-client" placeholder="Nome do cliente"></div>
+        <div class="form-group"><label>Valor (R$) *</label><input type="number" class="form-control" id="pay-amount" placeholder="0.00"></div>
+      </div>
+      <div class="form-group"><label>Descrição</label><input type="text" class="form-control" id="pay-desc" placeholder="Ex: Serviços maio/2026"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Vencimento</label><input type="date" class="form-control" id="pay-due"></div>
+        <div class="form-group"><label>Data de Pagamento</label><input type="date" class="form-control" id="pay-paid"></div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select class="form-control" id="pay-status">
+          <option value="pending">Pendente</option>
+          <option value="paid">Pago</option>
+          <option value="overdue">Atrasado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deletePayment()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="savePayment()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage('financeiro.html');
+if (!session) throw new Error('Not authenticated');
+
+let allPayments = [], allClients = [];
+
+const DEMO_PAYMENTS = [
+  { id:1, client_name:'GrowthX Agency',    description:'Serviços maio/2026', amount:12000, due_date:'2026-05-10', paid_date:'2026-05-09', status:'paid' },
+  { id:2, client_name:'MedTech Brasil',    description:'Serviços maio/2026', amount:4500,  due_date:'2026-05-15', paid_date:null,         status:'pending' },
+  { id:3, client_name:'US Digital LLC',    description:'Serviços maio/2026', amount:8200,  due_date:'2026-05-12', paid_date:null,         status:'overdue' },
+  { id:4, client_name:'Restaurante Sabor', description:'Serviços maio/2026', amount:1800,  due_date:'2026-05-05', paid_date:null,         status:'overdue' },
+  { id:5, client_name:'Academia Fit',      description:'Serviços maio/2026', amount:2400,  due_date:'2026-05-20', paid_date:null,         status:'pending' },
+  { id:6, client_name:'GrowthX Agency',    description:'Serviços abr/2026',  amount:12000, due_date:'2026-04-10', paid_date:'2026-04-08', status:'paid' },
+  { id:7, client_name:'MedTech Brasil',    description:'Serviços abr/2026',  amount:4500,  due_date:'2026-04-15', paid_date:'2026-04-14', status:'paid' },
+];
+
+const DEMO_CLIENTS = [
+  { id:1, name:'GrowthX Agency',    service:'Gestão de Tráfego',   responsible:'Gabriel', monthly_value:12000, renewal_date:'2026-11-01', health:'green' },
+  { id:2, name:'MedTech Brasil',    service:'Social Media + Ads',  responsible:'Gabriel', monthly_value:4500,  renewal_date:'2026-07-10', health:'green' },
+  { id:3, name:'US Digital LLC',    service:'Full Marketing',      responsible:'Lucas',   monthly_value:8200,  renewal_date:'2026-08-01', health:'yellow' },
+  { id:4, name:'Restaurante Sabor', service:'Instagram + Stories', responsible:'Gabriel', monthly_value:1800,  renewal_date:'2026-09-15', health:'red' },
+  { id:5, name:'Academia Fit',      service:'Google Ads',          responsible:'Gabriel', monthly_value:2400,  renewal_date:'2026-09-01', health:'green' },
+];
+
+const STATUS_INFO = {
+  paid:    { label:'Pago',     cls:'badge-green' },
+  pending: { label:'Pendente', cls:'badge-yellow' },
+  overdue: { label:'Atrasado', cls:'badge-red' },
+};
+
+const HEALTH_INFO = {
+  green:  { label:'Saudável', cls:'badge-green'  },
+  yellow: { label:'Atenção',  cls:'badge-yellow' },
+  red:    { label:'Em risco', cls:'badge-red'    },
+};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sector-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  const actionMap = { visao:'+ Lançamento', receber:'+ Lançamento', contratos:'' };
+  const ab = document.getElementById('main-action-btn');
+  ab.textContent = actionMap[name] || '+ Lançamento';
+  ab.style.display = name === 'contratos' ? 'none' : '';
+}
+
+async function loadData() {
+  if (window.drSupabase) {
+    try {
+      const [p, c] = await Promise.all([
+        window.drSupabase.from('payments').select('*').order('due_date', { ascending:false }),
+        window.drSupabase.from('clients').select('*').eq('active', true),
+      ]);
+      allPayments = (!p.error && p.data?.length) ? p.data : DEMO_PAYMENTS;
+      allClients  = (!c.error && c.data?.length) ? c.data : DEMO_CLIENTS;
+    } catch { allPayments = DEMO_PAYMENTS; allClients = DEMO_CLIENTS; }
+  } else {
+    allPayments = DEMO_PAYMENTS;
+    allClients  = DEMO_CLIENTS;
+  }
+  updateKPIs();
+  renderMRR();
+  renderPaymentsTable(allPayments);
+  renderContracts();
+}
+
+function updateKPIs() {
+  const paid    = allPayments.filter(p => p.status === 'paid');
+  const pending = allPayments.filter(p => p.status === 'pending');
+  const overdue = allPayments.filter(p => p.status === 'overdue');
+  const mrr     = allClients.reduce((s,c) => s+(Number(c.monthly_value)||0), 0);
+  const sum = arr => arr.reduce((s,p) => s+(Number(p.amount)||0), 0);
+
+  document.getElementById('fin-mrr').textContent      = fmt.currency(mrr);
+  document.getElementById('fin-received').textContent = fmt.currency(sum(paid));
+  document.getElementById('fin-pending').textContent  = fmt.currency(sum(pending));
+  document.getElementById('fin-overdue').textContent  = fmt.currency(sum(overdue));
+  document.getElementById('fin-subtitle').textContent = `MRR ${fmt.currency(mrr)} · ${overdue.length} em atraso`;
+
+  if (overdue.length) {
+    document.getElementById('overdue-alert').style.display = 'flex';
+    document.getElementById('overdue-msg').textContent = `${overdue.length} pagamento${overdue.length>1?'s':''} em atraso`;
+    document.getElementById('overdue-detail').textContent = `Total: ${fmt.currency(sum(overdue))} — ${overdue.map(p=>p.client_name).join(', ')}`;
+  }
+}
+
+function renderMRR() {
+  const mrr = allClients.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
+  document.getElementById('mrr-total-label').textContent = `Total: ${fmt.currency(mrr)}/mês`;
+  const sorted = [...allClients].sort((a,b)=>b.monthly_value-a.monthly_value);
+  document.getElementById('mrr-breakdown').innerHTML = sorted.map(c => {
+    const pct = mrr > 0 ? Math.round((c.monthly_value/mrr)*100) : 0;
+    return `
+      <div style="margin-bottom:16px">
+        <div class="flex items-center justify-between mb-1">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:13px;font-weight:600">${c.name}</span>
+            <span class="badge badge-muted" style="font-size:10px">${c.service}</span>
+            <span class="badge ${HEALTH_INFO[c.health]?.cls||'badge-muted'}" style="font-size:10px">${HEALTH_INFO[c.health]?.label||c.health}</span>
+          </div>
+          <span style="font-size:14px;font-weight:700;color:var(--green)">${fmt.currency(c.monthly_value)}<span style="font-size:11px;color:var(--text-muted);font-weight:400"> /mês (${pct}%)</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function filterPayments() {
+  const q   = document.getElementById('search-pay').value.toLowerCase();
+  const sta = document.getElementById('filter-status').value;
+  renderPaymentsTable(allPayments.filter(p => {
+    if (q && !(p.client_name||'').toLowerCase().includes(q)) return false;
+    if (sta && p.status !== sta) return false;
+    return true;
+  }));
+}
+
+function renderPaymentsTable(payments) {
+  const sorted = [...payments].sort((a,b) => {
+    const o = { overdue:0, pending:1, paid:2 };
+    return (o[a.status]||1)-(o[b.status]||1) || (a.due_date||'').localeCompare(b.due_date||'');
+  });
+  if (!sorted.length) {
+    document.getElementById('payments-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💰</div><h3>Sem lançamentos</h3></div></td></tr>`;
+    return;
+  }
+  document.getElementById('payments-tbody').innerHTML = sorted.map(p => {
+    const si = STATUS_INFO[p.status]||{label:p.status,cls:'badge-muted'};
+    return `<tr style="${p.status==='overdue'?'background:rgba(239,68,68,0.03)':''}">
+      <td><div class="td-main">${p.client_name}</div></td>
+      <td style="color:var(--text-secondary)">${p.description||'—'}</td>
+      <td style="font-weight:700;color:var(--green)">${fmt.currency(p.amount)}</td>
+      <td style="color:${p.status==='overdue'?'var(--red)':'inherit'}">${fmt.date(p.due_date)}</td>
+      <td>${p.paid_date ? fmt.date(p.paid_date) : '<span style="color:var(--text-muted)">—</span>'}</td>
+      <td><span class="badge ${si.cls}">${si.label}</span></td>
+      <td style="display:flex;gap:6px">
+        ${p.status!=='paid' ? `<button class="btn btn-secondary btn-sm" onclick="markPaid(${p.id})">✓ Pago</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderContracts() {
+  const daysUntil = d => d ? Math.ceil((new Date(d+'T12:00:00')-new Date())/86400000) : null;
+  document.getElementById('contracts-grid').innerHTML = allClients.map(c => {
+    const days = daysUntil(c.renewal_date);
+    const renewLabel = days === null ? '' : days < 0 ? `<span class="badge badge-red">Vencido há ${Math.abs(days)}d</span>` : days <= 30 ? `<span class="badge badge-yellow">Renova em ${days}d</span>` : `<span class="badge badge-muted">Renova em ${days}d</span>`;
+    const hi = HEALTH_INFO[c.health]||HEALTH_INFO.green;
+    return `
+      <div class="card" style="padding:18px;transition:all 0.18s;cursor:default"
+        onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-md)'"
+        onmouseleave="this.style.transform='';this.style.boxShadow=''">
+        <div class="flex items-center justify-between mb-3">
+          <div style="font-size:14px;font-weight:700">${c.name}</div>
+          <span class="badge ${hi.cls}">${hi.label}</span>
+        </div>
+        <div class="text-muted text-sm mb-3">${c.service}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <div class="text-muted" style="font-size:10px;margin-bottom:2px">VALOR MENSAL</div>
+            <div style="font-size:18px;font-weight:800;color:var(--green)">${fmt.currency(c.monthly_value)}</div>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:10px;margin-bottom:2px">RESPONSÁVEL</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600">
+              <div class="avatar avatar-sm avatar-${fmt.avatarClass(c.responsible)}">${fmt.initials(c.responsible)}</div>${c.responsible}
+            </div>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:10px;margin-bottom:2px">RENOVAÇÃO</div>
+            <div style="font-size:12px;font-weight:600">${fmt.date(c.renewal_date)}</div>
+          </div>
+          <div>
+            <div class="text-muted" style="font-size:10px;margin-bottom:2px">MRR ANUAL</div>
+            <div style="font-size:12px;font-weight:600;color:var(--green)">${fmt.currency(c.monthly_value*12)}</div>
+          </div>
+        </div>
+        ${renewLabel}
+      </div>`;
+  }).join('');
+}
+
+async function markPaid(id) {
+  const p = allPayments.find(x => x.id === id);
+  if (!p) return;
+  p.status = 'paid';
+  p.paid_date = new Date().toISOString().split('T')[0];
+  if (window.drSupabase) await window.drSupabase.from('payments').update({ status:'paid', paid_date:p.paid_date }).eq('id', id);
+  updateKPIs(); filterPayments();
+  showToast(`Pagamento de ${p.client_name} confirmado!`, 'success');
+}
+
+function openModal() {
+  document.getElementById('modal-title').textContent = 'Novo Lançamento';
+  document.getElementById('pay-id').value = '';
+  ['pay-client','pay-amount','pay-desc','pay-due','pay-paid'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pay-status').value = 'pending';
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('pay-modal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const p = allPayments.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modal-title').textContent = 'Editar Lançamento';
+  document.getElementById('pay-id').value = p.id;
+  document.getElementById('pay-client').value = p.client_name||'';
+  document.getElementById('pay-amount').value = p.amount||'';
+  document.getElementById('pay-desc').value = p.description||'';
+  document.getElementById('pay-due').value = p.due_date||'';
+  document.getElementById('pay-paid').value = p.paid_date||'';
+  document.getElementById('pay-status').value = p.status||'pending';
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('pay-modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('pay-modal').classList.remove('show'); }
+
+async function savePayment() {
+  const id = document.getElementById('pay-id').value;
+  const client = document.getElementById('pay-client').value.trim();
+  const amount = Number(document.getElementById('pay-amount').value);
+  if (!client || !amount) { showToast('Cliente e valor são obrigatórios.', 'error'); return; }
+  const data = { client_name:client, amount, description:document.getElementById('pay-desc').value.trim(), due_date:document.getElementById('pay-due').value||null, paid_date:document.getElementById('pay-paid').value||null, status:document.getElementById('pay-status').value };
+  if (id) {
+    if (window.drSupabase) await window.drSupabase.from('payments').update(data).eq('id', id);
+    const idx = allPayments.findIndex(p => p.id==id);
+    if (idx>=0) allPayments[idx] = { ...allPayments[idx], ...data };
+    showToast('Lançamento atualizado!', 'success');
+  } else {
+    data.created_at = new Date().toISOString();
+    if (window.drSupabase) { const { data:ins } = await window.drSupabase.from('payments').insert(data).select().single(); if (ins) allPayments.unshift(ins); }
+    else allPayments.unshift({ ...data, id:Date.now() });
+    showToast('Lançamento criado!', 'success');
+  }
+  closeModal(); updateKPIs(); filterPayments();
+}
+
+async function deletePayment() {
+  const id = document.getElementById('pay-id').value;
+  if (!id || !confirm('Excluir este lançamento?')) return;
+  if (window.drSupabase) await window.drSupabase.from('payments').delete().eq('id', id);
+  allPayments = allPayments.filter(p => p.id!=id);
+  closeModal(); updateKPIs(); filterPayments();
+  showToast('Excluído.', 'info');
+}
+
+document.getElementById('pay-modal').addEventListener('click', e => { if (e.target===document.getElementById('pay-modal')) closeModal(); });
+loadData();
+</script>
+</body>
+</html>

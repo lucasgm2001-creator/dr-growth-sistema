@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DR Growth Sistema — Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="login-page">
+
+  <div class="login-card animate-in">
+
+    <div class="login-logo">
+      <div class="logo-icon">DR</div>
+      <div class="logo-text">
+        <h1>DR Growth</h1>
+        <span>Sistema de Gestão</span>
+      </div>
+    </div>
+
+    <div class="login-heading">
+      <h2>Bem-vindo de volta</h2>
+      <p>Entre para acessar o sistema da equipe</p>
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+
+    <form id="login-form" autocomplete="on">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" class="form-control"
+          placeholder="seu@drgrowth.com" required autocomplete="email">
+      </div>
+      <div class="form-group" style="margin-bottom:24px">
+        <label for="password">Senha</label>
+        <input type="password" id="password" class="form-control"
+          placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">
+        Entrar no Sistema
+      </button>
+    </form>
+
+    <!-- Acessos rápidos demo -->
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+      <p class="text-muted" style="text-align:center;margin-bottom:12px;font-size:12px">
+        Acesso rápido de demonstração:
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="fillDemo('daniel@drgrowth.com','daniel123')">
+          <span style="font-size:14px">👑</span> Daniel <span class="text-muted" style="font-size:10px">Admin</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="fillDemo('lucas@drgrowth.com','lucas123')">
+          <span style="font-size:14px">📈</span> Lucas <span class="text-muted" style="font-size:10px">Comercial</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="fillDemo('gabriel@drgrowth.com','gabriel123')">
+          <span style="font-size:14px">📊</span> Gabriel <span class="text-muted" style="font-size:10px">Tráfego</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="fillDemo('thamyris@drgrowth.com','thamyris123')">
+          <span style="font-size:14px">💰</span> Thamyris <span class="text-muted" style="font-size:10px">Financeiro</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    // Já logado → vai direto pro Hall
+    if (AUTH.getSession()) {
+      window.location.href = 'hall.html';
+    }
+
+    function fillDemo(email, password) {
+      document.getElementById('email').value    = email;
+      document.getElementById('password').value = password;
+      document.getElementById('login-form').dispatchEvent(new Event('submit'));
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn   = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      const email = document.getElementById('email').value.trim();
+      const pass  = document.getElementById('password').value;
+
+      btn.disabled    = true;
+      btn.textContent = 'Entrando…';
+      errEl.classList.remove('show');
+
+      const { user, error } = await AUTH.login(email, pass);
+
+      if (error || !user) {
+        errEl.textContent = error || 'E-mail ou senha inválidos.';
+        errEl.classList.add('show');
+        btn.disabled    = false;
+        btn.textContent = 'Entrar no Sistema';
+        return;
+      }
+
+      btn.textContent = '✓ Bem-vindo, ' + user.name.split(' ')[0] + '!';
+      setTimeout(() => { window.location.href = 'hall.html'; }, 400);
+    });
+  </script>
+</body>
+</html>

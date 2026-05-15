@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand">
+      <h2>DR Growth</h2>
+      <span>Sistema de Gestão</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard.html">
+        <span class="nav-icon">⬛</span> Dashboard
+      </a>
+      <a href="funil.html" class="nav-item" data-page="funil.html">
+        <span class="nav-icon">◈</span> Funil de Vendas
+        <span class="nav-badge" id="badge-leads">—</span>
+      </a>
+      <a href="leads.html" class="nav-item" data-page="leads.html">
+        <span class="nav-icon">◉</span> Gestão de Leads
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Operações</div>
+      <a href="tarefas.html" class="nav-item" data-page="tarefas.html">
+        <span class="nav-icon">✓</span> Tarefas
+        <span class="nav-badge red" id="badge-tasks">—</span>
+      </a>
+      <a href="clientes.html" class="nav-item" data-page="clientes.html">
+        <span class="nav-icon">★</span> Clientes
+      </a>
+      <a href="financeiro.html" class="nav-item" data-page="financeiro.html">
+        <span class="nav-icon">$</span> Financeiro
+        <span class="nav-badge red" id="badge-fin">—</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-profile" id="user-profile"></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Dashboard</h1>
+      <p id="greeting">Bom dia!</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item">
+          <span class="clock-tz">🇧🇷 Brasil</span>
+          <span class="clock-time" id="clock-br">--:--:--</span>
+        </div>
+        <div class="clock-divider"></div>
+        <div class="clock-item">
+          <span class="clock-tz">🇺🇸 EUA (ET)</span>
+          <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card accent animate-in animate-in-delay-1" onclick="location.href='leads.html'">
+        <div class="kpi-top">
+          <span class="kpi-label">Novos Leads</span>
+          <div class="kpi-icon accent">◉</div>
+        </div>
+        <div class="kpi-value" id="kpi-leads">—</div>
+        <div class="kpi-change neutral" id="kpi-leads-sub">este mês</div>
+      </div>
+
+      <div class="kpi-card green animate-in animate-in-delay-2" onclick="location.href='clientes.html'">
+        <div class="kpi-top">
+          <span class="kpi-label">Clientes Ativos</span>
+          <div class="kpi-icon green">★</div>
+        </div>
+        <div class="kpi-value" id="kpi-clients">—</div>
+        <div class="kpi-change neutral">contratos vigentes</div>
+      </div>
+
+      <div class="kpi-card yellow animate-in animate-in-delay-3" onclick="location.href='financeiro.html'">
+        <div class="kpi-top">
+          <span class="kpi-label">MRR</span>
+          <div class="kpi-icon yellow">$</div>
+        </div>
+        <div class="kpi-value" id="kpi-mrr">—</div>
+        <div class="kpi-change neutral">receita mensal</div>
+      </div>
+
+      <div class="kpi-card red animate-in animate-in-delay-4" onclick="location.href='tarefas.html'">
+        <div class="kpi-top">
+          <span class="kpi-label">Tarefas Pendentes</span>
+          <div class="kpi-icon red">✓</div>
+        </div>
+        <div class="kpi-value" id="kpi-tasks">—</div>
+        <div class="kpi-change neutral">em aberto</div>
+      </div>
+    </div>
+
+    <!-- GRID CONTENT -->
+    <div class="grid-2 animate-in" style="animation-delay:0.2s">
+
+      <!-- Funil por Estágio -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Funil de Vendas</span>
+          <a href="funil.html" class="btn btn-ghost btn-sm">Ver tudo →</a>
+        </div>
+        <div class="card-body" id="funnel-summary">
+          <div class="empty-state"><div class="empty-icon">◈</div><p>Carregando…</p></div>
+        </div>
+      </div>
+
+      <!-- Tarefas prioritárias -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Tarefas Prioritárias</span>
+          <a href="tarefas.html" class="btn btn-ghost btn-sm">Ver tudo →</a>
+        </div>
+        <div id="priority-tasks">
+          <div class="empty-state"><div class="empty-icon">✓</div><p>Carregando…</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Segunda linha -->
+    <div class="grid-2 animate-in mt-4" style="animation-delay:0.3s">
+
+      <!-- Pagamentos pendentes -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Contas a Receber</span>
+          <a href="financeiro.html" class="btn btn-ghost btn-sm">Ver tudo →</a>
+        </div>
+        <div class="table-container" style="border:none; border-radius:0;">
+          <table id="payments-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="payments-body">
+              <tr><td colspan="4" class="text-muted" style="text-align:center;padding:24px">Carregando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Saúde dos Clientes -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Saúde dos Clientes</span>
+          <a href="clientes.html" class="btn btn-ghost btn-sm">Ver tudo →</a>
+        </div>
+        <div id="clients-health">
+          <div class="empty-state"><div class="empty-icon">★</div><p>Carregando…</p></div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage();
+if (!session) throw new Error('Not authenticated');
+
+// Saudação
+function setGreeting() {
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  document.getElementById('greeting').textContent = `${greet}, ${session.name.split(' ')[0]}!`;
+}
+setGreeting();
+
+// ---- Dados de demonstração (fallback sem Supabase) ----
+const DEMO = {
+  leads: [
+    { name:'Carlos Mendonça', company:'MedTech Brasil', stage:'proposta', value:4500, responsible:'Lucas', created_at:'2026-05-10' },
+    { name:'Sarah Johnson',   company:'US Digital LLC', stage:'reuniao',  value:8200, responsible:'Lucas', created_at:'2026-05-08' },
+    { name:'Fernanda Lima',   company:'Estudio Criativo', stage:'contato', value:2800, responsible:'Gabriel', created_at:'2026-05-12' },
+    { name:'Robert Davis',    company:'GrowthX Agency', stage:'fechado',  value:12000, responsible:'Lucas', created_at:'2026-05-01' },
+    { name:'Paulo Andrade',   company:'E-commerce Plus', stage:'novo',    value:3200, responsible:'Gabriel', created_at:'2026-05-14' },
+    { name:'Amanda Torres',   company:'Clínica Saúde+', stage:'perdido',  value:1800, responsible:'Gabriel', created_at:'2026-05-03' },
+  ],
+  tasks: [
+    { title:'Enviar proposta para MedTech Brasil', responsible:'Lucas', due_date:'2026-05-18', priority:'high', status:'pending' },
+    { title:'Configurar campanhas de Google Ads', responsible:'Gabriel', due_date:'2026-05-15', priority:'high', status:'in_progress' },
+    { title:'Reunião de onboarding — GrowthX', responsible:'Daniel', due_date:'2026-05-16', priority:'medium', status:'pending' },
+    { title:'Emitir NFs de maio', responsible:'Thamyris', due_date:'2026-05-20', priority:'medium', status:'pending' },
+    { title:'Ajustar landing page US Digital', responsible:'Gabriel', due_date:'2026-05-17', priority:'high', status:'in_progress' },
+    { title:'Follow-up Sarah Johnson', responsible:'Lucas', due_date:'2026-05-14', priority:'high', status:'done' },
+  ],
+  clients: [
+    { name:'GrowthX Agency',    service:'Gestão de Tráfego', monthly_value:12000, health:'green', active:true },
+    { name:'MedTech Brasil',    service:'Social Media + Ads', monthly_value:4500,  health:'green', active:true },
+    { name:'US Digital LLC',    service:'Full Marketing',    monthly_value:8200,  health:'yellow', active:true },
+    { name:'Restaurante Sabor', service:'Instagram + Stories',monthly_value:1800,  health:'red', active:true },
+    { name:'Academia Fit',      service:'Google Ads',        monthly_value:2400,  health:'green', active:true },
+  ],
+  payments: [
+    { client_name:'GrowthX Agency',    amount:12000, due_date:'2026-05-10', status:'paid' },
+    { client_name:'MedTech Brasil',    amount:4500,  due_date:'2026-05-15', status:'pending' },
+    { client_name:'US Digital LLC',    amount:8200,  due_date:'2026-05-12', status:'overdue' },
+    { client_name:'Restaurante Sabor', amount:1800,  due_date:'2026-05-05', status:'overdue' },
+    { client_name:'Academia Fit',      amount:2400,  due_date:'2026-05-20', status:'pending' },
+  ],
+};
+
+async function loadData() {
+  let leads = DEMO.leads, tasks = DEMO.tasks, clients = DEMO.clients, payments = DEMO.payments;
+
+  if (window.drSupabase) {
+    try {
+      const [l,t,c,p] = await Promise.all([
+        window.drSupabase.from('leads').select('*'),
+        window.drSupabase.from('tasks').select('*'),
+        window.drSupabase.from('clients').select('*').eq('active', true),
+        window.drSupabase.from('payments').select('*').order('due_date'),
+      ]);
+      if (!l.error && l.data?.length) leads = l.data;
+      if (!t.error && t.data?.length) tasks = t.data;
+      if (!c.error && c.data?.length) clients = c.data;
+      if (!p.error && p.data?.length) payments = p.data;
+    } catch(e) { /* usa demo */ }
+  }
+
+  renderKPIs(leads, tasks, clients);
+  renderFunnel(leads);
+  renderPriorityTasks(tasks);
+  renderPayments(payments);
+  renderClientsHealth(clients);
+  updateBadges(leads, tasks, payments);
+}
+
+function renderKPIs(leads, tasks, clients) {
+  const newLeads   = leads.filter(l => l.stage === 'novo' || l.stage === 'contato').length;
+  const activeClients = clients.filter(c => c.active !== false).length;
+  const mrr        = clients.reduce((s,c) => s + (Number(c.monthly_value)||0), 0);
+  const pendTasks  = tasks.filter(t => t.status !== 'done').length;
+
+  document.getElementById('kpi-leads').textContent   = newLeads;
+  document.getElementById('kpi-clients').textContent = activeClients;
+  document.getElementById('kpi-mrr').textContent     = fmt.currency(mrr);
+  document.getElementById('kpi-tasks').textContent   = pendTasks;
+}
+
+const STAGES = {
+  novo:     { label:'Novo Lead',         color:'#6366f1' },
+  contato:  { label:'Contato Feito',     color:'#3b82f6' },
+  reuniao:  { label:'Reunião Agendada',  color:'#a855f7' },
+  proposta: { label:'Proposta Enviada',  color:'#f97316' },
+  fechado:  { label:'Fechado',           color:'#22c55e' },
+  perdido:  { label:'Perdido',           color:'#ef4444' },
+};
+
+function renderFunnel(leads) {
+  const counts = {};
+  leads.forEach(l => { counts[l.stage] = (counts[l.stage]||0) + 1; });
+
+  const total = leads.filter(l => l.stage !== 'perdido').length || 1;
+
+  const html = Object.entries(STAGES).map(([key, s]) => {
+    const count = counts[key] || 0;
+    const pct   = key === 'perdido' ? 0 : Math.round((count / total) * 100);
+    return `
+      <div style="margin-bottom:14px">
+        <div class="flex items-center justify-between mb-1">
+          <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">${s.label}</span>
+          <span style="font-size:13px;font-weight:700;color:${s.color}">${count}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%;background:${s.color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('funnel-summary').innerHTML = html;
+}
+
+function renderPriorityTasks(tasks) {
+  const urgent = tasks
+    .filter(t => t.status !== 'done' && (t.priority === 'high' || t.priority === 'medium'))
+    .sort((a,b) => {
+      const po = {high:0,medium:1,low:2};
+      return (po[a.priority]||1) - (po[b.priority]||1);
+    })
+    .slice(0, 5);
+
+  if (!urgent.length) {
+    document.getElementById('priority-tasks').innerHTML = `<div class="empty-state"><div class="empty-icon">✓</div><h3>Tudo em dia!</h3><p>Sem tarefas urgentes.</p></div>`;
+    return;
+  }
+
+  const priorityLabels = { high:'Alta', medium:'Média', low:'Baixa' };
+  const priorityClass  = { high:'badge-red', medium:'badge-yellow', low:'badge-blue' };
+
+  const html = urgent.map(t => `
+    <div class="task-item">
+      <div class="task-check ${t.status==='done'?'done':''}">${t.status==='done'?'✓':''}</div>
+      <div class="task-content">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">
+          <span><div class="avatar avatar-sm avatar-${fmt.avatarClass(t.responsible)}" style="display:inline-flex">${fmt.initials(t.responsible)}</div> ${t.responsible}</span>
+          <span>📅 ${fmt.relative(t.due_date)}</span>
+          <span class="badge ${priorityClass[t.priority]}">${priorityLabels[t.priority]}</span>
+        </div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('priority-tasks').innerHTML = html;
+}
+
+function renderPayments(payments) {
+  const sorted = [...payments].sort((a,b) => {
+    const order = {overdue:0, pending:1, paid:2};
+    return (order[a.status]||1) - (order[b.status]||1);
+  }).slice(0, 5);
+
+  const statusInfo = {
+    paid:    { label:'Pago',     cls:'badge-green' },
+    pending: { label:'Pendente', cls:'badge-yellow' },
+    overdue: { label:'Atrasado', cls:'badge-red' },
+  };
+
+  const rows = sorted.map(p => `
+    <tr>
+      <td><div class="td-main">${p.client_name}</div></td>
+      <td style="font-weight:700;color:var(--green)">${fmt.currency(p.amount)}</td>
+      <td>${fmt.date(p.due_date)}</td>
+      <td><span class="badge ${statusInfo[p.status]?.cls||'badge-muted'}">${statusInfo[p.status]?.label||p.status}</span></td>
+    </tr>`).join('');
+
+  document.getElementById('payments-body').innerHTML = rows;
+}
+
+function renderClientsHealth(clients) {
+  const healthInfo = {
+    green:  { label:'Saudável',  cls:'badge-green',  dot:'green' },
+    yellow: { label:'Atenção',   cls:'badge-yellow', dot:'yellow' },
+    red:    { label:'Em risco',  cls:'badge-red',    dot:'red' },
+  };
+
+  const html = clients.slice(0, 5).map(c => `
+    <div class="task-item">
+      <div>
+        <div class="task-title">${c.name}</div>
+        <div class="task-meta">
+          <span>${c.service}</span>
+          <span style="font-weight:700;color:var(--green)">${fmt.currency(c.monthly_value)}/mês</span>
+        </div>
+      </div>
+      <div style="margin-left:auto">
+        <span class="badge ${healthInfo[c.health]?.cls||'badge-muted'}">
+          ${healthInfo[c.health]?.label||c.health}
+        </span>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('clients-health').innerHTML = html;
+}
+
+function updateBadges(leads, tasks, payments) {
+  const activeLeads = leads.filter(l => !['fechado','perdido'].includes(l.stage)).length;
+  const pendTasks   = tasks.filter(t => t.status !== 'done').length;
+  const overdues    = payments.filter(p => p.status === 'overdue').length;
+
+  document.getElementById('badge-leads').textContent = activeLeads;
+  document.getElementById('badge-tasks').textContent = pendTasks;
+  document.getElementById('badge-fin').textContent   = overdues || '';
+  if (!overdues) document.getElementById('badge-fin').style.display = 'none';
+}
+
+loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Leads — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard.html"><span class="nav-icon">⬛</span> Dashboard</a>
+      <a href="funil.html" class="nav-item" data-page="funil.html"><span class="nav-icon">◈</span> Funil de Vendas</a>
+      <a href="leads.html" class="nav-item" data-page="leads.html"><span class="nav-icon">◉</span> Gestão de Leads</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operações</div>
+      <a href="tarefas.html" class="nav-item" data-page="tarefas.html"><span class="nav-icon">✓</span> Tarefas</a>
+      <a href="clientes.html" class="nav-item" data-page="clientes.html"><span class="nav-icon">★</span> Clientes</a>
+      <a href="financeiro.html" class="nav-item" data-page="financeiro.html"><span class="nav-icon">$</span> Financeiro</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Gestão de Leads</h1>
+      <p id="leads-subtitle">Carregando…</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item"><span class="clock-tz">🇧🇷 Brasil</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-divider"></div>
+        <div class="clock-item"><span class="clock-tz">🇺🇸 EUA</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal()">+ Novo Lead</button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Filtros -->
+    <div class="filter-bar animate-in">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Buscar por nome, empresa…" oninput="filterLeads()">
+      </div>
+      <select class="filter-select" id="filter-stage" onchange="filterLeads()">
+        <option value="">Todos os estágios</option>
+        <option value="novo">Novo Lead</option>
+        <option value="contato">Contato Feito</option>
+        <option value="reuniao">Reunião Agendada</option>
+        <option value="proposta">Proposta Enviada</option>
+        <option value="fechado">Fechado</option>
+        <option value="perdido">Perdido</option>
+      </select>
+      <select class="filter-select" id="filter-resp" onchange="filterLeads()">
+        <option value="">Todos os responsáveis</option>
+        <option>Daniel</option>
+        <option>Lucas</option>
+        <option>Gabriel</option>
+        <option>Thamyris</option>
+      </select>
+      <select class="filter-select" id="filter-origin" onchange="filterLeads()">
+        <option value="">Todas as origens</option>
+        <option>LinkedIn</option>
+        <option>Instagram</option>
+        <option>Google Ads</option>
+        <option>Facebook</option>
+        <option>Indicação</option>
+        <option>Referência</option>
+      </select>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-container animate-in" style="animation-delay:0.1s">
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Estágio</th>
+            <th>Valor</th>
+            <th>Responsável</th>
+            <th>Origem</th>
+            <th>Entrada</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody">
+          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Detalhes / Histórico do Lead -->
+    <div id="lead-detail-panel" style="display:none" class="animate-in mt-4">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title" id="detail-title">Histórico do Lead</span>
+          <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Fechar ✕</button>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div>
+              <div class="mb-3">
+                <div class="text-muted mb-1">Observações</div>
+                <div id="detail-notes" style="font-size:13px;color:var(--text-secondary);min-height:40px"></div>
+              </div>
+              <div class="grid-2">
+                <div>
+                  <div class="text-muted mb-1">E-mail</div>
+                  <div id="detail-email" style="font-size:13px"></div>
+                </div>
+                <div>
+                  <div class="text-muted mb-1">Telefone</div>
+                  <div id="detail-phone" style="font-size:13px"></div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="text-muted mb-2">Adicionar interação</div>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="form-control" id="new-interaction" placeholder="Ex: Ligação realizada, proposta enviada…" style="flex:1">
+                  <button class="btn btn-primary btn-sm" onclick="addInteraction()">Registrar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-muted mb-2">Histórico de interações</div>
+              <div class="timeline" id="detail-history">
+                <div class="text-muted" style="font-size:12px">Nenhuma interação ainda.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL Lead -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Novo Lead</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lead-id">
+      <div class="grid-2">
+        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
+        <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>E-mail</label><input type="email" class="form-control" id="lead-email" placeholder="email@empresa.com"></div>
+        <div class="form-group"><label>Telefone</label><input type="text" class="form-control" id="lead-phone" placeholder="+55 11 99999-9999"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Valor Estimado (R$)</label><input type="number" class="form-control" id="lead-value" placeholder="0"></div>
+        <div class="form-group">
+          <label>Origem</label>
+          <select class="form-control" id="lead-origin">
+            <option value="">Selecione</option>
+            <option>LinkedIn</option><option>Instagram</option><option>Google Ads</option>
+            <option>Facebook</option><option>Indicação</option><option>Referência</option><option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Responsável</label>
+          <select class="form-control" id="lead-responsible">
+            <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estágio</label>
+          <select class="form-control" id="lead-stage">
+            <option value="novo">Novo Lead</option><option value="contato">Contato Feito</option>
+            <option value="reuniao">Reunião Agendada</option><option value="proposta">Proposta Enviada</option>
+            <option value="fechado">Fechado</option><option value="perdido">Perdido</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="lead-notes" rows="3" placeholder="Notas sobre o lead…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deleteLead()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage();
+if (!session) throw new Error('Not authenticated');
+
+let allLeads = [], selectedLeadId = null;
+let history = {};
+
+const DEMO_LEADS = [
+  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', email:'carlos@medtech.com', phone:'(11) 99234-5678', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', notes:'Interessado em gestão de tráfego pago.', created_at:'2026-05-10' },
+  { id:2, name:'Sarah Johnson',   company:'US Digital LLC', email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao', value:8200, responsible:'Lucas', origin:'Indicação', notes:'Reunião agendada para 20/05.', created_at:'2026-05-08' },
+  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo', email:'fernanda@estudio.com', phone:'(21) 98765-4321', stage:'contato', value:2800, responsible:'Gabriel', origin:'Instagram', notes:'Primeiro contato feito via DM.', created_at:'2026-05-12' },
+  { id:4, name:'Robert Davis',    company:'GrowthX Agency', email:'robert@growthx.io', phone:'+1 212 555-0147', stage:'fechado', value:12000, responsible:'Lucas', origin:'Google Ads', notes:'Contrato assinado. Início em junho.', created_at:'2026-05-01' },
+  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', email:'paulo@ecomplus.com', phone:'(41) 97654-3210', stage:'novo', value:3200, responsible:'Gabriel', origin:'Referência', notes:'', created_at:'2026-05-14' },
+  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+', email:'amanda@saude.com', phone:'(31) 96543-2109', stage:'perdido', value:1800, responsible:'Gabriel', origin:'Facebook', notes:'Escolheu concorrente.', created_at:'2026-05-03' },
+  { id:7, name:'Marcos Souza',    company:'TechStar', email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo', value:5500, responsible:'Daniel', origin:'LinkedIn', notes:'', created_at:'2026-05-13' },
+];
+
+const DEMO_HISTORY = {
+  1: [{ action:'Lead criado via LinkedIn', user_name:'Lucas', created_at:'2026-05-10T09:00:00' }, { action:'Proposta de R$4.500/mês enviada por e-mail', user_name:'Lucas', created_at:'2026-05-12T14:30:00' }],
+  2: [{ action:'Lead indicado por cliente existente', user_name:'Lucas', created_at:'2026-05-08T10:00:00' }, { action:'Call de descoberta realizada — 45min', user_name:'Lucas', created_at:'2026-05-11T16:00:00' }, { action:'Reunião de proposta agendada para 20/05', user_name:'Lucas', created_at:'2026-05-13T09:00:00' }],
+  4: [{ action:'Lead convertido — contrato assinado!', user_name:'Lucas', created_at:'2026-05-01T11:00:00' }],
+};
+
+const STAGE_INFO = {
+  novo:     { label:'Novo Lead',        cls:'badge-accent' },
+  contato:  { label:'Contato Feito',    cls:'badge-blue' },
+  reuniao:  { label:'Reunião Agendada', cls:'badge-purple' },
+  proposta: { label:'Proposta Enviada', cls:'badge-orange' },
+  fechado:  { label:'Fechado',          cls:'badge-green' },
+  perdido:  { label:'Perdido',          cls:'badge-red' },
+};
+
+async function loadLeads() {
+  if (window.drSupabase) {
+    try {
+      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
+      if (!error && data?.length) allLeads = data;
+      else allLeads = DEMO_LEADS;
+      const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
+      if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
+    } catch { allLeads = DEMO_LEADS; history = DEMO_HISTORY; }
+  } else {
+    allLeads = DEMO_LEADS;
+    history = DEMO_HISTORY;
+  }
+  updateSubtitle();
+  renderTable(allLeads);
+}
+
+function updateSubtitle() {
+  const active = allLeads.filter(l => !['fechado','perdido'].includes(l.stage)).length;
+  document.getElementById('leads-subtitle').textContent = `${allLeads.length} leads no total · ${active} ativos`;
+}
+
+function filterLeads() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const stage = document.getElementById('filter-stage').value;
+  const resp  = document.getElementById('filter-resp').value;
+  const origin= document.getElementById('filter-origin').value;
+
+  const filtered = allLeads.filter(l => {
+    const matchQ = !q || l.name.toLowerCase().includes(q) || (l.company||'').toLowerCase().includes(q) || (l.email||'').toLowerCase().includes(q);
+    const matchS = !stage || l.stage === stage;
+    const matchR = !resp  || l.responsible === resp;
+    const matchO = !origin || l.origin === origin;
+    return matchQ && matchS && matchR && matchO;
+  });
+
+  renderTable(filtered);
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('leads-tbody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◉</div><h3>Nenhum lead encontrado</h3><p>Tente ajustar os filtros.</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(l => {
+    const si = STAGE_INFO[l.stage] || { label:l.stage, cls:'badge-muted' };
+    return `
+      <tr style="cursor:pointer" onclick="selectLead(${l.id})">
+        <td>
+          <div class="td-main">${l.name}</div>
+          <div class="td-sub">${l.company || '—'}</div>
+        </td>
+        <td><span class="badge ${si.cls}">${si.label}</span></td>
+        <td style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>
+            ${l.responsible}
+          </div>
+        </td>
+        <td>${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
+        <td>${fmt.date(l.created_at)}</td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️ Editar</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function selectLead(id) {
+  selectedLeadId = id;
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+
+  document.getElementById('lead-detail-panel').style.display = 'block';
+  document.getElementById('detail-title').textContent = `Histórico — ${lead.name} · ${lead.company || ''}`;
+  document.getElementById('detail-notes').textContent = lead.notes || 'Sem observações.';
+  document.getElementById('detail-email').textContent = lead.email || '—';
+  document.getElementById('detail-phone').textContent = lead.phone || '—';
+
+  renderHistory(id);
+  document.getElementById('lead-detail-panel').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function renderHistory(id) {
+  const items = history[id] || [];
+  const el = document.getElementById('detail-history');
+  if (!items.length) {
+    el.innerHTML = '<div class="text-muted" style="font-size:12px">Nenhuma interação ainda.</div>';
+    return;
+  }
+  el.innerHTML = `<div class="timeline">${items.map(h => `
+    <div class="timeline-item">
+      <div class="timeline-time">${new Date(h.created_at).toLocaleString('pt-BR')} · ${h.user_name}</div>
+      <div class="timeline-text">${h.action}</div>
+    </div>`).join('')}</div>`;
+}
+
+async function addInteraction() {
+  const input = document.getElementById('new-interaction');
+  const text = input.value.trim();
+  if (!text || !selectedLeadId) return;
+
+  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: text, created_at: new Date().toISOString() };
+
+  if (!history[selectedLeadId]) history[selectedLeadId] = [];
+  history[selectedLeadId].push(entry);
+
+  if (window.drSupabase) {
+    await window.drSupabase.from('lead_history').insert(entry);
+  }
+
+  input.value = '';
+  renderHistory(selectedLeadId);
+  showToast('Interação registrada!', 'success');
+}
+
+function closeDetail() {
+  document.getElementById('lead-detail-panel').style.display = 'none';
+  selectedLeadId = null;
+}
+
+// ---- Modal ----
+function openModal() {
+  document.getElementById('modal-title').textContent = 'Novo Lead';
+  document.getElementById('lead-id').value = '';
+  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lead-origin').value = '';
+  document.getElementById('lead-stage').value = 'novo';
+  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const l = allLeads.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('modal-title').textContent = 'Editar Lead';
+  document.getElementById('lead-id').value = l.id;
+  document.getElementById('lead-name').value = l.name || '';
+  document.getElementById('lead-company').value = l.company || '';
+  document.getElementById('lead-email').value = l.email || '';
+  document.getElementById('lead-phone').value = l.phone || '';
+  document.getElementById('lead-value').value = l.value || '';
+  document.getElementById('lead-origin').value = l.origin || '';
+  document.getElementById('lead-notes').value = l.notes || '';
+  document.getElementById('lead-stage').value = l.stage;
+  document.getElementById('lead-responsible').value = l.responsible || 'Daniel';
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('lead-modal').classList.remove('show'); }
+
+async function saveLead() {
+  const id   = document.getElementById('lead-id').value;
+  const name = document.getElementById('lead-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+
+  const data = {
+    name, company: document.getElementById('lead-company').value.trim(),
+    email: document.getElementById('lead-email').value.trim(),
+    phone: document.getElementById('lead-phone').value.trim(),
+    value: Number(document.getElementById('lead-value').value) || null,
+    origin: document.getElementById('lead-origin').value,
+    notes: document.getElementById('lead-notes').value.trim(),
+    stage: document.getElementById('lead-stage').value,
+    responsible: document.getElementById('lead-responsible').value,
+  };
+
+  if (id) {
+    if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+    const idx = allLeads.findIndex(l => l.id == id);
+    if (idx >= 0) allLeads[idx] = { ...allLeads[idx], ...data };
+    showToast('Lead atualizado!', 'success');
+  } else {
+    const newId = Date.now();
+    data.created_at = new Date().toISOString();
+    if (window.drSupabase) {
+      const { data: ins } = await window.drSupabase.from('leads').insert(data).select().single();
+      if (ins) allLeads.unshift(ins);
+    } else { allLeads.unshift({ ...data, id: newId }); }
+    showToast('Lead criado!', 'success');
+  }
+
+  closeModal();
+  updateSubtitle();
+  renderTable(allLeads);
+}
+
+async function deleteLead() {
+  const id = document.getElementById('lead-id').value;
+  if (!id || !confirm('Excluir este lead?')) return;
+  if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
+  allLeads = allLeads.filter(l => l.id != id);
+  closeModal();
+  updateSubtitle();
+  renderTable(allLeads);
+  showToast('Lead excluído.', 'info');
+}
+
+document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
+loadLeads();
+</script>
+</body>
+</html>

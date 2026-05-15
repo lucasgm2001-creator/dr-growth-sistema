@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Configurações</h1>
+      <p>Controle de acesso e permissões</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-divider"></div>
+        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Aviso admin only -->
+    <div id="access-denied" style="display:none">
+      <div class="empty-state" style="padding:80px 24px">
+        <div class="empty-icon" style="font-size:48px">🔒</div>
+        <h3 style="font-size:18px;margin-bottom:8px">Acesso restrito</h3>
+        <p>Esta área é exclusiva para administradores.</p>
+        <button class="btn btn-primary mt-4" onclick="location.href='hall.html'">Voltar ao Hall</button>
+      </div>
+    </div>
+
+    <div id="admin-content">
+
+      <!-- Tabs -->
+      <div class="sector-header">
+        <div class="sector-title">
+          <div class="sector-icon" style="background:rgba(99,102,241,0.15)">🔑</div>
+          <div>
+            <div class="sector-name" style="color:#6366f1">Configurações</div>
+            <div class="text-muted">Acesso ao sistema · Gerenciamento de usuários</div>
+          </div>
+        </div>
+        <div class="sector-tabs" style="--tab-color:#6366f1">
+          <button class="sector-tab active" onclick="switchTab('acesso', this)">🔐 Controle de Acesso</button>
+          <button class="sector-tab" onclick="switchTab('usuarios', this)">👥 Usuários</button>
+          <button class="sector-tab" onclick="switchTab('sistema', this)">⚙ Sistema</button>
+        </div>
+      </div>
+
+      <!-- TAB: Controle de Acesso -->
+      <div class="tab-panel active" id="tab-acesso">
+        <div class="card animate-in mt-2">
+          <div class="card-header">
+            <span class="card-title">Permissões por Usuário</span>
+            <span class="text-muted text-sm">Defina quais andares cada pessoa pode acessar</span>
+          </div>
+          <div class="card-body" id="permissions-panel"></div>
+        </div>
+
+        <div class="card animate-in mt-4">
+          <div class="card-header">
+            <span class="card-title">Legenda dos Andares</span>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px" id="floors-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Usuários -->
+      <div class="tab-panel" id="tab-usuarios">
+        <div class="card animate-in mt-2">
+          <div class="card-header">
+            <span class="card-title">Membros da Equipe</span>
+            <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Convidar</button>
+          </div>
+          <div id="users-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB: Sistema -->
+      <div class="tab-panel" id="tab-sistema">
+        <div class="grid-2 animate-in mt-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Informações do Sistema</span></div>
+            <div class="card-body" id="system-info"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Dados de Demonstração</span></div>
+            <div class="card-body">
+              <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+                Popule o Supabase com dados de exemplo para testar o sistema completo.
+              </p>
+              <button class="btn btn-secondary w-full" onclick="runSeed()">Inserir Dados Demo no Supabase</button>
+              <div class="mt-3">
+                <p style="font-size:12px;color:var(--text-muted)">⚠️ Execute apenas uma vez. Requer Supabase configurado.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card animate-in mt-4">
+          <div class="card-header"><span class="card-title">Resetar Dados Locais</span></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+              Limpa avisos do mural, permissões customizadas e sessão atual armazenados localmente.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="clearAvisos()">🗑 Limpar Mural</button>
+              <button class="btn btn-secondary btn-sm" onclick="clearPermissions()">🔓 Resetar Permissões</button>
+              <button class="btn btn-danger btn-sm" onclick="if(confirm('Fazer logout?')) AUTH.logout()">⎋ Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL Usuário -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Convidar Usuário</h3>
+      <button class="modal-close" onclick="closeUserModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="u-name" placeholder="Nome completo"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" class="form-control" id="u-email" placeholder="email@empresa.com"></div>
+      <div class="form-group">
+        <label>Função / Role</label>
+        <select class="form-control" id="u-role">
+          <option value="comercial">Comercial</option>
+          <option value="trafego">Tráfego & Marketing</option>
+          <option value="financeiro">Administrativo & Financeiro</option>
+          <option value="admin">Admin (acesso total)</option>
+        </select>
+      </div>
+      <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;margin-top:4px">
+        <p style="font-size:12px;color:var(--text-muted)">
+          💡 Em produção com Supabase, o convite será enviado por e-mail. No modo demo, adicione o usuário ao array <code>demoUsers</code> em <code>auth.js</code>.
+        </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeUserModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="inviteUser()">Enviar Convite</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage('admin.html');
+if (!session) throw new Error('Not authenticated');
+
+// Só admin acessa
+if (session.role !== 'admin') {
+  document.getElementById('access-denied').style.display = 'block';
+  document.getElementById('admin-content').style.display = 'none';
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sector-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ---- Controle de Acesso ----
+const USERS = AUTH.demoUsers.filter(u => u.role !== 'admin');
+
+function renderPermissions() {
+  const panel = document.getElementById('permissions-panel');
+
+  panel.innerHTML = USERS.map(user => {
+    const custom = AUTH.getCustomPermissions(user.email);
+    const currentPerms = custom || SECTIONS.filter(s => s.roles.includes(user.role)).map(s => s.id);
+
+    return `
+      <div style="padding:20px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div class="avatar" style="background:linear-gradient(135deg,${user.color},${user.color}88);width:40px;height:40px;font-size:15px">
+            ${AUTH.roleInitials(user.name)}
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:700">${user.name}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${user.email} · ${AUTH.roleLabels[user.role]}</div>
+          </div>
+          ${custom ? `<span class="badge badge-accent" style="margin-left:auto">Permissões customizadas</span>` : `<span class="badge badge-muted" style="margin-left:auto">Padrão da função</span>`}
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          ${SECTIONS.filter(s => s.id !== 'hall').map(s => {
+            const checked = currentPerms.includes(s.id);
+            return `
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;background:var(--bg-tertiary);border:1px solid ${checked ? s.color+'40' : 'var(--border)'};border-radius:var(--radius-md);transition:all 0.18s"
+                onmouseenter="this.style.borderColor='${s.color}40'" onmouseleave="this.style.borderColor='${checked?s.color+'40':'var(--border)'}'">
+                <input type="checkbox" id="perm-${user.email.replace('@','_').replace('.','_')}-${s.id}"
+                  ${checked ? 'checked' : ''}
+                  style="accent-color:${s.color};width:14px;height:14px;cursor:pointer"
+                  onchange="updatePerm('${user.email}')">
+                <span style="font-size:13px;font-weight:600">${s.icon} ${s.label}</span>
+                <span style="font-size:10px;color:var(--text-muted)">${s.floor}</span>
+              </label>`;
+          }).join('')}
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="savePerm('${user.email}')">💾 Salvar permissões</button>
+          ${custom ? `<button class="btn btn-ghost btn-sm" onclick="resetPerm('${user.email}')">↩ Restaurar padrão</button>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // Legenda
+  document.getElementById('floors-legend').innerHTML = SECTIONS.map(s => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md)">
+      <div class="floor-btn" style="--floor-color:${s.color};background:color-mix(in srgb,${s.color} 15%,transparent);border-color:color-mix(in srgb,${s.color} 40%,transparent);flex-shrink:0">
+        <span class="floor-number" style="color:${s.color}">${s.floor}</span>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600">${s.label}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${s.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function getCheckedPerms(email) {
+  const key = email.replace('@','_').replace('.','_');
+  return SECTIONS.filter(s => s.id !== 'hall').filter(s => {
+    const el = document.getElementById(`perm-${key}-${s.id}`);
+    return el && el.checked;
+  }).map(s => s.id);
+}
+
+function savePerm(email) {
+  const perms = getCheckedPerms(email);
+  AUTH.saveCustomPermissions(email, perms);
+  renderPermissions();
+  showToast(`Permissões de ${email.split('@')[0]} salvas!`, 'success');
+}
+
+function updatePerm(email) {
+  // Visual feedback em tempo real
+}
+
+function resetPerm(email) {
+  if (!confirm('Restaurar permissões padrão da função?')) return;
+  try {
+    const all = JSON.parse(localStorage.getItem('drg_permissions') || '{}');
+    delete all[email];
+    localStorage.setItem('drg_permissions', JSON.stringify(all));
+  } catch {}
+  renderPermissions();
+  showToast('Permissões restauradas para o padrão.', 'info');
+}
+
+// ---- Usuários ----
+function renderUsers() {
+  const allUsers = [...AUTH.demoUsers];
+  document.getElementById('users-list').innerHTML = allUsers.map(u => `
+    <div class="task-item">
+      <div class="avatar" style="background:linear-gradient(135deg,${u.color},${u.color}88);flex-shrink:0">
+        ${AUTH.roleInitials(u.name)}
+      </div>
+      <div class="task-content">
+        <div class="task-title">${u.name}</div>
+        <div class="task-meta">
+          <span>✉ ${u.email}</span>
+          <span class="badge badge-accent">${AUTH.roleLabels[u.role] || u.role}</span>
+          ${u.role === 'admin' ? '<span class="badge badge-green">Admin</span>' : ''}
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted)">
+        ${AUTH.getCustomPermissions(u.email) ? '🔧 Permissões customizadas' : '📋 Padrão da função'}
+      </div>
+    </div>`).join('');
+}
+
+// ---- Sistema ----
+function renderSystemInfo() {
+  const session = AUTH.getSession();
+  document.getElementById('system-info').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${[
+        { label:'Versão',       value:'1.0.0' },
+        { label:'Usuário atual', value:session?.name || '—' },
+        { label:'Role',         value:AUTH.roleLabels[session?.role] || session?.role },
+        { label:'Login em',     value:session?.loginAt ? new Date(session.loginAt).toLocaleString('pt-BR') : '—' },
+        { label:'Supabase',     value:window.drSupabase ? '✅ Conectado' : '⚠️ Modo demo (sem Supabase)' },
+        { label:'Avisos no mural', value:`${JSON.parse(localStorage.getItem('drg_avisos')||'[]').length} aviso(s)` },
+      ].map(item => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <span style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.4px">${item.label}</span>
+          <span style="font-size:13px;font-weight:600">${item.value}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function clearAvisos() {
+  if (!confirm('Limpar todos os avisos do mural?')) return;
+  localStorage.removeItem('drg_avisos');
+  showToast('Mural limpo.', 'info');
+  renderSystemInfo();
+}
+
+function clearPermissions() {
+  if (!confirm('Resetar todas as permissões customizadas?')) return;
+  localStorage.removeItem('drg_permissions');
+  renderPermissions();
+  showToast('Permissões resetadas.', 'info');
+}
+
+async function runSeed() {
+  if (!window.drSupabase) { showToast('Configure o Supabase primeiro.', 'error'); return; }
+  if (!confirm('Inserir dados de demonstração no Supabase?')) return;
+  await window.seedDemoData?.();
+  showToast('Dados de demo inseridos!', 'success');
+}
+
+// ---- Modal usuário ----
+function openUserModal() { document.getElementById('user-modal').classList.add('show'); }
+function closeUserModal() { document.getElementById('user-modal').classList.remove('show'); }
+function inviteUser() {
+  const name  = document.getElementById('u-name').value.trim();
+  const email = document.getElementById('u-email').value.trim();
+  if (!name || !email) { showToast('Nome e e-mail são obrigatórios.', 'error'); return; }
+  closeUserModal();
+  showToast(`Convite para ${name} enviado! (Em produção, use Supabase Auth)`, 'success');
+}
+
+document.getElementById('user-modal').addEventListener('click', e => { if (e.target === document.getElementById('user-modal')) closeUserModal(); });
+
+// Init
+renderPermissions();
+renderUsers();
+renderSystemInfo();
+</script>
+</body>
+</html>
