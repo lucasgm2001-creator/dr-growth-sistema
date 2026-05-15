@@ -791,6 +791,44 @@ window.removeVendedor = function(name) {
 };
 window.listVendedores = function() { return getVendedores(); };
 
+function openVendedorModal() {
+  renderVendedoresList();
+  document.getElementById('new-vend-name').value = '';
+  document.getElementById('new-vend-email').value = '';
+  document.getElementById('vendedor-modal').classList.add('show');
+}
+function closeVendedorModal() { document.getElementById('vendedor-modal').classList.remove('show'); }
+
+function renderVendedoresList() {
+  const vends = getVendedores();
+  document.getElementById('vendedores-list').innerHTML = vends.map(v => `
+    <div class="flex items-center gap-2" style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="avatar avatar-sm avatar-${fmt.avatarClass(v.name.split(' ')[0])}">${fmt.initials(v.name)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${v.name}</div>
+        ${v.email ? `<div style="font-size:11px;color:var(--text-muted)">${v.email}</div>` : ''}
+      </div>
+      <button class="btn btn-ghost btn-sm" style="color:var(--red);font-size:11px" onclick="removeVendedorFromModal('${v.name}')">Remover</button>
+    </div>`).join('') || '<div class="text-muted text-sm">Nenhum vendedor cadastrado.</div>';
+}
+
+function addVendedorFromModal() {
+  const name = document.getElementById('new-vend-name').value.trim();
+  const email = document.getElementById('new-vend-email').value.trim();
+  if (!name) { showToast('Nome obrigatório.', 'error'); return; }
+  window.addVendedor(name, email);
+  document.getElementById('new-vend-name').value = '';
+  document.getElementById('new-vend-email').value = '';
+  renderVendedoresList();
+}
+
+function removeVendedorFromModal(name) {
+  window.removeVendedor(name);
+  renderVendedoresList();
+}
+
+document.getElementById('vendedor-modal').addEventListener('click', e => { if (e.target === document.getElementById('vendedor-modal')) closeVendedorModal(); });
+
 // ---- COMISSÕES ----
 function getComissaoTaxas() {
   try {
