@@ -335,10 +335,14 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'' };
   const btn2 = document.getElementById('main-action-btn');
-  btn2.textContent = actions[name] || '+ Novo Lead';
-  btn2.style.display = name === 'pipeline' ? 'none' : '';
+  if (name === 'pipeline' || name === 'comissoes') {
+    btn2.style.display = 'none';
+  } else {
+    btn2.textContent = '+ Novo Lead';
+    btn2.style.display = '';
+  }
+  if (name === 'comissoes') renderComissoes();
 }
 
 // ---- Kanban ----
