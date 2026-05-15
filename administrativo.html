@@ -572,10 +572,10 @@ async function deleteClient() {
 
 // ---- Modais Tarefa ----
 function openTaskModal() {
-  document.getElementById('task-modal-title').textContent='Nova Tarefa';
+  document.getElementById('task-modal-title').textContent = session.role==='admin' ? 'Atribuir Tarefa' : 'Nova Tarefa';
   document.getElementById('task-id').value='';
   ['task-title','task-desc','task-due'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('task-resp').value=session.name.split(' ')[0];
+  document.getElementById('task-resp').value='Lucas Moraes';
   document.getElementById('task-priority').value='medium';
   document.getElementById('task-status').value='pending';
   document.getElementById('task-delete-btn').style.display='none';
