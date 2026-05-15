@@ -472,6 +472,223 @@ initPostAvatars();
 renderFeed();
 renderMural();
 renderTeam();
+
+// ============================================================
+//  CALENDÁRIO
+// ============================================================
+const CAL_CATEGORY_COLORS = {
+  'Reunião':        '#4472d8',
+  'Financeiro':     '#22c55e',
+  'Comercial':      '#3b82f6',
+  'Tráfego':        '#a855f7',
+  'Administrativo': '#f97316',
+  'Urgente':        '#ef4444',
+  'Cliente':        '#eab308',
+  'Interno':        '#6b7280',
+};
+
+const HOLIDAYS = [
+  // Brasil
+  {date:'2025-01-01',name:'Confraternização Universal',country:'br'},
+  {date:'2025-04-18',name:'Sexta-Feira Santa',country:'br'},
+  {date:'2025-04-21',name:'Tiradentes',country:'br'},
+  {date:'2025-05-01',name:'Dia do Trabalho',country:'br'},
+  {date:'2025-06-19',name:'Corpus Christi',country:'br'},
+  {date:'2025-09-07',name:'Independência do Brasil',country:'br'},
+  {date:'2025-10-12',name:'N.Sra. Aparecida',country:'br'},
+  {date:'2025-11-02',name:'Finados',country:'br'},
+  {date:'2025-11-15',name:'Proclamação da República',country:'br'},
+  {date:'2025-12-25',name:'Natal',country:'br'},
+  {date:'2026-01-01',name:'Confraternização Universal',country:'br'},
+  {date:'2026-04-03',name:'Sexta-Feira Santa',country:'br'},
+  {date:'2026-04-21',name:'Tiradentes',country:'br'},
+  {date:'2026-05-01',name:'Dia do Trabalho',country:'br'},
+  {date:'2026-06-04',name:'Corpus Christi',country:'br'},
+  {date:'2026-09-07',name:'Independência do Brasil',country:'br'},
+  {date:'2026-10-12',name:'N.Sra. Aparecida',country:'br'},
+  {date:'2026-11-02',name:'Finados',country:'br'},
+  {date:'2026-11-15',name:'Proclamação da República',country:'br'},
+  {date:'2026-12-25',name:'Natal',country:'br'},
+  // EUA
+  {date:'2025-01-01',name:"New Year's Day",country:'us'},
+  {date:'2025-01-20',name:'MLK Day',country:'us'},
+  {date:'2025-02-17',name:"Presidents' Day",country:'us'},
+  {date:'2025-05-26',name:'Memorial Day',country:'us'},
+  {date:'2025-07-04',name:'Independence Day',country:'us'},
+  {date:'2025-09-01',name:'Labor Day',country:'us'},
+  {date:'2025-11-27',name:'Thanksgiving',country:'us'},
+  {date:'2025-12-25',name:'Christmas Day',country:'us'},
+  {date:'2026-01-01',name:"New Year's Day",country:'us'},
+  {date:'2026-01-19',name:'MLK Day',country:'us'},
+  {date:'2026-02-16',name:"Presidents' Day",country:'us'},
+  {date:'2026-05-25',name:'Memorial Day',country:'us'},
+  {date:'2026-07-04',name:'Independence Day',country:'us'},
+  {date:'2026-09-07',name:'Labor Day',country:'us'},
+  {date:'2026-11-26',name:'Thanksgiving',country:'us'},
+  {date:'2026-12-25',name:'Christmas Day',country:'us'},
+];
+
+let calYear  = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let editingCalId = null;
+
+function getCalEvents() {
+  try { return JSON.parse(localStorage.getItem('drg_calendar') || '[]'); } catch { return []; }
+}
+function saveCalEvents(ev) { localStorage.setItem('drg_calendar', JSON.stringify(ev)); }
+
+function renderCalendar() {
+  const today    = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay  = new Date(calYear, calMonth + 1, 0);
+  const startDow = firstDay.getDay();
+  const totalDays = lastDay.getDate();
+  const events    = getCalEvents();
+  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  let cells = '';
+  for (let i = 0; i < startDow; i++) cells += `<div class="cal-day cal-day-empty"></div>`;
+  for (let d = 1; d <= totalDays; d++) {
+    const mm  = String(calMonth + 1).padStart(2,'0');
+    const dd  = String(d).padStart(2,'0');
+    const ds  = `${calYear}-${mm}-${dd}`;
+    const isToday = ds === todayStr;
+    const hols    = HOLIDAYS.filter(h => h.date === ds);
+    const evs     = events.filter(e => e.date === ds);
+    const hasBR   = hols.some(h => h.country === 'br');
+    const hasUS   = hols.some(h => h.country === 'us');
+    let cls = 'cal-day';
+    if (isToday) cls += ' cal-today';
+    if (hasBR && hasUS) cls += ' cal-holiday-both';
+    else if (hasBR) cls += ' cal-holiday-br';
+    else if (hasUS)  cls += ' cal-holiday-us';
+    const holTip = hols.map(h=>`${h.country==='br'?'🇧🇷':'🇺🇸'} ${h.name}`).join('&#10;');
+    const dots   = evs.slice(0,3).map(e=>{const c=CAL_CATEGORY_COLORS[e.category]||'#4472d8';return `<div class="cal-event-dot" style="background:${c}" title="${e.title}"></div>`;}).join('');
+    const more   = evs.length>3 ? `<div class="cal-event-more">+${evs.length-3}</div>`:'';
+    const flags  = (hasBR||hasUS) ? `<div class="cal-holiday-flags">${hasBR?'🇧🇷':''}${hasUS?'🇺🇸':''}</div>`:'';
+    cells += `<div class="${cls}"${holTip?` title="${holTip}"`:''}  onclick="openCalDay('${ds}')">
+      <div class="cal-day-num">${d}</div>${flags}
+      <div class="cal-day-events">${dots}${more}</div>
+    </div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = `
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+      <h3 class="cal-month-title">${MONTHS[calMonth]} ${calYear}</h3>
+      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:8px" onclick="openCalEventModal(null,null)">+ Evento</button>
+    </div>
+    <div class="cal-weekdays">${['Dom','Seg','Ter','Qua','Qui','Sex','Sab'].map(d=>`<div class="cal-weekday">${d}</div>`).join('')}</div>
+    <div class="cal-days">${cells}</div>`;
+
+  renderUpcomingEvents();
+  renderCalLegend();
+}
+
+function calNav(dir) { calMonth += dir; if(calMonth<0){calMonth=11;calYear--;}else if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+function openCalDay(dateStr) { openCalEventModal(null, dateStr); }
+
+function openCalEventModal(id, defaultDate) {
+  editingCalId = id;
+  const ev = id ? getCalEvents().find(e => e.id === id) : null;
+  document.getElementById('cal-modal-title').textContent = ev ? 'Editar Compromisso' : 'Novo Compromisso';
+  document.getElementById('cal-ev-title').value    = ev?.title || '';
+  document.getElementById('cal-ev-date').value     = ev?.date || defaultDate || new Date().toISOString().split('T')[0];
+  document.getElementById('cal-ev-time').value     = ev?.time || '';
+  document.getElementById('cal-ev-category').value = ev?.category || 'Reunião';
+  document.getElementById('cal-ev-country').value  = ev?.country || 'both';
+  document.getElementById('cal-ev-resp').value     = ev?.responsible || session.name;
+  document.getElementById('cal-ev-desc').value     = ev?.description || '';
+  document.getElementById('cal-delete-btn').style.display = ev ? 'inline-flex' : 'none';
+  document.getElementById('cal-event-modal').classList.add('show');
+}
+
+function closeCalEventModal() {
+  document.getElementById('cal-event-modal').classList.remove('show');
+  editingCalId = null;
+}
+
+function saveCalEvent() {
+  const title = document.getElementById('cal-ev-title').value.trim();
+  if (!title) { showToast('Título é obrigatório.','error'); return; }
+  const entry = {
+    id: editingCalId || Date.now(),
+    title,
+    date:        document.getElementById('cal-ev-date').value,
+    time:        document.getElementById('cal-ev-time').value,
+    category:    document.getElementById('cal-ev-category').value,
+    country:     document.getElementById('cal-ev-country').value,
+    responsible: document.getElementById('cal-ev-resp').value,
+    description: document.getElementById('cal-ev-desc').value.trim(),
+    createdBy:   session.name,
+  };
+  let evs = getCalEvents();
+  if (editingCalId) { const i = evs.findIndex(e=>e.id===editingCalId); if(i>=0) evs[i]=entry; }
+  else evs.push(entry);
+  saveCalEvents(evs);
+  closeCalEventModal();
+  renderCalendar();
+  showToast(editingCalId?'Compromisso atualizado!':'Compromisso criado!','success');
+}
+
+function deleteCalEvent() {
+  if (!editingCalId || !confirm('Excluir este compromisso?')) return;
+  saveCalEvents(getCalEvents().filter(e=>e.id!==editingCalId));
+  closeCalEventModal();
+  renderCalendar();
+  showToast('Compromisso excluído.','info');
+}
+
+function renderUpcomingEvents() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const evs   = getCalEvents()
+    .filter(e => new Date(e.date+'T00:00:00') >= today)
+    .sort((a,b) => a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''))
+    .slice(0,6);
+  const el = document.getElementById('cal-upcoming');
+  if (!evs.length) { el.innerHTML=`<div class="text-muted" style="padding:14px;font-size:12px;text-align:center">Sem compromissos futuros</div>`; return; }
+  el.innerHTML = evs.map(e=>{
+    const c   = CAL_CATEGORY_COLORS[e.category]||'#4472d8';
+    const flag= e.country==='br'?'🇧🇷':e.country==='us'?'🇺🇸':'';
+    return `<div class="cal-upcoming-item" onclick="openCalEventModal(${e.id},null)">
+      <div class="cal-upcoming-bar" style="background:${c}"></div>
+      <div class="cal-upcoming-content">
+        <div style="font-size:12px;font-weight:600">${e.title} ${flag}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${fmt.date(e.date)}${e.time?' · '+e.time:''}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${e.category} · ${e.responsible.split(' ')[0]}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCalLegend() {
+  const el = document.getElementById('cal-legend');
+  let html = `
+    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(68,114,216,0.3);border:1px solid #4472d8"></div> Hoje</div>
+    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4)"></div> 🇧🇷 Feriado Brasil</div>
+    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4)"></div> 🇺🇸 Feriado EUA</div>
+    <div style="border-top:1px solid var(--border);margin:8px 0"></div>`;
+  Object.entries(CAL_CATEGORY_COLORS).forEach(([cat,col])=>{
+    html += `<div class="cal-legend-row"><div class="cal-event-dot" style="background:${col};width:10px;height:10px;border-radius:2px;flex-shrink:0"></div> ${cat}</div>`;
+  });
+  el.innerHTML = html;
+}
+
+document.getElementById('cal-event-modal')?.addEventListener('click', e => { if(e.target===document.getElementById('cal-event-modal')) closeCalEventModal(); });
+
+// Render calendar when section opens (lazy init)
+const _origToggle = toggleSection;
+window.toggleSection = function(name) {
+  _origToggle(name);
+  if (name === 'calendario') {
+    const isNowOpen = document.getElementById('calendario-body').classList.contains('open');
+    if (isNowOpen && !document.getElementById('cal-grid').innerHTML) renderCalendar();
+    else if (isNowOpen) renderCalendar();
+  }
+};
 </script>
 </body>
 </html>
