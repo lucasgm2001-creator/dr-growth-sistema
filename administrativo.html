@@ -129,7 +129,7 @@
         </div>
         <select class="filter-select" id="filter-resp-task" onchange="filterTasks()">
           <option value="">Todos</option>
-          <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+          <option>Daniel Ramos</option><option>Lucas Moraes</option><option>Gabriel Ramos</option><option>Thamyris Lages</option>
         </select>
         <select class="filter-select" id="filter-priority" onchange="filterTasks()">
           <option value="">Toda prioridade</option>
@@ -141,7 +141,9 @@
           <option value="in_progress">Em andamento</option>
           <option value="done">Concluído</option>
         </select>
-        <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Tarefa</button>
+        <div id="admin-task-btn" style="display:none">
+          <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Atribuir Tarefa</button>
+        </div>
       </div>
 
       <div class="card animate-in mt-3" id="tasks-card">
