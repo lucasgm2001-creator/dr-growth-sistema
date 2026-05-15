@@ -329,8 +329,9 @@ const fmt = {
     return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
   },
   avatarClass(name) {
+    const first = (name || '').split(' ')[0];
     const map = { 'Daniel': 'daniel', 'Lucas': 'lucas', 'Gabriel': 'gabriel', 'Thamyris': 'thamyris' };
-    return map[name] || 'accent';
+    return map[first] || 'accent';
   },
   timeAgo(isoStr) {
     if (!isoStr) return '';
