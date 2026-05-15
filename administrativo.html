@@ -336,6 +336,11 @@ async function loadData() {
   updateTaskKPIs();  renderTasksList(allTasks);
   document.getElementById('adm-subtitle').textContent =
     `${allClients.filter(c=>c.active!==false).length} clientes · ${allTasks.filter(t=>t.status!=='done').length} tarefas abertas`;
+
+  // Mostrar botão "Atribuir Tarefa" somente para admin
+  if (session.role === 'admin') {
+    document.getElementById('admin-task-btn').style.display = '';
+  }
 }
 
 // ---- CLIENTES ----
