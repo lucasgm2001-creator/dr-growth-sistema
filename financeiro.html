@@ -432,10 +432,23 @@ function switchTab(name, btn) {
   document.querySelectorAll('.sector-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  const actionMap = { visao:'+ Lançamento', receber:'+ Lançamento', contratos:'' };
   const ab = document.getElementById('main-action-btn');
-  ab.textContent = actionMap[name] || '+ Lançamento';
-  ab.style.display = name === 'contratos' ? 'none' : '';
+  const noAction = ['contratos', 'balanco', 'resultado'];
+  if (noAction.includes(name)) {
+    ab.style.display = 'none';
+  } else if (name === 'despesas') {
+    ab.textContent = '+ Despesa';
+    ab.onclick = openDespesaModal;
+    ab.style.display = '';
+  } else {
+    ab.textContent = '+ Lançamento';
+    ab.onclick = openModal;
+    ab.style.display = '';
+  }
+  if (name === 'despesas') renderDespesasUI();
+  if (name === 'balanco') renderBalanco();
+  if (name === 'resultado') renderResultado();
+  if (name === 'contratos') renderContracts();
 }
 
 async function loadData() {
