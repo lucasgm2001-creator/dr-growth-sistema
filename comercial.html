@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comercial — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Comercial</h1>
+      <p id="comercial-subtitle">Funil de vendas & leads</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-divider"></div>
+        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="main-action-btn" onclick="openNewLeadModal()">+ Novo Lead</button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Cabeçalho do setor com abas -->
+    <div class="sector-header">
+      <div class="sector-title">
+        <div class="sector-icon" style="background:rgba(59,130,246,0.15)">📈</div>
+        <div>
+          <div class="sector-name" style="color:#3b82f6">Comercial</div>
+          <div class="text-muted">Andar 01 · Funil de Vendas & Gestão de Leads</div>
+        </div>
+      </div>
+      <div class="sector-tabs" style="--tab-color:#3b82f6">
+        <button class="sector-tab active" onclick="switchTab('funil', this)">◈ Funil Kanban</button>
+        <button class="sector-tab" onclick="switchTab('leads', this)">◉ Lista de Leads</button>
+        <button class="sector-tab" onclick="switchTab('pipeline', this)">💰 Pipeline</button>
+      </div>
+    </div>
+
+    <!-- TAB: Funil Kanban -->
+    <div class="tab-panel active" id="tab-funil" style="overflow-x:auto">
+      <div class="kanban-board animate-in" id="kanban-board"></div>
+    </div>
+
+    <!-- TAB: Lista de Leads -->
+    <div class="tab-panel" id="tab-leads">
+      <div class="filter-bar animate-in" style="margin-top:4px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-leads" placeholder="Buscar por nome, empresa…" oninput="filterLeads()">
+        </div>
+        <select class="filter-select" id="filter-stage" onchange="filterLeads()">
+          <option value="">Todos os estágios</option>
+          <option value="novo">Novo Lead</option>
+          <option value="contato">Contato Feito</option>
+          <option value="reuniao">Reunião Agendada</option>
+          <option value="proposta">Proposta Enviada</option>
+          <option value="fechado">Fechado</option>
+          <option value="perdido">Perdido</option>
+        </select>
+        <select class="filter-select" id="filter-resp" onchange="filterLeads()">
+          <option value="">Todos</option>
+          <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+        </select>
+      </div>
+      <div class="table-container animate-in mt-3">
+        <table>
+          <thead>
+            <tr>
+              <th>Lead</th><th>Estágio</th><th>Valor</th><th>Responsável</th><th>Origem</th><th>Data</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Painel de histórico -->
+      <div id="lead-detail" style="display:none" class="card mt-4 animate-in">
+        <div class="card-header">
+          <span class="card-title" id="detail-title">Histórico</span>
+          <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Fechar ✕</button>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <div>
+              <div class="text-muted mb-1">Observações</div>
+              <div id="detail-notes" style="font-size:13px;color:var(--text-secondary);min-height:32px"></div>
+              <div class="grid-2 mt-3">
+                <div><div class="text-muted mb-1">E-mail</div><div id="detail-email" style="font-size:13px"></div></div>
+                <div><div class="text-muted mb-1">Telefone</div><div id="detail-phone" style="font-size:13px"></div></div>
+              </div>
+              <div class="mt-3">
+                <div class="text-muted mb-2">Registrar interação</div>
+                <div style="display:flex;gap:8px">
+                  <input type="text" class="form-control" id="new-interaction" placeholder="Ligação feita, proposta enviada…" style="flex:1">
+                  <button class="btn btn-primary btn-sm" onclick="addInteraction()">Registrar</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="text-muted mb-2">Histórico de interações</div>
+              <div id="detail-history"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Pipeline -->
+    <div class="tab-panel" id="tab-pipeline">
+      <div class="grid-2 mt-2 animate-in">
+        <div class="card">
+          <div class="card-header"><span class="card-title">💰 Pipeline por Estágio</span></div>
+          <div class="card-body" id="pipeline-stages"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">👤 Pipeline por Responsável</span></div>
+          <div class="card-body" id="pipeline-resp"></div>
+        </div>
+      </div>
+      <div class="card mt-4 animate-in">
+        <div class="card-header"><span class="card-title">📊 Resumo do Funil</span></div>
+        <div class="card-body" id="pipeline-summary"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL Lead -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Novo Lead</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lead-id">
+      <div class="grid-2">
+        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
+        <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>E-mail</label><input type="email" class="form-control" id="lead-email" placeholder="email@empresa.com"></div>
+        <div class="form-group"><label>Telefone</label><input type="text" class="form-control" id="lead-phone" placeholder="+55 11 99999-9999"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Valor Estimado</label><input type="number" class="form-control" id="lead-value" placeholder="0"></div>
+        <div class="form-group">
+          <label>Origem</label>
+          <select class="form-control" id="lead-origin">
+            <option value="">Selecione</option>
+            <option>LinkedIn</option><option>Instagram</option><option>Google Ads</option>
+            <option>Facebook</option><option>Indicação</option><option>Referência</option><option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Responsável</label>
+          <select class="form-control" id="lead-responsible">
+            <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estágio</label>
+          <select class="form-control" id="lead-stage">
+            <option value="novo">Novo Lead</option><option value="contato">Contato Feito</option>
+            <option value="reuniao">Reunião Agendada</option><option value="proposta">Proposta Enviada</option>
+            <option value="fechado">Fechado</option><option value="perdido">Perdido</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="lead-notes" rows="3" placeholder="Notas sobre o lead…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deleteLead()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage('comercial.html');
+if (!session) throw new Error('Not authenticated');
+
+const STAGES = [
+  { key:'novo',     label:'Novo Lead',        color:'#6366f1' },
+  { key:'contato',  label:'Contato Feito',     color:'#3b82f6' },
+  { key:'reuniao',  label:'Reunião Agendada',  color:'#a855f7' },
+  { key:'proposta', label:'Proposta Enviada',  color:'#f97316' },
+  { key:'fechado',  label:'Fechado',           color:'#22c55e' },
+  { key:'perdido',  label:'Perdido',           color:'#ef4444' },
+];
+
+const STAGE_INFO = {};
+STAGES.forEach(s => STAGE_INFO[s.key] = s);
+
+let leads = [], history = {}, draggedId = null, selectedLeadId = null;
+
+const DEMO_LEADS = [
+  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil',  email:'carlos@medtech.com',  phone:'(11) 99234-5678', stage:'proposta', value:4500,  responsible:'Lucas',   origin:'LinkedIn',  notes:'Interessado em tráfego pago.',    created_at:'2026-05-10' },
+  { id:2, name:'Sarah Johnson',   company:'US Digital LLC',  email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao',  value:8200,  responsible:'Lucas',   origin:'Indicação', notes:'Reunião 20/05.',                  created_at:'2026-05-08' },
+  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo',email:'fernanda@estudio.com',phone:'(21) 98765-4321', stage:'contato',  value:2800,  responsible:'Gabriel', origin:'Instagram', notes:'Primeiro contato via DM.',        created_at:'2026-05-12' },
+  { id:4, name:'Robert Davis',    company:'GrowthX Agency',  email:'robert@growthx.io',   phone:'+1 212 555-0147', stage:'fechado',  value:12000, responsible:'Lucas',   origin:'Google Ads',notes:'Contrato assinado.',              created_at:'2026-05-01' },
+  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', email:'paulo@ecomplus.com',  phone:'(41) 97654-3210', stage:'novo',     value:3200,  responsible:'Gabriel', origin:'Referência', notes:'',                              created_at:'2026-05-14' },
+  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+',  email:'amanda@saude.com',    phone:'(31) 96543-2109', stage:'perdido',  value:1800,  responsible:'Gabriel', origin:'Facebook',  notes:'Escolheu concorrente.',           created_at:'2026-05-03' },
+  { id:7, name:'Marcos Souza',    company:'TechStar',        email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo',     value:5500,  responsible:'Daniel',  origin:'LinkedIn',  notes:'',                              created_at:'2026-05-13' },
+];
+
+const DEMO_HISTORY = {
+  1: [{ action:'Lead criado via LinkedIn', user_name:'Lucas', created_at:'2026-05-10T09:00:00' }, { action:'Proposta de R$4.500 enviada', user_name:'Lucas', created_at:'2026-05-12T14:30:00' }],
+  2: [{ action:'Lead indicado por cliente existente', user_name:'Lucas', created_at:'2026-05-08T10:00:00' }, { action:'Reunião agendada para 20/05', user_name:'Lucas', created_at:'2026-05-13T09:00:00' }],
+  4: [{ action:'Contrato assinado!', user_name:'Lucas', created_at:'2026-05-01T11:00:00' }],
+};
+
+async function loadLeads() {
+  if (window.drSupabase) {
+    try {
+      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
+      if (!error && data?.length) leads = data;
+      else leads = DEMO_LEADS;
+      const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
+      if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
+    } catch { leads = DEMO_LEADS; history = DEMO_HISTORY; }
+  } else {
+    leads = DEMO_LEADS;
+    history = DEMO_HISTORY;
+  }
+  updateSubtitle();
+  renderKanban();
+  renderLeadsTable(leads);
+  renderPipeline();
+}
+
+function updateSubtitle() {
+  const active = leads.filter(l => !['fechado','perdido'].includes(l.stage));
+  const pipeline = active.reduce((s,l) => s + (Number(l.value)||0), 0);
+  document.getElementById('comercial-subtitle').textContent =
+    `${leads.length} leads · ${active.length} ativos · Pipeline ${fmt.currency(pipeline)}`;
+}
+
+// ---- Tab switching ----
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sector-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'' };
+  const btn2 = document.getElementById('main-action-btn');
+  btn2.textContent = actions[name] || '+ Novo Lead';
+  btn2.style.display = name === 'pipeline' ? 'none' : '';
+}
+
+// ---- Kanban ----
+function renderKanban() {
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = STAGES.map(stage => {
+    const stageLeads = leads.filter(l => l.stage === stage.key);
+    const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col-header">
+          <div class="col-dot" style="background:${stage.color}"></div>
+          <span class="col-title">${stage.label}</span>
+          <span class="col-count">${stageLeads.length}</span>
+        </div>
+        ${stage.key !== 'perdido' ? `<div style="padding:5px 10px 2px;font-size:11px;font-weight:600;color:var(--text-muted)">${fmt.currency(stageValue)}</div>` : ''}
+        <div class="kanban-cards" id="cards-${stage.key}"
+          ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${stage.key}')">
+          ${stageLeads.map(l => buildCard(l)).join('') || `<div style="text-align:center;font-size:11px;color:var(--text-muted);opacity:0.4;padding:10px">Arraste aqui</div>`}
+        </div>
+        <div style="padding:6px 8px 8px">
+          <button class="btn btn-ghost btn-sm w-full" onclick="openNewLeadModal('${stage.key}')">+ Adicionar</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buildCard(lead) {
+  const now = new Date();
+  const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
+  const usTime = now.toLocaleTimeString('en-US', { timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', hour12:true });
+  const daysAgo = Math.floor((now - new Date(lead.created_at)) / 86400000);
+  return `
+    <div class="lead-card" draggable="true" id="card-${lead.id}"
+      ondragstart="onDragStart(event,${lead.id})" ondragend="onDragEnd(event)"
+      onclick="openEditModal(${lead.id})">
+      <div class="lead-card-top">
+        <div>
+          <div class="lead-card-name">${lead.name}</div>
+          <div class="lead-card-company">${lead.company || '—'}</div>
+        </div>
+        ${lead.value ? `<div class="lead-card-value">${fmt.currency(lead.value)}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+        <div class="avatar avatar-sm avatar-${fmt.avatarClass(lead.responsible)}">${fmt.initials(lead.responsible)}</div>
+        <span style="font-size:11px;color:var(--text-muted)">${lead.responsible}</span>
+        ${lead.origin ? `<span class="badge badge-muted" style="margin-left:auto;font-size:10px">${lead.origin}</span>` : ''}
+      </div>
+      <div class="lead-card-meta">
+        <div class="lead-card-dates">
+          <strong>🇧🇷 ${brTime} &nbsp;🇺🇸 ${usTime}</strong>
+          <span>Há ${daysAgo === 0 ? 'hoje' : daysAgo + 'd'}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Drag & Drop
+function onDragStart(e, id) { draggedId = id; setTimeout(() => e.target.classList.add('dragging'), 0); e.dataTransfer.effectAllowed = 'move'; }
+function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over')); }
+function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+async function onDrop(e, stage) {
+  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+  if (!draggedId) return;
+  const lead = leads.find(l => l.id === draggedId);
+  if (!lead || lead.stage === stage) return;
+  lead.stage = stage;
+  if (window.drSupabase) await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId);
+  renderKanban(); renderLeadsTable(leads); renderPipeline(); updateSubtitle();
+  showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
+  draggedId = null;
+}
+
+// ---- Tabela de leads ----
+function filterLeads() {
+  const q    = document.getElementById('search-leads').value.toLowerCase();
+  const stage = document.getElementById('filter-stage').value;
+  const resp  = document.getElementById('filter-resp').value;
+  renderLeadsTable(leads.filter(l => {
+    if (q && !l.name.toLowerCase().includes(q) && !(l.company||'').toLowerCase().includes(q)) return false;
+    if (stage && l.stage !== stage) return false;
+    if (resp && l.responsible !== resp) return false;
+    return true;
+  }));
+}
+
+function renderLeadsTable(data) {
+  if (!data.length) {
+    document.getElementById('leads-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◉</div><h3>Nenhum lead</h3></div></td></tr>`;
+    return;
+  }
+  document.getElementById('leads-tbody').innerHTML = data.map(l => `
+    <tr style="cursor:pointer" onclick="selectLead(${l.id})">
+      <td><div class="td-main">${l.name}</div><div class="td-sub">${l.company||'—'}</div></td>
+      <td><span class="badge" style="background:${STAGE_INFO[l.stage]?.color}18;color:${STAGE_INFO[l.stage]?.color};border-color:${STAGE_INFO[l.stage]?.color}30">${STAGE_INFO[l.stage]?.label||l.stage}</span></td>
+      <td style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>${l.responsible}</div></td>
+      <td>${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
+      <td>${fmt.date(l.created_at)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️</button></td>
+    </tr>`).join('');
+}
+
+function selectLead(id) {
+  selectedLeadId = id;
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  document.getElementById('lead-detail').style.display = 'block';
+  document.getElementById('detail-title').textContent = `${lead.name} · ${lead.company||''}`;
+  document.getElementById('detail-notes').textContent = lead.notes || 'Sem observações.';
+  document.getElementById('detail-email').textContent = lead.email || '—';
+  document.getElementById('detail-phone').textContent = lead.phone || '—';
+  renderHistory(id);
+  document.getElementById('lead-detail').scrollIntoView({ behavior:'smooth' });
+}
+
+function renderHistory(id) {
+  const items = history[id] || [];
+  const el = document.getElementById('detail-history');
+  if (!items.length) { el.innerHTML = '<div class="text-muted" style="font-size:12px">Sem interações ainda.</div>'; return; }
+  el.innerHTML = `<div class="timeline">${items.map(h => `
+    <div class="timeline-item">
+      <div class="timeline-time">${new Date(h.created_at).toLocaleString('pt-BR')} · ${h.user_name}</div>
+      <div class="timeline-text">${h.action}</div>
+    </div>`).join('')}</div>`;
+}
+
+async function addInteraction() {
+  const input = document.getElementById('new-interaction');
+  const text = input.value.trim();
+  if (!text || !selectedLeadId) return;
+  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: text, created_at: new Date().toISOString() };
+  if (!history[selectedLeadId]) history[selectedLeadId] = [];
+  history[selectedLeadId].push(entry);
+  if (window.drSupabase) await window.drSupabase.from('lead_history').insert(entry);
+  input.value = '';
+  renderHistory(selectedLeadId);
+  showToast('Interação registrada!', 'success');
+}
+
+function closeDetail() { document.getElementById('lead-detail').style.display = 'none'; }
+
+// ---- Pipeline ----
+function renderPipeline() {
+  const active = leads.filter(l => l.stage !== 'perdido');
+  const totalValue = active.reduce((s,l) => s+(Number(l.value)||0), 0) || 1;
+
+  // Por estágio
+  document.getElementById('pipeline-stages').innerHTML = STAGES.filter(s=>s.key!=='perdido').map(s => {
+    const sl = leads.filter(l => l.stage === s.key);
+    const sv = sl.reduce((acc,l)=>acc+(Number(l.value)||0),0);
+    const pct = Math.round((sv/totalValue)*100);
+    return `<div style="margin-bottom:14px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600;color:var(--text-secondary)">${s.label}</span>
+        <span style="font-size:13px;font-weight:700;color:${s.color}">${fmt.currency(sv)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${sl.length})</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${s.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Por responsável
+  const resps = ['Daniel','Lucas','Gabriel','Thamyris'];
+  document.getElementById('pipeline-resp').innerHTML = resps.map(r => {
+    const rl = active.filter(l => l.responsible === r);
+    const rv = rl.reduce((acc,l)=>acc+(Number(l.value)||0),0);
+    const pct = Math.round((rv/totalValue)*100);
+    return `<div style="margin-bottom:14px">
+      <div class="flex items-center justify-between mb-1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(r)}">${fmt.initials(r)}</div>
+          <span style="font-size:12px;font-weight:600">${r}</span>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${fmt.currency(rv)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${rl.length})</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Resumo
+  const closed = leads.filter(l=>l.stage==='fechado');
+  const lost   = leads.filter(l=>l.stage==='perdido');
+  const txConv = active.length > 0 ? Math.round((closed.length/(closed.length+lost.length+active.length))*100) : 0;
+  document.getElementById('pipeline-summary').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
+      ${[
+        { label:'Total no Pipeline', value: fmt.currency(totalValue), color:'var(--green)' },
+        { label:'Leads Ativos', value: active.length, color:'var(--blue)' },
+        { label:'Fechados', value: closed.length, color:'var(--green)' },
+        { label:'Perdidos', value: lost.length, color:'var(--red)' },
+        { label:'Taxa de Conversão', value: txConv + '%', color:'var(--accent)' },
+        { label:'Ticket Médio', value: closed.length ? fmt.currency(closed.reduce((s,l)=>s+(Number(l.value)||0),0)/closed.length) : '—', color:'var(--yellow)' },
+      ].map(k => `
+        <div class="fin-card" style="padding:16px">
+          <div class="fin-card-label">${k.label}</div>
+          <div class="fin-card-value" style="font-size:22px;color:${k.color}">${k.value}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ---- Modal ----
+function openNewLeadModal(stage = 'novo') {
+  document.getElementById('modal-title').textContent = 'Novo Lead';
+  document.getElementById('lead-id').value = '';
+  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('lead-origin').value = '';
+  document.getElementById('lead-stage').value = stage;
+  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('modal-title').textContent = 'Editar Lead';
+  document.getElementById('lead-id').value = l.id;
+  document.getElementById('lead-name').value = l.name||'';
+  document.getElementById('lead-company').value = l.company||'';
+  document.getElementById('lead-email').value = l.email||'';
+  document.getElementById('lead-phone').value = l.phone||'';
+  document.getElementById('lead-value').value = l.value||'';
+  document.getElementById('lead-origin').value = l.origin||'';
+  document.getElementById('lead-notes').value = l.notes||'';
+  document.getElementById('lead-stage').value = l.stage;
+  document.getElementById('lead-responsible').value = l.responsible||'Daniel';
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('lead-modal').classList.remove('show'); }
+
+async function saveLead() {
+  const id = document.getElementById('lead-id').value;
+  const name = document.getElementById('lead-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+  const data = { name, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage: document.getElementById('lead-stage').value, responsible: document.getElementById('lead-responsible').value };
+  if (id) {
+    if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+    const idx = leads.findIndex(l => l.id == id);
+    if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
+    showToast('Lead atualizado!', 'success');
+  } else {
+    data.created_at = new Date().toISOString();
+    if (window.drSupabase) { const { data: ins } = await window.drSupabase.from('leads').insert(data).select().single(); if (ins) leads.unshift(ins); }
+    else leads.unshift({ ...data, id: Date.now() });
+    showToast('Lead criado!', 'success');
+  }
+  closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+}
+
+async function deleteLead() {
+  const id = document.getElementById('lead-id').value;
+  if (!id || !confirm('Excluir este lead?')) return;
+  if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
+  leads = leads.filter(l => l.id != id);
+  closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+  showToast('Lead excluído.', 'info');
+}
+
+document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
+loadLeads();
+</script>
+</body>
+</html>

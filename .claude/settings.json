@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; [ -z \"$f\" ] && exit 0; REPO=$(git -C \"$(dirname \"$f\")\" rev-parse --show-toplevel 2>/dev/null); [ -z \"$REPO\" ] && exit 0; git -C \"$REPO\" add \"$f\" && git -C \"$REPO\" commit -m \"Update $(basename \"$f\")\" && git -C \"$REPO\" push; } 2>/dev/null || true",
+            "timeout": 60,
+            "statusMessage": "Commitando e enviando para o repositório..."
+          }
+        ]
+      }
+    ]
+  }
+}

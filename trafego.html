@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tráfego — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Tráfego & Marketing</h1>
+      <p id="traf-subtitle">Campanhas, métricas e desempenho</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-divider"></div>
+        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+      </div>
+      <button class="btn btn-primary btn-sm" id="main-btn" onclick="openCampaignModal()">+ Campanha</button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <div class="sector-header">
+      <div class="sector-title">
+        <div class="sector-icon" style="background:rgba(168,85,247,0.15)">📊</div>
+        <div>
+          <div class="sector-name" style="color:#a855f7">Tráfego & Marketing</div>
+          <div class="text-muted">Andar 03 · Campanhas, Métricas & Conteúdo</div>
+        </div>
+      </div>
+      <div class="sector-tabs" style="--tab-color:#a855f7">
+        <button class="sector-tab active" onclick="switchTab('campanhas', this)">🚀 Campanhas</button>
+        <button class="sector-tab" onclick="switchTab('metricas', this)">📈 Métricas</button>
+        <button class="sector-tab" onclick="switchTab('conteudo', this)">📅 Conteúdo</button>
+      </div>
+    </div>
+
+    <!-- TAB: Campanhas -->
+    <div class="tab-panel active" id="tab-campanhas">
+
+      <!-- KPIs de tráfego -->
+      <div class="kpi-grid animate-in" style="margin-bottom:20px">
+        <div class="kpi-card" style="border-color:rgba(168,85,247,0.3)">
+          <div class="kpi-top"><span class="kpi-label">Campanhas Ativas</span><div class="kpi-icon" style="background:rgba(168,85,247,0.15)">🚀</div></div>
+          <div class="kpi-value" id="kpi-active-campaigns" style="color:#a855f7">—</div>
+          <div class="kpi-change neutral">em veiculação</div>
+        </div>
+        <div class="kpi-card" style="border-color:rgba(239,68,68,0.3)">
+          <div class="kpi-top"><span class="kpi-label">Invest. Total/mês</span><div class="kpi-icon" style="background:rgba(239,68,68,0.12)">💸</div></div>
+          <div class="kpi-value" id="kpi-spend" style="color:var(--red)">—</div>
+          <div class="kpi-change neutral">gasto em mídia</div>
+        </div>
+        <div class="kpi-card" style="border-color:rgba(59,130,246,0.3)">
+          <div class="kpi-top"><span class="kpi-label">Leads Gerados</span><div class="kpi-icon" style="background:rgba(59,130,246,0.12)">🎯</div></div>
+          <div class="kpi-value" id="kpi-leads-gen" style="color:var(--blue)">—</div>
+          <div class="kpi-change neutral">este mês</div>
+        </div>
+        <div class="kpi-card" style="border-color:rgba(34,197,94,0.3)">
+          <div class="kpi-top"><span class="kpi-label">CPL Médio</span><div class="kpi-icon" style="background:rgba(34,197,94,0.12)">📉</div></div>
+          <div class="kpi-value" id="kpi-cpl" style="color:var(--green)">—</div>
+          <div class="kpi-change neutral">custo por lead</div>
+        </div>
+      </div>
+
+      <!-- Grid de campanhas -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" id="campaigns-grid" class="animate-in"></div>
+    </div>
+
+    <!-- TAB: Métricas -->
+    <div class="tab-panel" id="tab-metricas">
+      <div class="animate-in mt-2">
+
+        <!-- Tabela de performance por cliente -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title">Performance por Cliente</span>
+            <span class="text-muted text-sm">Maio / 2026</span>
+          </div>
+          <div class="table-container" style="border:none;border-radius:0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th><th>Plataforma</th><th>Investimento</th>
+                  <th>Impressões</th><th>Cliques</th><th>Leads</th>
+                  <th>CPL</th><th>ROAS</th>
+                </tr>
+              </thead>
+              <tbody id="metrics-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Resumo por plataforma -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Por Plataforma</span></div>
+            <div class="card-body" id="platform-breakdown"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Metas do Mês</span></div>
+            <div class="card-body" id="monthly-goals"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Conteúdo -->
+    <div class="tab-panel" id="tab-conteudo">
+      <div class="animate-in mt-2">
+        <div class="filter-bar" style="margin-bottom:20px">
+          <select class="filter-select" id="filter-client-content" onchange="filterContent()">
+            <option value="">Todos os clientes</option>
+            <option>GrowthX Agency</option><option>MedTech Brasil</option>
+            <option>US Digital LLC</option><option>Academia Fit</option>
+          </select>
+          <select class="filter-select" id="filter-status-content" onchange="filterContent()">
+            <option value="">Todos os status</option>
+            <option value="scheduled">Agendado</option>
+            <option value="published">Publicado</option>
+            <option value="draft">Rascunho</option>
+            <option value="revision">Em revisão</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Conteúdo</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px" id="content-grid"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL Campanha -->
+<div class="modal-overlay" id="campaign-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="camp-modal-title">Nova Campanha</h3>
+      <button class="modal-close" onclick="closeCampaignModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="camp-id">
+      <div class="grid-2">
+        <div class="form-group"><label>Nome da Campanha *</label><input type="text" class="form-control" id="camp-name" placeholder="Ex: Google Ads — MedTech"></div>
+        <div class="form-group"><label>Cliente</label><input type="text" class="form-control" id="camp-client" placeholder="Nome do cliente"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Plataforma</label>
+          <select class="form-control" id="camp-platform">
+            <option value="google">Google Ads</option><option value="meta">Meta Ads</option>
+            <option value="tiktok">TikTok Ads</option><option value="linkedin">LinkedIn Ads</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="camp-status">
+            <option value="active">Ativa</option><option value="paused">Pausada</option><option value="ended">Encerrada</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Orçamento Mensal (R$)</label><input type="number" class="form-control" id="camp-budget" placeholder="0"></div>
+        <div class="form-group"><label>Objetivo</label>
+          <select class="form-control" id="camp-objective">
+            <option>Geração de Leads</option><option>Tráfego</option><option>Conversão</option>
+            <option>Reconhecimento</option><option>Engajamento</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Observações</label><textarea class="form-control" id="camp-notes" rows="2" style="resize:vertical" placeholder="Notas sobre a campanha…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCampaignModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="camp-delete-btn" onclick="deleteCampaign()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveCampaign()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL Conteúdo -->
+<div class="modal-overlay" id="content-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Novo Conteúdo</h3>
+      <button class="modal-close" onclick="closeContentModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group"><label>Título *</label><input type="text" class="form-control" id="cont-title" placeholder="Título do post"></div>
+        <div class="form-group"><label>Cliente</label>
+          <select class="form-control" id="cont-client">
+            <option>GrowthX Agency</option><option>MedTech Brasil</option><option>US Digital LLC</option><option>Academia Fit</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Rede Social</label>
+          <select class="form-control" id="cont-platform">
+            <option>Instagram</option><option>Facebook</option><option>LinkedIn</option><option>TikTok</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Formato</label>
+          <select class="form-control" id="cont-format">
+            <option>Feed</option><option>Stories</option><option>Reels</option><option>Carrossel</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Data de Publicação</label><input type="date" class="form-control" id="cont-date"></div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="cont-status">
+            <option value="draft">Rascunho</option><option value="revision">Em revisão</option>
+            <option value="scheduled">Agendado</option><option value="published">Publicado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Descrição / Caption</label><textarea class="form-control" id="cont-desc" rows="3" style="resize:vertical" placeholder="Texto do post…"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeContentModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveContent()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage('trafego.html');
+if (!session) throw new Error('Not authenticated');
+
+// ---- Demo Data ----
+let campaigns = [
+  { id:1, name:'Google Ads — MedTech', client:'MedTech Brasil', platform:'google', status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200, clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.' },
+  { id:2, name:'Meta Ads — GrowthX', client:'GrowthX Agency', platform:'meta', status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em campanha de conversão.' },
+  { id:3, name:'Google Ads — US Digital', client:'US Digital LLC', platform:'google', status:'active', budget:4000, objective:'Conversão', spend:3890, impressions:67000, clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.' },
+  { id:4, name:'Instagram — Academia Fit', client:'Academia Fit', platform:'meta', status:'paused', budget:800, objective:'Engajamento', spend:620, impressions:28000, clicks:940, leads:12, notes:'Pausado para revisão de criativos.' },
+  { id:5, name:'LinkedIn — US Digital', client:'US Digital LLC', platform:'linkedin', status:'active', budget:1500, objective:'Tráfego', spend:1200, impressions:15000, clicks:480, leads:22, notes:'B2B, CPL alto mas qualificado.' },
+];
+
+let contents = [
+  { id:1, title:'Post lançamento produto', client:'MedTech Brasil', platform:'Instagram', format:'Carrossel', date:'2026-05-16', status:'scheduled', desc:'Lançamento da nova linha de equipamentos.' },
+  { id:2, title:'Case de sucesso GrowthX', client:'GrowthX Agency', platform:'LinkedIn', format:'Feed', date:'2026-05-14', status:'published', desc:'Resultado de 300% de ROI em 3 meses.' },
+  { id:3, title:'Promoção academia', client:'Academia Fit', platform:'Instagram', format:'Stories', date:'2026-05-18', status:'revision', desc:'Desconto matrícula para novos alunos.' },
+  { id:4, title:'Tutorial produto digital', client:'US Digital LLC', platform:'LinkedIn', format:'Feed', date:'2026-05-20', status:'draft', desc:'Como usar a plataforma de analytics.' },
+  { id:5, title:'Reels bastidores', client:'Academia Fit', platform:'Instagram', format:'Reels', date:'2026-05-22', status:'scheduled', desc:'Dia a dia da academia.' },
+  { id:6, title:'Depoimento cliente', client:'MedTech Brasil', platform:'Facebook', format:'Feed', date:'2026-05-12', status:'published', desc:'Depoimento Dr. Carlos sobre o produto.' },
+];
+
+const PLATFORM_INFO = {
+  google:   { name:'Google Ads',  icon:'🔍', color:'#ea4335' },
+  meta:     { name:'Meta Ads',    icon:'📘', color:'#1877f2' },
+  tiktok:   { name:'TikTok Ads',  icon:'🎵', color:'#000000' },
+  linkedin: { name:'LinkedIn Ads',icon:'💼', color:'#0a66c2' },
+};
+
+const STATUS_CAMP = {
+  active: { label:'Ativa',     cls:'badge-green' },
+  paused: { label:'Pausada',   cls:'badge-yellow' },
+  ended:  { label:'Encerrada', cls:'badge-muted' },
+};
+
+const STATUS_CONT = {
+  draft:     { label:'Rascunho',   cls:'badge-muted',   icon:'📝' },
+  revision:  { label:'Em revisão', cls:'badge-yellow',  icon:'👁' },
+  scheduled: { label:'Agendado',   cls:'badge-accent',  icon:'📅' },
+  published: { label:'Publicado',  cls:'badge-green',   icon:'✅' },
+};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sector-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  const mb = document.getElementById('main-btn');
+  if (name === 'campanhas') { mb.textContent = '+ Campanha'; mb.onclick = openCampaignModal; mb.style.display = ''; }
+  else if (name === 'conteudo') { mb.textContent = '+ Conteúdo'; mb.onclick = openContentModal; mb.style.display = ''; }
+  else mb.style.display = 'none';
+}
+
+function updateKPIs() {
+  const active = campaigns.filter(c => c.status === 'active');
+  const totalSpend = active.reduce((s,c) => s+(c.spend||0), 0);
+  const totalLeads = active.reduce((s,c) => s+(c.leads||0), 0);
+  const cpl = totalLeads > 0 ? totalSpend / totalLeads : 0;
+
+  document.getElementById('kpi-active-campaigns').textContent = active.length;
+  document.getElementById('kpi-spend').textContent = fmt.currency(totalSpend);
+  document.getElementById('kpi-leads-gen').textContent = totalLeads;
+  document.getElementById('kpi-cpl').textContent = cpl > 0 ? fmt.currency(cpl) : '—';
+  document.getElementById('traf-subtitle').textContent = `${active.length} campanhas ativas · ${totalLeads} leads gerados · CPL médio ${fmt.currency(cpl)}`;
+}
+
+function renderCampaigns() {
+  const grid = document.getElementById('campaigns-grid');
+  if (!campaigns.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🚀</div><h3>Sem campanhas</h3><p>Adicione a primeira campanha.</p></div>`;
+    return;
+  }
+  grid.innerHTML = campaigns.map(c => {
+    const pi = PLATFORM_INFO[c.platform] || { name:c.platform, icon:'📊', color:'#6366f1' };
+    const si = STATUS_CAMP[c.status] || { label:c.status, cls:'badge-muted' };
+    const roas = c.spend > 0 ? ((c.leads * 500) / c.spend).toFixed(1) : '—'; // estimated
+    const cpl  = c.leads > 0 ? fmt.currency(c.spend / c.leads) : '—';
+    const pctBudget = c.budget > 0 ? Math.min(Math.round((c.spend/c.budget)*100), 100) : 0;
+
+    return `
+      <div class="campaign-card" onclick="openEditCampaign(${c.id})">
+        <div class="campaign-platform">
+          <div class="platform-icon" style="background:${pi.color}18;font-size:20px">${pi.icon}</div>
+          <div>
+            <div class="campaign-name">${c.name}</div>
+            <div class="campaign-client">${c.client} · ${pi.name}</div>
+          </div>
+          <span class="badge ${si.cls}" style="margin-left:auto">${si.label}</span>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <div class="flex items-center justify-between" style="margin-bottom:4px">
+            <span class="text-muted text-sm">Orçamento utilizado</span>
+            <span style="font-size:11px;font-weight:700;color:${pctBudget>=90?'var(--red)':pctBudget>=70?'var(--yellow)':'var(--green)'}">${pctBudget}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pctBudget}%;background:${pctBudget>=90?'var(--red)':pctBudget>=70?'var(--yellow)':'var(--accent)'}"></div>
+          </div>
+          <div class="flex items-center justify-between mt-1">
+            <span style="font-size:10px;color:var(--text-muted)">${fmt.currency(c.spend)} gasto</span>
+            <span style="font-size:10px;color:var(--text-muted)">${fmt.currency(c.budget)} orçamento</span>
+          </div>
+        </div>
+
+        <div class="campaign-metrics">
+          <div class="metric-item">
+            <div class="metric-label">Leads</div>
+            <div class="metric-value" style="color:var(--blue)">${c.leads}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">CPL</div>
+            <div class="metric-value" style="color:var(--green)">${cpl}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">Cliques</div>
+            <div class="metric-value">${(c.clicks||0).toLocaleString('pt-BR')}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">Impressões</div>
+            <div class="metric-value">${c.impressions > 999 ? (c.impressions/1000).toFixed(1)+'k' : c.impressions}</div>
+          </div>
+        </div>
+
+        ${c.notes ? `<div class="text-muted text-sm mt-2" style="padding-top:10px;border-top:1px solid var(--border)">💬 ${c.notes}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function renderMetrics() {
+  // Tabela
+  document.getElementById('metrics-tbody').innerHTML = campaigns.map(c => {
+    const pi = PLATFORM_INFO[c.platform] || { icon:'📊' };
+    const cpl  = c.leads > 0 ? fmt.currency(c.spend/c.leads) : '—';
+    const ctr  = c.impressions > 0 ? ((c.clicks/c.impressions)*100).toFixed(2)+'%' : '—';
+    const roas = c.spend > 0 ? ((c.leads*500)/c.spend).toFixed(1)+'x' : '—';
+    return `<tr>
+      <td><div class="td-main">${c.client}</div></td>
+      <td>${pi.icon} ${PLATFORM_INFO[c.platform]?.name||c.platform}</td>
+      <td style="font-weight:700;color:var(--red)">${fmt.currency(c.spend)}</td>
+      <td>${(c.impressions||0).toLocaleString('pt-BR')}</td>
+      <td>${(c.clicks||0).toLocaleString('pt-BR')} <span class="text-muted text-sm">(${ctr})</span></td>
+      <td style="font-weight:700;color:var(--blue)">${c.leads||0}</td>
+      <td style="font-weight:700;color:var(--green)">${cpl}</td>
+      <td style="font-weight:700;color:var(--accent)">${roas}</td>
+    </tr>`;
+  }).join('');
+
+  // Por plataforma
+  const platData = {};
+  campaigns.forEach(c => {
+    if (!platData[c.platform]) platData[c.platform] = { spend:0, leads:0 };
+    platData[c.platform].spend += c.spend||0;
+    platData[c.platform].leads += c.leads||0;
+  });
+  const totalSpend = Object.values(platData).reduce((s,p)=>s+p.spend,0)||1;
+  document.getElementById('platform-breakdown').innerHTML = Object.entries(platData).map(([key, val]) => {
+    const pi = PLATFORM_INFO[key]||{ icon:'📊', name:key };
+    const pct = Math.round((val.spend/totalSpend)*100);
+    return `<div style="margin-bottom:14px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600">${pi.icon} ${pi.name}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--red)">${fmt.currency(val.spend)} <span style="color:var(--text-muted);font-weight:400">(${val.leads} leads)</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Metas
+  const totalLeads = campaigns.reduce((s,c)=>s+(c.leads||0),0);
+  const meta = 150;
+  const pctLeads = Math.round((totalLeads/meta)*100);
+  const totalBudget = campaigns.reduce((s,c)=>s+(c.budget||0),0);
+  const totalSpendAll = campaigns.reduce((s,c)=>s+(c.spend||0),0);
+  const pctSpend = totalBudget > 0 ? Math.round((totalSpendAll/totalBudget)*100) : 0;
+  document.getElementById('monthly-goals').innerHTML = `
+    <div style="margin-bottom:18px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600">Meta de Leads</span>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${totalLeads} / ${meta} <span style="color:var(--text-muted);font-size:11px">(${pctLeads}%)</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pctLeads,100)}%"></div></div>
+    </div>
+    <div style="margin-bottom:18px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600">Uso de Orçamento</span>
+        <span style="font-size:13px;font-weight:700;color:var(--yellow)">${fmt.currency(totalSpendAll)} / ${fmt.currency(totalBudget)} <span style="color:var(--text-muted);font-size:11px">(${pctSpend}%)</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(pctSpend,100)}%;background:var(--yellow)"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+      ${[
+        {l:'CPL Médio', v: totalLeads>0?fmt.currency(totalSpendAll/totalLeads):'—', c:'var(--green)'},
+        {l:'CTR Médio', v: (campaigns.reduce((s,c)=>s+(c.impressions||0),0)>0 ? ((campaigns.reduce((s,c)=>s+(c.clicks||0),0)/campaigns.reduce((s,c)=>s+(c.impressions||0),0))*100).toFixed(2)+'%' : '—'), c:'var(--blue)'},
+      ].map(k=>`<div class="fin-card" style="padding:12px"><div class="fin-card-label">${k.l}</div><div style="font-size:18px;font-weight:800;color:${k.c}">${k.v}</div></div>`).join('')}
+    </div>`;
+}
+
+function filterContent() {
+  const client = document.getElementById('filter-client-content').value;
+  const status = document.getElementById('filter-status-content').value;
+  renderContent(contents.filter(c => (!client || c.client===client) && (!status || c.status===status)));
+}
+
+function renderContent(items) {
+  const grid = document.getElementById('content-grid');
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📅</div><h3>Sem conteúdo</h3></div>`;
+    return;
+  }
+  grid.innerHTML = items.map(c => {
+    const si = STATUS_CONT[c.status]||{ label:c.status, cls:'badge-muted', icon:'📝' };
+    const platformIcons = { Instagram:'📸', Facebook:'📘', LinkedIn:'💼', TikTok:'🎵' };
+    const isOverdue = c.status !== 'published' && c.date && new Date(c.date+'T23:59:59') < new Date();
+    return `
+      <div class="card" style="padding:16px;transition:all 0.18s;${isOverdue?'border-color:rgba(239,68,68,0.3)':''}"
+        onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='var(--shadow-md)'"
+        onmouseleave="this.style.transform='';this.style.boxShadow=''">
+        <div class="flex items-center justify-between mb-2">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:16px">${platformIcons[c.platform]||'📱'}</span>
+            <span style="font-size:11px;color:var(--text-muted);font-weight:600">${c.platform} · ${c.format}</span>
+          </div>
+          <span class="badge ${si.cls}">${si.label}</span>
+        </div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">${c.title}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${c.client}</div>
+        ${c.desc ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.desc}</div>` : ''}
+        <div style="font-size:11px;color:${isOverdue?'var(--red)':'var(--text-muted)'}">
+          📅 ${fmt.date(c.date)} ${fmt.relative(c.date) ? '· '+fmt.relative(c.date) : ''} ${isOverdue?'⚠️ Atrasado':''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ---- Modais Campanha ----
+function openCampaignModal() {
+  document.getElementById('camp-modal-title').textContent = 'Nova Campanha';
+  document.getElementById('camp-id').value = '';
+  ['camp-name','camp-client','camp-budget','camp-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('camp-platform').value = 'google';
+  document.getElementById('camp-status').value = 'active';
+  document.getElementById('camp-objective').value = 'Geração de Leads';
+  document.getElementById('camp-delete-btn').style.display = 'none';
+  document.getElementById('campaign-modal').classList.add('show');
+}
+
+function openEditCampaign(id) {
+  const c = campaigns.find(x=>x.id===id);
+  if (!c) return;
+  document.getElementById('camp-modal-title').textContent = 'Editar Campanha';
+  document.getElementById('camp-id').value = c.id;
+  document.getElementById('camp-name').value = c.name||'';
+  document.getElementById('camp-client').value = c.client||'';
+  document.getElementById('camp-platform').value = c.platform||'google';
+  document.getElementById('camp-status').value = c.status||'active';
+  document.getElementById('camp-budget').value = c.budget||'';
+  document.getElementById('camp-objective').value = c.objective||'Geração de Leads';
+  document.getElementById('camp-notes').value = c.notes||'';
+  document.getElementById('camp-delete-btn').style.display = 'inline-flex';
+  document.getElementById('campaign-modal').classList.add('show');
+}
+
+function closeCampaignModal() { document.getElementById('campaign-modal').classList.remove('show'); }
+
+function saveCampaign() {
+  const id   = document.getElementById('camp-id').value;
+  const name = document.getElementById('camp-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+  const data = { name, client:document.getElementById('camp-client').value.trim(), platform:document.getElementById('camp-platform').value, status:document.getElementById('camp-status').value, budget:Number(document.getElementById('camp-budget').value)||0, objective:document.getElementById('camp-objective').value, notes:document.getElementById('camp-notes').value.trim() };
+  if (id) {
+    const idx = campaigns.findIndex(c=>c.id==id);
+    if (idx>=0) campaigns[idx] = { ...campaigns[idx], ...data };
+    showToast('Campanha atualizada!', 'success');
+  } else {
+    campaigns.unshift({ ...data, id:Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
+    showToast('Campanha criada!', 'success');
+  }
+  closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
+}
+
+function deleteCampaign() {
+  const id = document.getElementById('camp-id').value;
+  if (!id || !confirm('Excluir campanha?')) return;
+  campaigns = campaigns.filter(c=>c.id!=id);
+  closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
+  showToast('Campanha excluída.', 'info');
+}
+
+// ---- Modal Conteúdo ----
+function openContentModal() { document.getElementById('content-modal').classList.add('show'); }
+function closeContentModal() { document.getElementById('content-modal').classList.remove('show'); }
+
+function saveContent() {
+  const title = document.getElementById('cont-title').value.trim();
+  if (!title) { showToast('Título é obrigatório.', 'error'); return; }
+  const data = { id:Date.now(), title, client:document.getElementById('cont-client').value, platform:document.getElementById('cont-platform').value, format:document.getElementById('cont-format').value, date:document.getElementById('cont-date').value, status:document.getElementById('cont-status').value, desc:document.getElementById('cont-desc').value.trim() };
+  contents.unshift(data);
+  closeContentModal();
+  filterContent();
+  showToast('Conteúdo adicionado!', 'success');
+}
+
+document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
+document.getElementById('content-modal').addEventListener('click', e => { if (e.target===document.getElementById('content-modal')) closeContentModal(); });
+
+// Init
+updateKPIs();
+renderCampaigns();
+renderMetrics();
+renderContent(contents);
+</script>
+</body>
+</html>

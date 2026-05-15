@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funil de Vendas — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Principal</div>
+      <a href="dashboard.html" class="nav-item" data-page="dashboard.html"><span class="nav-icon">⬛</span> Dashboard</a>
+      <a href="funil.html" class="nav-item" data-page="funil.html"><span class="nav-icon">◈</span> Funil de Vendas</a>
+      <a href="leads.html" class="nav-item" data-page="leads.html"><span class="nav-icon">◉</span> Gestão de Leads</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operações</div>
+      <a href="tarefas.html" class="nav-item" data-page="tarefas.html"><span class="nav-icon">✓</span> Tarefas</a>
+      <a href="clientes.html" class="nav-item" data-page="clientes.html"><span class="nav-icon">★</span> Clientes</a>
+      <a href="financeiro.html" class="nav-item" data-page="financeiro.html"><span class="nav-icon">$</span> Financeiro</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Funil de Vendas</h1>
+      <p id="funnel-subtitle">Kanban de oportunidades</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item">
+          <span class="clock-tz">🇧🇷 Brasil</span>
+          <span class="clock-time" id="clock-br">--:--:--</span>
+        </div>
+        <div class="clock-divider"></div>
+        <div class="clock-item">
+          <span class="clock-tz">🇺🇸 EUA (ET)</span>
+          <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">+ Novo Lead</button>
+    </div>
+  </header>
+
+  <main class="page-content" style="overflow-x:auto;">
+    <div class="kanban-board animate-in" id="kanban-board">
+      <!-- colunas geradas pelo JS -->
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: Novo / Editar Lead -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Novo Lead</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lead-id">
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" class="form-control" id="lead-name" placeholder="Nome do contato">
+        </div>
+        <div class="form-group">
+          <label>Empresa</label>
+          <input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" class="form-control" id="lead-email" placeholder="email@empresa.com">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" class="form-control" id="lead-phone" placeholder="+55 11 99999-9999">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Valor Estimado</label>
+          <input type="number" class="form-control" id="lead-value" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Origem</label>
+          <select class="form-control filter-select" id="lead-origin" style="padding:10px 14px;appearance:none">
+            <option value="">Selecione</option>
+            <option>LinkedIn</option>
+            <option>Instagram</option>
+            <option>Google Ads</option>
+            <option>Facebook</option>
+            <option>Indicação</option>
+            <option>Referência</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Responsável</label>
+          <select class="form-control filter-select" id="lead-responsible" style="padding:10px 14px;appearance:none">
+            <option>Daniel</option>
+            <option>Lucas</option>
+            <option>Gabriel</option>
+            <option>Thamyris</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estágio</label>
+          <select class="form-control filter-select" id="lead-stage" style="padding:10px 14px;appearance:none">
+            <option value="novo">Novo Lead</option>
+            <option value="contato">Contato Feito</option>
+            <option value="reuniao">Reunião Agendada</option>
+            <option value="proposta">Proposta Enviada</option>
+            <option value="fechado">Fechado</option>
+            <option value="perdido">Perdido</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="lead-notes" rows="3" placeholder="Notas sobre o lead…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deleteLead()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage();
+if (!session) throw new Error('Not authenticated');
+
+const STAGES = [
+  { key:'novo',     label:'Novo Lead',         color:'#6366f1', dot:'#6366f1' },
+  { key:'contato',  label:'Contato Feito',      color:'#3b82f6', dot:'#3b82f6' },
+  { key:'reuniao',  label:'Reunião Agendada',   color:'#a855f7', dot:'#a855f7' },
+  { key:'proposta', label:'Proposta Enviada',   color:'#f97316', dot:'#f97316' },
+  { key:'fechado',  label:'Fechado',            color:'#22c55e', dot:'#22c55e' },
+  { key:'perdido',  label:'Perdido',            color:'#ef4444', dot:'#ef4444' },
+];
+
+let leads = [];
+let draggedId = null;
+
+const DEMO_LEADS = [
+  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', created_at:'2026-05-10T10:00:00' },
+  { id:2, name:'Sarah Johnson',   company:'US Digital LLC', stage:'reuniao',  value:8200, responsible:'Lucas', origin:'Indicação', created_at:'2026-05-08T14:30:00' },
+  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo', stage:'contato', value:2800, responsible:'Gabriel', origin:'Instagram', created_at:'2026-05-12T09:15:00' },
+  { id:4, name:'Robert Davis',    company:'GrowthX Agency', stage:'fechado',  value:12000, responsible:'Lucas', origin:'Google Ads', created_at:'2026-05-01T11:00:00' },
+  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', stage:'novo',    value:3200, responsible:'Gabriel', origin:'Referência', created_at:'2026-05-14T08:00:00' },
+  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+', stage:'perdido',  value:1800, responsible:'Gabriel', origin:'Facebook', created_at:'2026-05-03T16:00:00' },
+  { id:7, name:'Marcos Souza',    company:'TechStar',        stage:'novo',    value:5500, responsible:'Daniel', origin:'LinkedIn', created_at:'2026-05-13T10:00:00' },
+];
+
+async function loadLeads() {
+  if (window.drSupabase) {
+    try {
+      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending: false });
+      if (!error && data?.length) { leads = data; }
+      else leads = DEMO_LEADS;
+    } catch { leads = DEMO_LEADS; }
+  } else {
+    leads = DEMO_LEADS;
+  }
+  renderBoard();
+  updateSubtitle();
+}
+
+function updateSubtitle() {
+  const active = leads.filter(l => !['fechado','perdido'].includes(l.stage));
+  const totalValue = active.reduce((s,l) => s + (Number(l.value)||0), 0);
+  document.getElementById('funnel-subtitle').textContent =
+    `${active.length} oportunidades ativas · Pipeline: ${fmt.currency(totalValue)}`;
+}
+
+function renderBoard() {
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = STAGES.map(stage => {
+    const stageLeads = leads.filter(l => l.stage === stage.key);
+    const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
+
+    const cards = stageLeads.map(l => buildCard(l)).join('');
+
+    return `
+      <div class="kanban-col" id="col-${stage.key}">
+        <div class="kanban-col-header">
+          <div class="col-dot" style="background:${stage.dot}"></div>
+          <span class="col-title">${stage.label}</span>
+          <span class="col-count">${stageLeads.length}</span>
+        </div>
+        ${stage.key !== 'perdido' ? `<div style="padding:6px 10px 2px;font-size:11px;font-weight:600;color:var(--text-muted)">${fmt.currency(stageValue)}</div>` : ''}
+        <div class="kanban-cards"
+          id="cards-${stage.key}"
+          ondragover="onDragOver(event)"
+          ondragleave="onDragLeave(event)"
+          ondrop="onDrop(event,'${stage.key}')">
+          ${cards || `<div style="padding:8px;text-align:center;font-size:11px;color:var(--text-muted);opacity:0.5">Arraste aqui</div>`}
+        </div>
+        <div style="padding:8px 10px 10px">
+          <button class="btn btn-ghost btn-sm w-full" onclick="openNewLeadModal('${stage.key}')">+ Adicionar</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function buildCard(lead) {
+  const now   = new Date();
+  const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
+  const usTime = now.toLocaleTimeString('en-US', { timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', hour12:true });
+  const created = new Date(lead.created_at);
+  const daysAgo = Math.floor((now - created) / 86400000);
+
+  return `
+    <div class="lead-card"
+      draggable="true"
+      id="card-${lead.id}"
+      ondragstart="onDragStart(event,${lead.id})"
+      ondragend="onDragEnd(event)"
+      onclick="openEditModal(${lead.id})">
+      <div class="lead-card-top">
+        <div>
+          <div class="lead-card-name">${lead.name}</div>
+          <div class="lead-card-company">${lead.company || '—'}</div>
+        </div>
+        ${lead.value ? `<div class="lead-card-value">${fmt.currency(lead.value)}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+        <div class="avatar avatar-sm avatar-${fmt.avatarClass(lead.responsible)}">${fmt.initials(lead.responsible)}</div>
+        <span style="font-size:11px;color:var(--text-muted)">${lead.responsible}</span>
+        ${lead.origin ? `<span class="badge badge-muted" style="margin-left:auto;font-size:10px">${lead.origin}</span>` : ''}
+      </div>
+      <div class="lead-card-meta">
+        <div class="lead-card-dates">
+          <strong>🇧🇷 ${brTime} &nbsp; 🇺🇸 ${usTime}</strong>
+          <span>Há ${daysAgo === 0 ? 'hoje' : daysAgo + 'd'}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ---- Drag & Drop ----
+function onDragStart(e, id) {
+  draggedId = id;
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over'));
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+async function onDrop(e, stage) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!draggedId) return;
+
+  const lead = leads.find(l => l.id === draggedId);
+  if (!lead || lead.stage === stage) return;
+
+  lead.stage = stage;
+
+  if (window.drSupabase) {
+    await window.drSupabase.from('leads').update({ stage, updated_at: new Date().toISOString() }).eq('id', draggedId);
+  }
+
+  renderBoard();
+  updateSubtitle();
+  showToast(`Lead movido para "${STAGES.find(s=>s.key===stage)?.label}"`, 'success');
+  draggedId = null;
+}
+
+// ---- Modal ----
+function openNewLeadModal(stage = 'novo') {
+  document.getElementById('modal-title').textContent = 'Novo Lead';
+  document.getElementById('lead-id').value = '';
+  document.getElementById('lead-name').value = '';
+  document.getElementById('lead-company').value = '';
+  document.getElementById('lead-email').value = '';
+  document.getElementById('lead-phone').value = '';
+  document.getElementById('lead-value').value = '';
+  document.getElementById('lead-origin').value = '';
+  document.getElementById('lead-notes').value = '';
+  document.getElementById('lead-stage').value = stage;
+  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function openEditModal(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+
+  document.getElementById('modal-title').textContent = 'Editar Lead';
+  document.getElementById('lead-id').value = lead.id;
+  document.getElementById('lead-name').value = lead.name || '';
+  document.getElementById('lead-company').value = lead.company || '';
+  document.getElementById('lead-email').value = lead.email || '';
+  document.getElementById('lead-phone').value = lead.phone || '';
+  document.getElementById('lead-value').value = lead.value || '';
+  document.getElementById('lead-origin').value = lead.origin || '';
+  document.getElementById('lead-notes').value = lead.notes || '';
+  document.getElementById('lead-stage').value = lead.stage;
+  document.getElementById('lead-responsible').value = lead.responsible || 'Daniel';
+  document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('lead-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('lead-modal').classList.remove('show');
+}
+
+async function saveLead() {
+  const id = document.getElementById('lead-id').value;
+  const name = document.getElementById('lead-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+
+  const data = {
+    name,
+    company:     document.getElementById('lead-company').value.trim(),
+    email:       document.getElementById('lead-email').value.trim(),
+    phone:       document.getElementById('lead-phone').value.trim(),
+    value:       Number(document.getElementById('lead-value').value) || null,
+    origin:      document.getElementById('lead-origin').value,
+    notes:       document.getElementById('lead-notes').value.trim(),
+    stage:       document.getElementById('lead-stage').value,
+    responsible: document.getElementById('lead-responsible').value,
+    updated_at:  new Date().toISOString(),
+  };
+
+  if (id) {
+    // Update
+    if (window.drSupabase) {
+      await window.drSupabase.from('leads').update(data).eq('id', id);
+    }
+    const idx = leads.findIndex(l => l.id == id);
+    if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
+    showToast('Lead atualizado!', 'success');
+  } else {
+    // Insert
+    data.created_at = new Date().toISOString();
+    const newId = Date.now();
+    if (window.drSupabase) {
+      const { data: inserted } = await window.drSupabase.from('leads').insert(data).select().single();
+      if (inserted) leads.unshift(inserted);
+    } else {
+      leads.unshift({ ...data, id: newId });
+    }
+    showToast('Lead criado!', 'success');
+  }
+
+  closeModal();
+  renderBoard();
+  updateSubtitle();
+}
+
+async function deleteLead() {
+  const id = document.getElementById('lead-id').value;
+  if (!id || !confirm('Tem certeza que deseja excluir este lead?')) return;
+
+  if (window.drSupabase) {
+    await window.drSupabase.from('leads').delete().eq('id', id);
+  }
+  leads = leads.filter(l => l.id != id);
+  closeModal();
+  renderBoard();
+  updateSubtitle();
+  showToast('Lead excluído.', 'info');
+}
+
+document.getElementById('lead-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('lead-modal')) closeModal();
+});
+
+loadLeads();
+</script>
+</body>
+</html>

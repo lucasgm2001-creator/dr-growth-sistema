@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hall — DR Growth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="hall-page">
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- SIDEBAR / ELEVADOR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand">
+      <h2>DR Growth</h2>
+      <span>Sistema de Gestão</span>
+    </div>
+  </div>
+
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
+
+  <div class="sidebar-footer">
+    <div class="user-profile" id="user-profile"></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-content">
+  <header class="topbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="topbar-title">
+      <h1>Hall</h1>
+      <p>Recepção · DR Growth</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="clock-row">
+        <div class="clock-item">
+          <span class="clock-tz">🇧🇷 São Paulo</span>
+          <span class="clock-time" id="clock-br">--:--:--</span>
+        </div>
+        <div class="clock-divider"></div>
+        <div class="clock-item">
+          <span class="clock-tz">🇺🇸 New York</span>
+          <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Saudação -->
+    <div class="hall-greeting animate-in">
+      <div class="hall-greeting-inner">
+        <div class="greeting-text">
+          <h1 id="greeting-msg">Bom dia, <span id="greeting-name">—</span> 👋</h1>
+          <p id="greeting-sub">Aqui estão as novidades de hoje na DR Growth.</p>
+        </div>
+        <div class="greeting-date">
+          <div class="date-main" id="greeting-date">—</div>
+          <div class="date-sub" id="greeting-weekday">—</div>
+          <div class="clock-row mt-2" style="justify-content:flex-end">
+            <div class="clock-item" style="align-items:flex-end">
+              <span class="clock-tz">🇧🇷</span>
+              <span class="clock-time" style="font-size:18px;font-weight:800" id="clock-hero-br">--:--</span>
+            </div>
+            <div class="clock-divider"></div>
+            <div class="clock-item" style="align-items:flex-end">
+              <span class="clock-tz">🇺🇸</span>
+              <span class="clock-time" style="font-size:18px;font-weight:800" id="clock-hero-us">--:--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid principal -->
+    <div class="hall-grid">
+
+      <!-- Coluna esquerda: Feed -->
+      <div>
+        <div class="feed-card animate-in" style="animation-delay:0.1s">
+          <div class="feed-header">
+            <div class="feed-live-dot"></div>
+            <h3>O que aconteceu</h3>
+            <span class="text-muted text-sm" id="feed-time-range">Últimas 24h</span>
+          </div>
+          <div class="feed-list" id="feed-list">
+            <div class="empty-state" style="padding:32px">
+              <div class="empty-icon">📡</div>
+              <p>Carregando novidades…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: Mural + Time -->
+      <div>
+
+        <!-- Mural de Avisos -->
+        <div class="mural-card animate-in" style="animation-delay:0.15s">
+          <div class="mural-header">
+            <h3>📌 Mural de Avisos</h3>
+            <span id="aviso-admin-btn"></span>
+          </div>
+          <div id="mural-list">
+            <div class="empty-state" style="padding:24px">
+              <div class="empty-icon">📌</div>
+              <p>Sem avisos no momento.</p>
+            </div>
+          </div>
+          <div class="aviso-form" id="aviso-form" style="display:none">
+            <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
+            <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
+          </div>
+        </div>
+
+        <!-- Time hoje -->
+        <div class="team-card animate-in" style="animation-delay:0.2s">
+          <div class="team-header">
+            <h3>👥 Time hoje</h3>
+          </div>
+          <div id="team-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script>
+const session = initPage('hall.html');
+if (!session) throw new Error('Not authenticated');
+
+// ---- Saudação dinâmica ----
+function setGreeting() {
+  const h = new Date().getHours();
+  const period = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  const emoji  = h < 12 ? '☀️' : h < 18 ? '🌤️' : '🌙';
+  const firstName = session.name.split(' ')[0];
+
+  document.getElementById('greeting-msg').innerHTML =
+    `${period}, <span>${firstName}</span> ${emoji}`;
+
+  const subs = {
+    admin:     'Você tem acesso total ao sistema. Bom trabalho!',
+    comercial: 'Confira os leads e oportunidades no setor Comercial.',
+    trafego:   'Suas campanhas e métricas estão no setor Tráfego.',
+    financeiro:'O financeiro e os contratos estão te esperando.',
+  };
+  document.getElementById('greeting-sub').textContent =
+    subs[session.role] || 'Aqui estão as novidades de hoje na DR Growth.';
+}
+
+function updateDates() {
+  const now = new Date();
+  const dayNames = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const monthNames = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+  document.getElementById('greeting-date').textContent =
+    `${now.getDate()} de ${monthNames[now.getMonth()]} de ${now.getFullYear()}`;
+  document.getElementById('greeting-weekday').textContent = dayNames[now.getDay()];
+
+  const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
+  const usTime = now.toLocaleTimeString('en-US', { timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', hour12:true });
+  document.getElementById('clock-hero-br').textContent = brTime;
+  document.getElementById('clock-hero-us').textContent = usTime;
+}
+
+setGreeting();
+updateDates();
+setInterval(updateDates, 30000);
+
+// ---- Feed de novidades ----
+const FEED_DEMO = [
+  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Marcos Souza</strong> adicionado ao funil', who:'Lucas', time: new Date(Date.now() - 15*60000).toISOString() },
+  { type:'payment', icon:'💰', color:'#22c55e', msg:'Pagamento de <strong>GrowthX Agency — R$12.000</strong> confirmado', who:'Thamyris', time: new Date(Date.now() - 45*60000).toISOString() },
+  { type:'task',    icon:'✅', color:'#22c55e', msg:'Tarefa <strong>Follow-up Sarah Johnson</strong> concluída', who:'Lucas', time: new Date(Date.now() - 90*60000).toISOString() },
+  { type:'campaign',icon:'📊', color:'#a855f7', msg:'Campanha <strong>Google Ads — MedTech</strong> otimizada', who:'Gabriel', time: new Date(Date.now() - 2*3600000).toISOString() },
+  { type:'lead',    icon:'📈', color:'#3b82f6', msg:'Lead <strong>Sarah Johnson</strong> movido para Reunião Agendada', who:'Lucas', time: new Date(Date.now() - 3*3600000).toISOString() },
+  { type:'client',  icon:'⭐', color:'#f59e0b', msg:'Cliente <strong>US Digital LLC</strong> marcado como atenção', who:'Gabriel', time: new Date(Date.now() - 5*3600000).toISOString() },
+  { type:'task',    icon:'📋', color:'#6366f1', msg:'Tarefa <strong>Configurar campanhas Google Ads</strong> em andamento', who:'Gabriel', time: new Date(Date.now() - 7*3600000).toISOString() },
+  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Paulo Andrade</strong> de E-commerce Plus entrou no funil', who:'Gabriel', time: new Date(Date.now() - 18*3600000).toISOString() },
+  { type:'payment', icon:'⚠️', color:'#ef4444', msg:'Pagamento de <strong>US Digital LLC — R$8.200</strong> está em atraso', who:'Sistema', time: new Date(Date.now() - 24*3600000).toISOString() },
+];
+
+function renderFeed(items) {
+  if (!items.length) {
+    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3><p>Nenhuma novidade nas últimas 24h.</p></div>`;
+    return;
+  }
+
+  document.getElementById('feed-list').innerHTML = items.map((item, i) => `
+    <div class="feed-item animate-in" style="animation-delay:${i * 0.04}s">
+      <div class="feed-icon" style="background:${item.color}18;font-size:18px">${item.icon}</div>
+      <div class="feed-content">
+        <div class="feed-msg">${item.msg}</div>
+        <div class="feed-meta">
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(item.who)}">${fmt.initials(item.who)}</div>
+          ${item.who}
+        </div>
+      </div>
+      <div class="feed-time">${fmt.timeAgo(item.time)}</div>
+    </div>`).join('');
+}
+
+// ---- Mural de Avisos ----
+const AVISOS_DEFAULT = [
+  { id:1, text:'Reunião de alinhamento toda segunda às 9h (BR) / 8h (ET). Link no grupo do WhatsApp.', author:'Daniel', pinned:true, time: new Date(Date.now() - 2*86400000).toISOString() },
+  { id:2, text:'Prazo para envio de NFs: todo dia 20 do mês. Thamyris coordena.', author:'Daniel', pinned:false, time: new Date(Date.now() - 5*86400000).toISOString() },
+];
+
+function getAvisos() {
+  try {
+    const raw = localStorage.getItem('drg_avisos');
+    return raw ? JSON.parse(raw) : AVISOS_DEFAULT;
+  } catch { return AVISOS_DEFAULT; }
+}
+
+function saveAvisos(avisos) {
+  localStorage.setItem('drg_avisos', JSON.stringify(avisos));
+}
+
+function renderMural() {
+  const avisos = getAvisos();
+  const isAdmin = session.role === 'admin';
+
+  // Botão de novo aviso (só admin)
+  const adminBtn = document.getElementById('aviso-admin-btn');
+  if (isAdmin) {
+    adminBtn.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="toggleAvisoForm()">+ Novo</button>`;
+    document.getElementById('aviso-form').style.display = 'flex';
+  }
+
+  if (!avisos.length) {
+    document.getElementById('mural-list').innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📌</div><p>Sem avisos.</p></div>`;
+    return;
+  }
+
+  const sorted = [...avisos].sort((a,b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+  document.getElementById('mural-list').innerHTML = sorted.map(a => `
+    <div class="aviso-item">
+      ${a.pinned ? '<div class="aviso-pinned">📌 fixado</div>' : ''}
+      <div class="aviso-text">${a.text}</div>
+      <div class="aviso-author">
+        <div class="avatar avatar-sm avatar-${fmt.avatarClass(a.author)}">${fmt.initials(a.author)}</div>
+        ${a.author} · ${fmt.timeAgo(a.time)}
+        ${isAdmin ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px;margin-left:auto;color:var(--text-muted)" onclick="removeAviso(${a.id})">✕</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function toggleAvisoForm() {
+  const form = document.getElementById('aviso-form');
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+}
+
+function postAviso() {
+  const input = document.getElementById('aviso-input');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  const avisos = getAvisos();
+  avisos.unshift({ id: Date.now(), text, author: session.name.split(' ')[0], pinned: false, time: new Date().toISOString() });
+  saveAvisos(avisos);
+  input.value = '';
+  renderMural();
+  showToast('Aviso postado!', 'success');
+}
+
+function removeAviso(id) {
+  const avisos = getAvisos().filter(a => a.id !== id);
+  saveAvisos(avisos);
+  renderMural();
+}
+
+// Enter para postar aviso
+document.getElementById('aviso-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') postAviso();
+});
+
+// ---- Time hoje ----
+const TEAM = [
+  { name:'Daniel Rocha',   role:'Gestor / Dono',             color:'#6366f1', status:'online',  activity:'Revisando métricas' },
+  { name:'Lucas Moraes',   role:'Comercial EUA',              color:'#3b82f6', status:'online',  activity:'Follow-up de leads' },
+  { name:'Gabriel Silva',  role:'Tráfego & Marketing',        color:'#a855f7', status:'online',  activity:'Otimizando campanhas' },
+  { name:'Thamyris Costa', role:'Administrativo & Financeiro',color:'#22c55e', status:'away',    activity:'Emitindo NFs' },
+];
+
+const statusLabels = { online:'● Online', away:'◌ Ocupado', offline:'○ Offline' };
+const statusColors = { online:'var(--green)', away:'var(--yellow)', offline:'var(--text-muted)' };
+
+function renderTeam() {
+  document.getElementById('team-list').innerHTML = TEAM.map(m => `
+    <div class="team-member">
+      <div class="avatar" style="background:linear-gradient(135deg,${m.color},${m.color}88)">${fmt.initials(m.name)}</div>
+      <div class="team-member-info">
+        <div class="tm-name">${m.name}</div>
+        <div class="tm-role">${m.role}</div>
+        <div class="text-muted" style="font-size:11px;margin-top:2px">↳ ${m.activity}</div>
+      </div>
+      <div class="team-status" style="color:${statusColors[m.status]}">
+        ${statusLabels[m.status]}
+      </div>
+    </div>`).join('');
+}
+
+// ---- Init ----
+renderFeed(FEED_DEMO);
+renderMural();
+renderTeam();
+</script>
+</body>
+</html>
