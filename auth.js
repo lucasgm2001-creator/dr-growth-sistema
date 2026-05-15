@@ -359,6 +359,49 @@ function initPage(currentPage) {
   return session;
 }
 
+// ============================================================
+//  Country Selector
+// ============================================================
+function initCountrySelector(module, onRefresh) {
+  const key = 'drg_country_' + module;
+  let current = localStorage.getItem(key) || 'all';
+
+  const el = document.getElementById('country-selector');
+  if (!el) return;
+
+  const options = [
+    { id:'all', flag:'🌐', label:'Todos', desc:'Visão consolidada' },
+    { id:'br',  flag:'🇧🇷', label:'Brasil', desc:'Operação BR' },
+    { id:'us',  flag:'🇺🇸', label:'EUA', desc:'US Operation' },
+  ];
+
+  el.className = 'country-selector animate-in';
+  el.innerHTML = options.map(o => `
+    <div class="country-card ${current === o.id ? 'active' : ''}" data-country="${o.id}">
+      <span class="country-card-flag">${o.flag}</span>
+      <div>
+        <div class="country-card-name">${o.label}</div>
+        <div class="country-card-desc">${o.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('.country-card').forEach(card => {
+    card.addEventListener('click', () => {
+      current = card.dataset.country;
+      localStorage.setItem(key, current);
+      el.querySelectorAll('.country-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      window._currentCountry = current;
+      if (onRefresh) onRefresh(current);
+    });
+  });
+
+  window._currentCountry = current;
+  window.filterByCountry = (items) =>
+    current === 'all' ? items : items.filter(i => !i.country || i.country === current);
+}
+
 // Expõe globalmente
 window.AUTH       = AUTH;
 window.SECTIONS   = SECTIONS;
@@ -366,3 +409,4 @@ window.fmt        = fmt;
 window.initPage   = initPage;
 window.showToast  = showToast;
 window.renderElevator = renderElevator;
+window.initCountrySelector = initCountrySelector;
