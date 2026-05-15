@@ -125,6 +125,36 @@
       </div>
     </div>
 
+    <!-- TAB: Comissões -->
+    <div class="tab-panel" id="tab-comissoes">
+      <div class="animate-in mt-2">
+
+        <div id="comissao-admin-bar" style="display:none" class="filter-bar mb-3">
+          <span style="font-weight:600;font-size:13px;color:var(--text-secondary)">🔑 Edição de comissões (somente admin)</span>
+          <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openComissaoModal()">+ Ajustar Taxa</button>
+        </div>
+
+        <!-- Cards por vendedor -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px" id="comissao-cards"></div>
+
+        <!-- Tabela de comissões detalhada -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Histórico de Comissões</span>
+            <span class="text-muted text-sm" id="comissao-period">Maio / 2026</span>
+          </div>
+          <div class="table-container" style="border:none;border-radius:0">
+            <table>
+              <thead>
+                <tr><th>Vendedor</th><th>Cliente Fechado</th><th>Valor Contrato</th><th>Taxa (%)</th><th>Comissão</th><th>Status</th></tr>
+              </thead>
+              <tbody id="comissao-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB: Pipeline -->
     <div class="tab-panel" id="tab-pipeline">
       <div class="grid-2 mt-2 animate-in">
