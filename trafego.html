@@ -675,6 +675,62 @@ function renderContent(items) {
   }).join('');
 }
 
+// ---- Detalhe Campanha ----
+let _detailCampaignId = null;
+
+function openCampaignDetail(id) {
+  const c = campaigns.find(x => x.id === id);
+  if (!c) return;
+  _detailCampaignId = id;
+
+  const pi = PLATFORM_INFO[c.platform] || { icon:'📊', name:c.platform, color:'#6366f1' };
+  const si = STATUS_CAMP[c.status]     || { label:c.status, cls:'badge-muted' };
+  const cpl  = c.leads > 0  ? fmt.currency(c.spend / c.leads) : '—';
+  const roas = c.spend > 0  ? ((c.leads * 500) / c.spend).toFixed(1) + 'x' : '—';
+  const ctr  = c.impressions > 0 ? ((c.clicks / c.impressions) * 100).toFixed(2) + '%' : '—';
+  const pctB = c.budget > 0 ? Math.min(Math.round((c.spend / c.budget) * 100), 100) : 0;
+  const barColor = pctB >= 90 ? 'var(--red)' : pctB >= 70 ? 'var(--yellow)' : 'var(--accent)';
+
+  document.getElementById('detail-platform-icon').textContent = pi.icon;
+  document.getElementById('detail-camp-name').textContent     = c.name;
+  document.getElementById('detail-camp-client').textContent   = c.client + ' · ' + pi.name;
+  document.getElementById('detail-camp-status').textContent   = si.label;
+  document.getElementById('detail-camp-status').className     = 'badge ' + si.cls;
+
+  document.getElementById('detail-budget-pct').textContent    = pctB + '%';
+  document.getElementById('detail-budget-pct').style.color    = barColor;
+  document.getElementById('detail-budget-bar').style.width    = pctB + '%';
+  document.getElementById('detail-budget-bar').style.background = barColor;
+  document.getElementById('detail-budget-spent').textContent  = fmt.currency(c.spend) + ' gasto';
+  document.getElementById('detail-budget-total').textContent  = fmt.currency(c.budget) + ' orçamento';
+
+  document.getElementById('detail-leads').textContent       = c.leads || 0;
+  document.getElementById('detail-cpl').textContent         = cpl;
+  document.getElementById('detail-clicks').textContent      = (c.clicks || 0).toLocaleString('pt-BR');
+  document.getElementById('detail-roas').textContent        = roas;
+  document.getElementById('detail-impressions').textContent = c.impressions > 999 ? (c.impressions/1000).toFixed(1) + 'k' : (c.impressions || 0);
+  document.getElementById('detail-ctr').textContent         = ctr;
+  document.getElementById('detail-objective').textContent   = c.objective || '—';
+  document.getElementById('detail-platform-name').textContent = pi.name;
+
+  const notesWrap = document.getElementById('detail-notes-wrap');
+  if (c.notes) {
+    notesWrap.style.display = '';
+    document.getElementById('detail-notes-text').textContent = c.notes;
+  } else {
+    notesWrap.style.display = 'none';
+  }
+
+  document.getElementById('campaign-detail-modal').classList.add('show');
+}
+
+function closeCampaignDetail() { document.getElementById('campaign-detail-modal').classList.remove('show'); }
+
+function openEditFromDetail() {
+  closeCampaignDetail();
+  if (_detailCampaignId) openEditCampaign(_detailCampaignId);
+}
+
 // ---- Modais Campanha ----
 function openCampaignModal() {
   document.getElementById('camp-modal-title').textContent = 'Nova Campanha';
