@@ -316,7 +316,9 @@ function switchTab(name, btn) {
   btn.classList.add('active');
   const mb = document.getElementById('main-btn');
   if (name==='clientes') { mb.textContent='+ Cliente'; mb.onclick=openClientModal; mb.style.display=''; }
-  else { mb.textContent='+ Tarefa'; mb.onclick=openTaskModal; mb.style.display=''; }
+  else if (name==='tarefas') { mb.style.display='none'; }
+  else { mb.style.display='none'; }
+  if (name==='relatorio') initRelatorio();
 }
 
 async function loadData() {
