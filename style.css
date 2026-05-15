@@ -148,7 +148,7 @@ img { display: block; max-width: 100%; }
 .login-logo .logo-icon {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background: linear-gradient(135deg, var(--drg-navy), var(--drg-blue-mid));
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -239,7 +239,7 @@ img { display: block; max-width: 100%; }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background: linear-gradient(135deg, var(--drg-navy), var(--drg-blue-mid));
   color: white;
   border-color: transparent;
   box-shadow: 0 2px 12px rgba(99,102,241,0.35);
@@ -339,7 +339,7 @@ img { display: block; max-width: 100%; }
 .sidebar-logo {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background: linear-gradient(135deg, var(--drg-navy), var(--drg-blue-mid));
   border-radius: 8px;
   display: flex;
   align-items: center;
