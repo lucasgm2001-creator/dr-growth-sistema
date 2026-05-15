@@ -629,6 +629,94 @@ async function deleteTask() {
 
 document.getElementById('client-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('client-modal')) closeClientModal(); });
 document.getElementById('task-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('task-modal')) closeTaskModal(); });
+
+// ---- RELATÓRIO DIÁRIO ----
+function getRelatorios() {
+  try { return JSON.parse(localStorage.getItem('drg_relatorios') || '[]'); } catch { return []; }
+}
+function saveRelatorios(list) { localStorage.setItem('drg_relatorios', JSON.stringify(list)); }
+
+function initRelatorio() {
+  const isAdmin = session.role === 'admin';
+  const hoje = new Date().toLocaleDateString('pt-BR');
+  document.getElementById('relatorio-data-hoje').textContent = hoje;
+
+  // Mostrar filtro de autor só para admin
+  const filterWrap = document.querySelector('#tab-relatorio .card-header select');
+  if (filterWrap) filterWrap.style.display = isAdmin ? '' : 'none';
+
+  if (!isAdmin) {
+    document.getElementById('relatorios-titulo').textContent = 'Meus Relatórios';
+  }
+  renderRelatorios();
+}
+
+function enviarRelatorio() {
+  const ativ = document.getElementById('rel-atividades').value.trim();
+  if (!ativ) { showToast('Descreva pelo menos as atividades do dia.', 'error'); return; }
+  const rel = {
+    id: Date.now(),
+    autor: session.name,
+    data: new Date().toISOString().split('T')[0],
+    atividades: ativ,
+    pendencias: document.getElementById('rel-pendencias').value.trim(),
+    amanha: document.getElementById('rel-amanha').value.trim(),
+    criado_em: new Date().toISOString(),
+  };
+  const list = getRelatorios();
+  list.unshift(rel);
+  saveRelatorios(list);
+  ['rel-atividades','rel-pendencias','rel-amanha'].forEach(id=>document.getElementById(id).value='');
+  renderRelatorios();
+  showToast('Relatório enviado com sucesso!', 'success');
+}
+
+function renderRelatorios() {
+  const isAdmin = session.role === 'admin';
+  const autorFilter = isAdmin ? (document.getElementById('filter-rel-autor')?.value || '') : session.name;
+  let list = getRelatorios();
+  if (autorFilter) list = list.filter(r => r.autor === autorFilter);
+
+  const el = document.getElementById('relatorios-list');
+  if (!list.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📋</div><h3>Nenhum relatório</h3><p>Ainda não há relatórios ${autorFilter ? 'de '+autorFilter : ''}.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => `
+    <div class="task-item" style="flex-direction:column;align-items:flex-start;padding:16px">
+      <div class="flex items-center gap-2 mb-2 w-full">
+        <div class="avatar avatar-sm avatar-${fmt.avatarClass(r.autor.split(' ')[0])}">${fmt.initials(r.autor)}</div>
+        <strong>${r.autor}</strong>
+        <span class="badge badge-muted" style="font-size:10px">📅 ${fmt.date(r.data)}</span>
+        <span class="text-muted" style="font-size:11px;margin-left:auto">${fmt.timeAgo(r.criado_em)}</span>
+        ${isAdmin ? `<button class="btn btn-ghost btn-sm" style="font-size:10px;color:var(--red)" onclick="excluirRelatorio(${r.id})">✕</button>` : ''}
+      </div>
+      <div style="width:100%;display:grid;gap:10px">
+        <div style="background:var(--surface);border-radius:8px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px">✅ Atividades do dia</div>
+          <div style="font-size:13px;white-space:pre-wrap">${r.atividades}</div>
+        </div>
+        ${r.pendencias ? `<div style="background:rgba(239,68,68,0.06);border-radius:8px;padding:12px;border:1px solid rgba(239,68,68,0.15)">
+          <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:4px">⚠️ Pendências / Obstáculos</div>
+          <div style="font-size:13px;white-space:pre-wrap">${r.pendencias}</div>
+        </div>` : ''}
+        ${r.amanha ? `<div style="background:rgba(99,102,241,0.06);border-radius:8px;padding:12px;border:1px solid rgba(99,102,241,0.15)">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:4px">🎯 Prioridades para amanhã</div>
+          <div style="font-size:13px;white-space:pre-wrap">${r.amanha}</div>
+        </div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function excluirRelatorio(id) {
+  if (!confirm('Excluir este relatório?')) return;
+  const list = getRelatorios().filter(r=>r.id!==id);
+  saveRelatorios(list);
+  renderRelatorios();
+  showToast('Relatório excluído.', 'info');
+}
+
 loadData();
 </script>
 </body>
