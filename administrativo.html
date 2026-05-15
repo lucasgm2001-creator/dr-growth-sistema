@@ -472,6 +472,10 @@ async function toggleTask(id, e) {
   e.stopPropagation();
   const t = allTasks.find(x=>x.id===id);
   if (!t) return;
+  if (t.responsible !== session.name) {
+    showToast('Apenas o responsável pode alterar o status desta tarefa.', 'error');
+    return;
+  }
   t.status = t.status==='done'?'pending':'done';
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:t.status}).eq('id',id);
   updateTaskKPIs(); filterTasks();
@@ -482,6 +486,10 @@ async function updateTaskStatus(id, newStatus, e) {
   e.stopPropagation();
   const t = allTasks.find(x=>x.id===id);
   if (!t) return;
+  if (t.responsible !== session.name) {
+    showToast('Apenas o responsável pode alterar o status desta tarefa.', 'error');
+    return;
+  }
   t.status = newStatus;
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus}).eq('id',id);
   updateTaskKPIs(); filterTasks();
