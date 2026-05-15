@@ -451,8 +451,9 @@ function filterTasks() {
 }
 
 function renderTasksList(tasks) {
+  const isAdmin = session.role === 'admin';
   document.getElementById('tasks-count').textContent = `${tasks.length} tarefas`;
-  if (!tasks.length) { document.getElementById('tasks-list').innerHTML=`<div class="empty-state"><div class="empty-icon">✓</div><h3>Nenhuma tarefa</h3></div>`; return; }
+  if (!tasks.length) { document.getElementById('tasks-list').innerHTML=`<div class="empty-state"><div class="empty-icon">✓</div><h3>Nenhuma tarefa</h3><p>${isAdmin?'Crie uma tarefa para começar.':'Sem tarefas atribuídas a você.'}</p></div>`; return; }
   const groups = { in_progress:[], pending:[], done:[] };
   tasks.forEach(t=>{ (groups[t.status]||groups.pending).push(t); });
   let html='';
@@ -464,6 +465,7 @@ function renderTasksList(tasks) {
       const pri = PRIORITY[t.priority]||{label:t.priority,cls:'badge-muted'};
       const sta = TASK_STATUS[t.status]||{label:t.status,cls:'badge-muted'};
       const over = isOverdue(t);
+      const canEdit = isAdmin || t.responsible === session.name;
       return `
         <div class="task-item">
           <div class="task-check ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id},event)">${t.status==='done'?'✓':''}</div>
@@ -471,13 +473,20 @@ function renderTasksList(tasks) {
             <div class="task-title ${t.status==='done'?'done':''}">${t.title}</div>
             ${t.description?`<div class="text-muted mt-1" style="font-size:12px">${t.description}</div>`:''}
             <div class="task-meta mt-1">
-              <span><div class="avatar avatar-sm avatar-${fmt.avatarClass(t.responsible)}" style="display:inline-flex">${fmt.initials(t.responsible)}</div> ${t.responsible}</span>
+              <span><div class="avatar avatar-sm avatar-${fmt.avatarClass(t.responsible.split(' ')[0])}" style="display:inline-flex">${fmt.initials(t.responsible)}</div> ${t.responsible}</span>
+              ${t.assigned_by?`<span class="text-muted" style="font-size:11px">Atribuída por: ${t.assigned_by}</span>`:''}
               ${t.due_date?`<span style="color:${over?'var(--red)':'var(--text-muted)'}">📅 ${fmt.relative(t.due_date)} (${fmt.date(t.due_date)})${over?' ⚠️':''}</span>`:''}
               <span class="badge ${pri.cls}">${pri.label}</span>
-              <span class="badge ${sta.cls}">${sta.label}</span>
             </div>
+            ${canEdit && !isAdmin ? `
+            <div style="display:flex;gap:6px;margin-top:8px">
+              ${['pending','in_progress','done'].map(s=>`
+                <button class="btn btn-sm ${t.status===s?'btn-primary':'btn-secondary'}" onclick="updateTaskStatus(${t.id},'${s}',event)">
+                  ${s==='pending'?'Pendente':s==='in_progress'?'Em andamento':'Concluído'}
+                </button>`).join('')}
+            </div>` : `<span class="badge ${sta.cls}" style="margin-top:4px;display:inline-block">${sta.label}</span>`}
           </div>
-          <div class="task-actions"><button class="btn btn-ghost btn-sm" onclick="openEditTask(${t.id})">✏️</button></div>
+          ${isAdmin ? `<div class="task-actions"><button class="btn btn-ghost btn-sm" onclick="openEditTask(${t.id})">✏️</button></div>` : ''}
         </div>`;
     }).join('');
   });
