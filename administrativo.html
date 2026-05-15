@@ -337,7 +337,8 @@ function filterClients() {
   const q      = document.getElementById('search-clients').value.toLowerCase();
   const health = document.getElementById('filter-health').value;
   const resp   = document.getElementById('filter-resp-client').value;
-  renderClientsGrid(allClients.filter(c=>{
+  const base   = window.filterByCountry ? window.filterByCountry(allClients) : allClients;
+  renderClientsGrid(base.filter(c=>{
     if (q && !(c.name||'').toLowerCase().includes(q) && !(c.service||'').toLowerCase().includes(q)) return false;
     if (health && c.health!==health) return false;
     if (resp && c.responsible!==resp) return false;
