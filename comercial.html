@@ -178,16 +178,44 @@
 
 <!-- MODAL Lead -->
 <div class="modal-overlay" id="lead-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:680px">
     <div class="modal-header">
       <h3 id="modal-title">Novo Lead</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="lead-id">
+
+      <!-- IA Parser -->
+      <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:16px">🤖</span>
+          <span style="font-size:13px;font-weight:700;color:var(--accent)">Preenchimento automático com IA</span>
+          <span style="font-size:11px;color:var(--text-muted)">(opcional)</span>
+        </div>
+        <textarea class="form-control" id="ai-lead-text" rows="3" style="resize:vertical;font-size:12px" placeholder="Cole aqui o formulário enviado pelo lead via WhatsApp ou qualquer texto com as informações…"></textarea>
+        <button class="btn btn-secondary btn-sm" style="margin-top:8px;border-color:rgba(99,102,241,0.4);color:var(--accent)" onclick="parseLeadWithAI()">🤖 Interpretar e preencher</button>
+        <div id="ai-parse-result" style="display:none;margin-top:6px;font-size:11px;color:var(--green)">✓ Campos preenchidos — confira e ajuste antes de salvar.</div>
+      </div>
+
       <div class="grid-2">
-        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
+        <div class="form-group"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
+        <div class="form-group">
+          <label>Nicho <span style="color:var(--red)">*</span></label>
+          <select class="form-control" id="lead-nicho">
+            <option value="">Selecione</option>
+            <option>Saúde e Estética</option><option>Educação</option><option>Imóveis</option>
+            <option>E-commerce</option><option>Serviços B2B</option><option>Restaurante / Food</option>
+            <option>Academia / Fitness</option><option>Clínica / Consultório</option>
+            <option>Tecnologia / SaaS</option><option>Moda e Varejo</option>
+            <option>Jurídico / Advocacia</option><option>Construção / Reforma</option>
+            <option>Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
         <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa"></div>
+        <div class="form-group"><label>Localização</label><input type="text" class="form-control" id="lead-location" placeholder="Cidade / Estado"></div>
       </div>
       <div class="grid-2">
         <div class="form-group"><label>E-mail</label><input type="email" class="form-control" id="lead-email" placeholder="email@empresa.com"></div>
@@ -206,13 +234,11 @@
       </div>
       <div class="grid-2">
         <div class="form-group">
-          <label>Responsável</label>
-          <select class="form-control" id="lead-responsible">
-            <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
-          </select>
+          <label>Responsável (Vendedor)</label>
+          <select class="form-control" id="lead-responsible" id="lead-responsible"></select>
         </div>
         <div class="form-group">
-          <label>Estágio</label>
+          <label>Estágio <span style="color:var(--red)">*</span></label>
           <select class="form-control" id="lead-stage">
             <option value="novo">Novo Lead</option><option value="contato">Contato Feito</option>
             <option value="reuniao">Reunião Agendada</option><option value="proposta">Proposta Enviada</option>
@@ -222,7 +248,7 @@
       </div>
       <div class="form-group">
         <label>Observações</label>
-        <textarea class="form-control" id="lead-notes" rows="3" placeholder="Notas sobre o lead…" style="resize:vertical"></textarea>
+        <textarea class="form-control" id="lead-notes" rows="2" placeholder="Notas sobre o lead…" style="resize:vertical"></textarea>
       </div>
     </div>
     <div class="modal-footer">
