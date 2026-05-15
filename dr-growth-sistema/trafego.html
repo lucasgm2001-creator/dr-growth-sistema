@@ -51,6 +51,7 @@
         <button class="sector-tab active" onclick="switchTab('campanhas', this)">🚀 Campanhas</button>
         <button class="sector-tab" onclick="switchTab('metricas', this)">📈 Métricas</button>
         <button class="sector-tab" onclick="switchTab('conteudo', this)">📅 Conteúdo</button>
+        <button class="sector-tab" onclick="switchTab('meta', this)">📣 Meta Ads</button>
       </div>
     </div>
 
@@ -146,7 +147,58 @@
       </div>
     </div>
 
+    <!-- TAB: Meta Ads -->
+    <div class="tab-panel" id="tab-meta">
+      <div class="meta-config-banner animate-in">
+        <div class="meta-logo">f</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Integração Meta Ads</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="meta-status-text">Exibindo dados de demonstração · Configure suas credenciais para dados reais</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="openMetaConfig()">⚙️ Configurar API</button>
+        <button class="btn btn-primary btn-sm" onclick="fetchMetaData()">↻ Atualizar</button>
+      </div>
+      <div class="metrics-kpi-row animate-in" id="meta-kpis"></div>
+      <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:13px;font-weight:700">Campanhas</div>
+        <select class="filter-select" id="meta-filter-status" onchange="renderMetaCampaigns()" style="min-width:140px">
+          <option value="">Todos os status</option>
+          <option value="ACTIVE">Ativas</option>
+          <option value="PAUSED">Pausadas</option>
+        </select>
+      </div>
+      <div class="meta-campaign-grid animate-in" id="meta-campaigns"></div>
+    </div>
+
   </main>
+</div>
+
+<!-- MODAL Meta Config -->
+<div class="modal-overlay" id="meta-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3>⚙️ Configurar Meta Ads API</h3>
+      <button class="modal-close" onclick="closeMetaModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-secondary);line-height:1.6">
+        Crie um app em <strong>developers.facebook.com</strong>, gere um Access Token com permissão <code style="background:var(--bg-active);padding:1px 5px;border-radius:3px">ads_read</code> e copie o ID da sua conta de anúncios (formato: <code style="background:var(--bg-active);padding:1px 5px;border-radius:3px">act_XXXXXXXXX</code>).
+      </div>
+      <div class="form-group">
+        <label>Access Token</label>
+        <input type="password" class="form-control" id="meta-token" placeholder="EAABsbCS4abc..." autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Ad Account ID</label>
+        <input type="text" class="form-control" id="meta-account-id" placeholder="act_123456789">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" onclick="clearMetaCreds()" style="margin-right:auto">Desconectar</button>
+      <button class="btn btn-secondary" onclick="closeMetaModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMetaCreds()">Salvar e Conectar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL Campanha -->
@@ -551,6 +603,179 @@ function saveContent() {
 
 document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
 document.getElementById('content-modal').addEventListener('click', e => { if (e.target===document.getElementById('content-modal')) closeContentModal(); });
+document.getElementById('meta-modal').addEventListener('click', e => { if (e.target===document.getElementById('meta-modal')) closeMetaModal(); });
+
+// ============================================================
+// META ADS
+// ============================================================
+const META_DEMO = [
+  { id:'1', name:'DR Growth — Lead Gen BR', status:'ACTIVE', objective:'LEAD_GENERATION', market:'🇧🇷',
+    insights:{ spend:'R$ 1.840', reach:'62.400', clicks:'1.240', impressions:'187.300', cpl:'R$ 22,50', cpm:'R$ 9,82', cpc:'R$ 1,48', leads:82 } },
+  { id:'2', name:'US Digital LLC — Conversão', status:'ACTIVE', objective:'CONVERSIONS', market:'🇺🇸',
+    insights:{ spend:'R$ 3.120', reach:'38.900', clicks:'980',  impressions:'124.500', cpl:'R$ 41,07', cpm:'R$ 25,06', cpc:'R$ 3,18', leads:76 } },
+  { id:'3', name:'MedTech Brasil — Awareness', status:'ACTIVE', objective:'BRAND_AWARENESS', market:'🇧🇷',
+    insights:{ spend:'R$ 890',   reach:'94.200', clicks:'620',  impressions:'210.000', cpl:'—',        cpm:'R$ 4,24', cpc:'R$ 1,44', leads:0  } },
+  { id:'4', name:'Academia Fit — Tráfego', status:'PAUSED', objective:'TRAFFIC', market:'🇧🇷',
+    insights:{ spend:'R$ 540',   reach:'18.700', clicks:'430',  impressions:'62.400',  cpl:'R$ 18,00', cpm:'R$ 8,65', cpc:'R$ 1,26', leads:30 } },
+  { id:'5', name:'GrowthX Agency — Retargeting', status:'ACTIVE', objective:'CONVERSIONS', market:'🇺🇸',
+    insights:{ spend:'R$ 2.200', reach:'12.400', clicks:'890',  impressions:'48.300',  cpl:'R$ 28,57', cpm:'R$ 45,55', cpc:'R$ 2,47', leads:77 } },
+  { id:'6', name:'E-commerce Plus — Catálogo', status:'PAUSED', objective:'CATALOG_SALES', market:'🇧🇷',
+    insights:{ spend:'R$ 720',   reach:'29.100', clicks:'1.040', impressions:'88.600', cpl:'—',        cpm:'R$ 8,12', cpc:'R$ 0,69', leads:0  } },
+];
+
+const OBJ_LABELS = {
+  LEAD_GENERATION:'Captação de Leads', CONVERSIONS:'Conversões', BRAND_AWARENESS:'Reconhecimento',
+  TRAFFIC:'Tráfego', CATALOG_SALES:'Vendas de Catálogo', REACH:'Alcance',
+};
+
+let metaData = [...META_DEMO];
+let metaLoading = false;
+
+function getMetaCreds() {
+  return { token: localStorage.getItem('drg_meta_token'), accountId: localStorage.getItem('drg_meta_account') };
+}
+
+function renderMetaKPIs() {
+  const active  = metaData.filter(c => c.status === 'ACTIVE');
+  const totalSpend = metaData.reduce((s,c) => {
+    const val = parseFloat((c.insights.spend||'0').replace(/[^0-9,.]/g,'').replace(',','.'));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+  const totalLeads  = metaData.reduce((s,c) => s + (c.insights.leads||0), 0);
+  const totalReach  = metaData.reduce((s,c) => {
+    const val = parseInt((c.insights.reach||'0').replace(/\D/g,''));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+  const totalClicks = metaData.reduce((s,c) => {
+    const val = parseInt((c.insights.clicks||'0').replace(/\D/g,''));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+
+  document.getElementById('meta-kpis').innerHTML = [
+    { label:'Campanhas Ativas',  value: active.length,                     color:'var(--green)',  sub:`de ${metaData.length} total` },
+    { label:'Investimento Total',value: 'R$ ' + totalSpend.toLocaleString('pt-BR',{minimumFractionDigits:0}), color:'var(--red)', sub:'período atual' },
+    { label:'Leads Gerados',     value: totalLeads,                        color:'var(--accent)', sub:'todas campanhas' },
+    { label:'Alcance Total',     value: totalReach >= 1000 ? (totalReach/1000).toFixed(1)+'K' : totalReach, color:'var(--blue)', sub:'pessoas únicas' },
+    { label:'Cliques Totais',    value: totalClicks.toLocaleString('pt-BR'),color:'var(--purple)',sub:'no período' },
+    { label:'CPL Médio',         value: totalLeads ? 'R$ '+(totalSpend/totalLeads).toFixed(2).replace('.',',') : '—', color:'var(--yellow)', sub:'custo por lead' },
+  ].map(k => `
+    <div class="metric-kpi">
+      <div class="metric-kpi-label">${k.label}</div>
+      <div class="metric-kpi-value" style="color:${k.color}">${k.value}</div>
+      <div class="metric-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+function renderMetaCampaigns() {
+  const filter = document.getElementById('meta-filter-status')?.value || '';
+  const filtered = filter ? metaData.filter(c => c.status === filter) : metaData;
+
+  if (!filtered.length) {
+    document.getElementById('meta-campaigns').innerHTML = `<div class="empty-state"><div class="empty-icon">📣</div><h3>Nenhuma campanha</h3></div>`;
+    return;
+  }
+
+  document.getElementById('meta-campaigns').innerHTML = filtered.map(c => {
+    const isActive = c.status === 'ACTIVE';
+    const ins = c.insights;
+    return `
+    <div class="meta-card">
+      <div class="meta-card-top">
+        <div>
+          <div class="meta-card-name">${c.market} ${c.name}</div>
+          <div class="meta-card-obj">${OBJ_LABELS[c.objective] || c.objective}</div>
+        </div>
+        <span class="badge ${isActive ? 'badge-green' : 'badge-muted'}">${isActive ? 'Ativa' : 'Pausada'}</span>
+      </div>
+      <div class="meta-metrics">
+        <div><div class="meta-metric-label">Investimento</div><div class="meta-metric-value" style="color:var(--red)">${ins.spend}</div></div>
+        <div><div class="meta-metric-label">Leads</div><div class="meta-metric-value" style="color:var(--accent)">${ins.leads || '—'}</div></div>
+        <div><div class="meta-metric-label">Alcance</div><div class="meta-metric-value">${ins.reach}</div></div>
+        <div><div class="meta-metric-label">Cliques</div><div class="meta-metric-value">${ins.clicks}</div></div>
+        <div><div class="meta-metric-label">CPL</div><div class="meta-metric-value" style="color:var(--yellow)">${ins.cpl}</div></div>
+        <div><div class="meta-metric-label">CPM</div><div class="meta-metric-value">${ins.cpm}</div></div>
+        <div><div class="meta-metric-label">CPC</div><div class="meta-metric-value">${ins.cpc}</div></div>
+        <div><div class="meta-metric-label">Impressões</div><div class="meta-metric-value">${ins.impressions}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchMetaData() {
+  const { token, accountId } = getMetaCreds();
+  if (!token || !accountId) {
+    showToast('Configure as credenciais da API primeiro.', 'error');
+    openMetaConfig();
+    return;
+  }
+  document.getElementById('meta-status-text').textContent = 'Buscando dados reais…';
+  try {
+    const fields = 'name,status,objective,insights{spend,reach,clicks,impressions,cost_per_result,cpm,cpc,actions}';
+    const url = `https://graph.facebook.com/v18.0/${accountId}/campaigns?fields=${encodeURIComponent(fields)}&access_token=${token}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error.message);
+    metaData = json.data.map(c => ({
+      id: c.id, name: c.name, status: c.status, objective: c.objective, market: '',
+      insights: {
+        spend:       'R$ ' + parseFloat(c.insights?.data?.[0]?.spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2}),
+        reach:       parseInt(c.insights?.data?.[0]?.reach||0).toLocaleString('pt-BR'),
+        clicks:      parseInt(c.insights?.data?.[0]?.clicks||0).toLocaleString('pt-BR'),
+        impressions: parseInt(c.insights?.data?.[0]?.impressions||0).toLocaleString('pt-BR'),
+        cpl:         c.insights?.data?.[0]?.cost_per_result ? 'R$ '+parseFloat(c.insights.data[0].cost_per_result).toFixed(2).replace('.',',') : '—',
+        cpm:         'R$ '+parseFloat(c.insights?.data?.[0]?.cpm||0).toFixed(2).replace('.',','),
+        cpc:         'R$ '+parseFloat(c.insights?.data?.[0]?.cpc||0).toFixed(2).replace('.',','),
+        leads:       c.insights?.data?.[0]?.actions?.find(a=>a.action_type==='lead')?.value || 0,
+      }
+    }));
+    document.getElementById('meta-status-text').textContent = `✓ Dados reais · ${accountId} · atualizado agora`;
+    showToast('Meta Ads atualizado!', 'success');
+  } catch(err) {
+    document.getElementById('meta-status-text').textContent = 'Erro na API — exibindo dados demo';
+    showToast('Erro: ' + err.message, 'error');
+    metaData = [...META_DEMO];
+  }
+  renderMetaKPIs();
+  renderMetaCampaigns();
+}
+
+function openMetaConfig() {
+  const { token, accountId } = getMetaCreds();
+  document.getElementById('meta-token').value      = token || '';
+  document.getElementById('meta-account-id').value = accountId || '';
+  document.getElementById('meta-modal').classList.add('show');
+}
+
+function closeMetaModal() { document.getElementById('meta-modal').classList.remove('show'); }
+
+function saveMetaCreds() {
+  const token     = document.getElementById('meta-token').value.trim();
+  const accountId = document.getElementById('meta-account-id').value.trim();
+  if (!token || !accountId) { showToast('Preencha token e account ID.', 'error'); return; }
+  localStorage.setItem('drg_meta_token',   token);
+  localStorage.setItem('drg_meta_account', accountId);
+  closeMetaModal();
+  showToast('Credenciais salvas! Clique em Atualizar.', 'success');
+  document.getElementById('meta-status-text').textContent = `Conectado · ${accountId} · clique em Atualizar para carregar`;
+}
+
+function clearMetaCreds() {
+  localStorage.removeItem('drg_meta_token');
+  localStorage.removeItem('drg_meta_account');
+  metaData = [...META_DEMO];
+  document.getElementById('meta-status-text').textContent = 'Exibindo dados de demonstração · Configure suas credenciais para dados reais';
+  closeMetaModal();
+  renderMetaKPIs();
+  renderMetaCampaigns();
+  showToast('Credenciais removidas.', 'info');
+}
+
+// Patch switchTab to init Meta when opened
+const _origSwitch = switchTab;
+switchTab = function(name, btn) {
+  _origSwitch(name, btn);
+  if (name === 'meta') { renderMetaKPIs(); renderMetaCampaigns(); }
+};
 
 // Init
 updateKPIs();

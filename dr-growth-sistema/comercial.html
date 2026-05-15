@@ -52,6 +52,7 @@
         <button class="sector-tab active" onclick="switchTab('funil', this)">◈ Funil Kanban</button>
         <button class="sector-tab" onclick="switchTab('leads', this)">◉ Lista de Leads</button>
         <button class="sector-tab" onclick="switchTab('pipeline', this)">💰 Pipeline</button>
+        <button class="sector-tab" onclick="switchTab('metricas', this)">📊 Métricas</button>
       </div>
     </div>
 
@@ -120,6 +121,31 @@
               <div id="detail-history"></div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Métricas -->
+    <div class="tab-panel" id="tab-metricas">
+      <div class="metrics-kpi-row animate-in" id="met-kpis"></div>
+      <div class="grid-2 animate-in mt-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌎 Mercado: Brasil vs EUA</span></div>
+          <div class="card-body" id="met-markets"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📥 Origem dos Leads</span></div>
+          <div class="card-body" id="met-sources"></div>
+        </div>
+      </div>
+      <div class="grid-2 animate-in mt-4">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏆 Taxa de Fechamento por Responsável</span></div>
+          <div class="card-body" id="met-closers"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⏱ Velocidade do Funil</span></div>
+          <div class="card-body" id="met-velocity"></div>
         </div>
       </div>
     </div>
@@ -271,10 +297,121 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'' };
+  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'' };
   const btn2 = document.getElementById('main-action-btn');
   btn2.textContent = actions[name] || '+ Novo Lead';
-  btn2.style.display = name === 'pipeline' ? 'none' : '';
+  btn2.style.display = (name === 'pipeline' || name === 'metricas') ? 'none' : '';
+  if (name === 'metricas') renderMetrics();
+}
+
+// ---- Métricas personalizadas ----
+function renderMetrics() {
+  const active  = leads.filter(l => !['fechado','perdido'].includes(l.stage));
+  const closed  = leads.filter(l => l.stage === 'fechado');
+  const lost    = leads.filter(l => l.stage === 'perdido');
+  const total   = leads.length;
+  const pipeline = active.reduce((s,l) => s + (Number(l.value)||0), 0);
+  const closedVal= closed.reduce((s,l) => s + (Number(l.value)||0), 0);
+  const avgTicket= closed.length ? closedVal / closed.length : 0;
+  const convRate = total ? Math.round((closed.length / total) * 100) : 0;
+  const lostRate = total ? Math.round((lost.length / total) * 100) : 0;
+
+  // KPI row
+  document.getElementById('met-kpis').innerHTML = [
+    { label:'Leads Totais',       value: total,               color:'var(--blue)',   sub: `${active.length} ativos` },
+    { label:'Pipeline Ativo',     value: fmt.currency(pipeline), color:'var(--accent)', sub: `${active.length} leads` },
+    { label:'Receita Fechada',    value: fmt.currency(closedVal),color:'var(--green)', sub: `${closed.length} contratos` },
+    { label:'Ticket Médio',       value: avgTicket ? fmt.currency(avgTicket) : '—', color:'var(--yellow)', sub:'deals fechados' },
+    { label:'Taxa de Conversão',  value: convRate + '%',      color:'var(--green)',  sub:`${lostRate}% perdidos` },
+    { label:'Leads Perdidos',     value: lost.length,         color:'var(--red)',    sub:'este período' },
+  ].map(k => `
+    <div class="metric-kpi">
+      <div class="metric-kpi-label">${k.label}</div>
+      <div class="metric-kpi-value" style="color:${k.color}">${k.value}</div>
+      <div class="metric-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // Markets: Lucas = EUA, others = Brasil (by responsible)
+  const usLeads = leads.filter(l => l.responsible === 'Lucas');
+  const brLeads = leads.filter(l => l.responsible !== 'Lucas');
+  const usPipeline = usLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
+  const brPipeline = brLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
+  const usConv = usLeads.length ? Math.round((usLeads.filter(l=>l.stage==='fechado').length/usLeads.length)*100) : 0;
+  const brConv = brLeads.length ? Math.round((brLeads.filter(l=>l.stage==='fechado').length/brLeads.length)*100) : 0;
+  const totalPip = (usPipeline + brPipeline) || 1;
+
+  document.getElementById('met-markets').innerHTML = `
+    <div style="margin-bottom:18px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:13px;font-weight:700">🇺🇸 EUA <span style="font-size:10px;color:var(--text-muted);font-weight:400">(Lucas · ${usLeads.length} leads)</span></span>
+        <span style="font-size:13px;font-weight:700;color:var(--blue)">${fmt.currency(usPipeline)}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(usPipeline/totalPip*100)}%;background:var(--blue)"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Conversão: ${usConv}% · ${usLeads.filter(l=>l.stage==='fechado').length} fechados</div>
+    </div>
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:13px;font-weight:700">🇧🇷 Brasil <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${brLeads.length} leads)</span></span>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${fmt.currency(brPipeline)}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(brPipeline/totalPip*100)}%;background:var(--green)"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Conversão: ${brConv}% · ${brLeads.filter(l=>l.stage==='fechado').length} fechados</div>
+    </div>`;
+
+  // Lead sources
+  const sourceCount = {};
+  leads.forEach(l => { if (l.origin) sourceCount[l.origin] = (sourceCount[l.origin]||0) + 1; });
+  const sortedSources = Object.entries(sourceCount).sort((a,b) => b[1]-a[1]);
+  const maxSrc = sortedSources[0]?.[1] || 1;
+  const srcColors = { LinkedIn:'#0a66c2', Instagram:'#e1306c', 'Google Ads':'#4285f4', Facebook:'#1877f2', Indicação:'#22c55e', Referência:'#a855f7', Outro:'#64748b' };
+  document.getElementById('met-sources').innerHTML = sortedSources.map(([src, count]) => `
+    <div style="margin-bottom:12px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600">${src}</span>
+        <span style="font-size:13px;font-weight:700;color:${srcColors[src]||'var(--accent)'}">${count} lead${count>1?'s':''}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(count/maxSrc*100)}%;background:${srcColors[src]||'var(--accent)'}"></div></div>
+    </div>`).join('') || '<div class="text-muted">Sem dados de origem.</div>';
+
+  // Win rate by closer
+  const closers = ['Daniel','Lucas','Gabriel','Thamyris'];
+  document.getElementById('met-closers').innerHTML = closers.map(name => {
+    const mine   = leads.filter(l => l.responsible === name);
+    const won    = mine.filter(l => l.stage === 'fechado');
+    const rate   = mine.length ? Math.round((won.length / mine.length) * 100) : 0;
+    const value  = won.reduce((s,l) => s+(Number(l.value)||0), 0);
+    return `<div style="margin-bottom:14px">
+      <div class="flex items-center justify-between mb-1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(name)}">${fmt.initials(name)}</div>
+          <span style="font-size:12px;font-weight:600">${name}</span>
+          <span style="font-size:10px;color:var(--text-muted)">${mine.length} leads</span>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${rate}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${rate}%"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${won.length} fechados · ${fmt.currency(value)}</div>
+    </div>`;
+  }).join('');
+
+  // Funnel velocity
+  const stageOrder = ['novo','contato','reuniao','proposta','fechado'];
+  const avgDays = { novo:2, contato:5, reuniao:8, proposta:12, fechado:18 }; // demo estimates
+  document.getElementById('met-velocity').innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Tempo médio estimado por estágio até o fechamento:</div>
+    ${stageOrder.map((s,i) => {
+      const stageLeads = leads.filter(l => l.stage === s);
+      const info = STAGE_INFO[s];
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${info?.color};flex-shrink:0"></div>
+        <div style="flex:1;font-size:12px;font-weight:600">${info?.label}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${stageLeads.length} leads</div>
+        <div style="font-size:12px;font-weight:700;color:${info?.color}">~${avgDays[s]}d</div>
+      </div>`;
+    }).join('')}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted)">
+      Ciclo médio total estimado: <strong style="color:var(--accent)">~18 dias</strong>
+    </div>`
 }
 
 // ---- Kanban ----
