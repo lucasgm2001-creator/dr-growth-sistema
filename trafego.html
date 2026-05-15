@@ -256,6 +256,92 @@
   </main>
 </div>
 
+<!-- MODAL Detalhe Campanha -->
+<div class="modal-overlay" id="campaign-detail-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header" id="detail-modal-header" style="border-bottom:2px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="detail-platform-icon" style="font-size:24px"></div>
+        <div>
+          <h3 id="detail-camp-name" style="margin:0;font-size:16px"></h3>
+          <div style="font-size:12px;color:var(--text-muted)" id="detail-camp-client"></div>
+        </div>
+        <span id="detail-camp-status" class="badge" style="margin-left:8px"></span>
+      </div>
+      <button class="modal-close" onclick="closeCampaignDetail()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:20px">
+
+      <!-- Budget bar -->
+      <div style="margin-bottom:20px">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-muted text-sm">Orçamento utilizado</span>
+          <span id="detail-budget-pct" style="font-size:12px;font-weight:700"></span>
+        </div>
+        <div class="progress-bar" style="height:8px">
+          <div id="detail-budget-bar" class="progress-fill" style="height:8px"></div>
+        </div>
+        <div class="flex items-center justify-between mt-1">
+          <span style="font-size:11px;color:var(--text-muted)" id="detail-budget-spent">—</span>
+          <span style="font-size:11px;color:var(--text-muted)" id="detail-budget-total">—</span>
+        </div>
+      </div>
+
+      <!-- Métricas -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+        <div class="fin-card" style="padding:14px;text-align:center">
+          <div class="fin-card-label">Leads</div>
+          <div id="detail-leads" style="font-size:24px;font-weight:800;color:var(--blue)">—</div>
+        </div>
+        <div class="fin-card" style="padding:14px;text-align:center">
+          <div class="fin-card-label">CPL</div>
+          <div id="detail-cpl" style="font-size:20px;font-weight:800;color:var(--green)">—</div>
+        </div>
+        <div class="fin-card" style="padding:14px;text-align:center">
+          <div class="fin-card-label">Cliques</div>
+          <div id="detail-clicks" style="font-size:20px;font-weight:800">—</div>
+        </div>
+        <div class="fin-card" style="padding:14px;text-align:center">
+          <div class="fin-card-label">ROAS</div>
+          <div id="detail-roas" style="font-size:20px;font-weight:800;color:var(--accent)">—</div>
+        </div>
+      </div>
+
+      <!-- Impressões + CTR -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+        <div class="fin-card" style="padding:14px">
+          <div class="fin-card-label">Impressões</div>
+          <div id="detail-impressions" style="font-size:18px;font-weight:800">—</div>
+        </div>
+        <div class="fin-card" style="padding:14px">
+          <div class="fin-card-label">CTR</div>
+          <div id="detail-ctr" style="font-size:18px;font-weight:800;color:var(--yellow)">—</div>
+        </div>
+      </div>
+
+      <!-- Objetivo + Notas -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
+        <div>
+          <div class="text-muted" style="font-size:11px;margin-bottom:4px">OBJETIVO</div>
+          <div id="detail-objective" style="font-size:13px;font-weight:600">—</div>
+        </div>
+        <div>
+          <div class="text-muted" style="font-size:11px;margin-bottom:4px">PLATAFORMA</div>
+          <div id="detail-platform-name" style="font-size:13px;font-weight:600">—</div>
+        </div>
+      </div>
+      <div id="detail-notes-wrap" style="display:none;margin-top:14px;padding:12px;background:var(--surface);border-radius:8px;font-size:13px;color:var(--text-secondary);border:1px solid var(--border)">
+        <span style="font-size:10px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px">OBSERVAÇÕES</span>
+        <span id="detail-notes-text"></span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCampaignDetail()">Fechar</button>
+      <button class="btn btn-primary" id="detail-edit-btn" onclick="openEditFromDetail()">✏️ Editar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL Campanha -->
 <div class="modal-overlay" id="campaign-modal">
   <div class="modal">
