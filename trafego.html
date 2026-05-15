@@ -499,8 +499,12 @@ function switchTab(name, btn) {
   if (name === 'clientes') renderClienteView();
 }
 
+function getFilteredCampaigns() {
+  return window.filterByCountry ? window.filterByCountry(campaigns) : campaigns;
+}
+
 function updateKPIs() {
-  const active = campaigns.filter(c => c.status === 'active');
+  const active = getFilteredCampaigns().filter(c => c.status === 'active');
   const totalSpend = active.reduce((s,c) => s+(c.spend||0), 0);
   const totalLeads = active.reduce((s,c) => s+(c.leads||0), 0);
   const cpl = totalLeads > 0 ? totalSpend / totalLeads : 0;
