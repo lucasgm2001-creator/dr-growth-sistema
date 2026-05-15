@@ -683,7 +683,14 @@ function renderRelatorio() {
   content.innerHTML = html;
 }
 
-loadData();
+loadData().then(() => {
+  initCountrySelector('administrativo', () => {
+    filterClients();
+    filterTasks();
+    updateClientKPIs();
+    updateTaskKPIs();
+  });
+});
 </script>
 </body>
 </html>
