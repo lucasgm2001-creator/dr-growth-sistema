@@ -449,11 +449,13 @@ if (!session) throw new Error('Not authenticated');
 
 // ---- Demo Data ----
 let campaigns = [
-  { id:1, name:'Google Ads — MedTech', client:'MedTech Brasil', platform:'google', status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200, clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.' },
-  { id:2, name:'Meta Ads — GrowthX', client:'GrowthX Agency', platform:'meta', status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em campanha de conversão.' },
-  { id:3, name:'Google Ads — US Digital', client:'US Digital LLC', platform:'google', status:'active', budget:4000, objective:'Conversão', spend:3890, impressions:67000, clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.' },
-  { id:4, name:'Instagram — Academia Fit', client:'Academia Fit', platform:'meta', status:'paused', budget:800, objective:'Engajamento', spend:620, impressions:28000, clicks:940, leads:12, notes:'Pausado para revisão de criativos.' },
-  { id:5, name:'LinkedIn — US Digital', client:'US Digital LLC', platform:'linkedin', status:'active', budget:1500, objective:'Tráfego', spend:1200, impressions:15000, clicks:480, leads:22, notes:'B2B, CPL alto mas qualificado.' },
+  { id:1, name:'Google Ads — MedTech',      client:'MedTech Brasil',   platform:'google',   status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200,  clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.',         country:'br' },
+  { id:2, name:'Meta Ads — GrowthX',         client:'GrowthX Agency',  platform:'meta',     status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em conversão.',         country:'br' },
+  { id:3, name:'Google Ads — US Digital',    client:'US Digital LLC',  platform:'google',   status:'active', budget:4000, objective:'Conversão',         spend:3890, impressions:67000,  clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.',country:'us' },
+  { id:4, name:'Instagram — Academia Fit',   client:'Academia Fit',    platform:'meta',     status:'paused', budget:800,  objective:'Engajamento',        spend:620,  impressions:28000,  clicks:940,  leads:12, notes:'Pausado para revisão de criativos.',  country:'br' },
+  { id:5, name:'LinkedIn — US Digital',      client:'US Digital LLC',  platform:'linkedin', status:'active', budget:1500, objective:'Tráfego',            spend:1200, impressions:15000,  clicks:480,  leads:22, notes:'B2B, CPL alto mas qualificado.',      country:'us' },
+  { id:6, name:'Meta Ads — Miami Health',    client:'Miami Health Co.', platform:'meta',    status:'active', budget:2500, objective:'Geração de Leads',   spend:2100, impressions:89000,  clicks:2600, leads:45, notes:'Leads qualificados. ROAS 3.2x.',      country:'us' },
+  { id:7, name:'Google Ads — Restaurante',   client:'Restaurante Sabor',platform:'google',  status:'active', budget:600,  objective:'Tráfego Local',      spend:540,  impressions:18000,  clicks:720,  leads:8,  notes:'Foco em raio de 5km.',               country:'br' },
 ];
 
 let contents = [
