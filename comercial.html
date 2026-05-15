@@ -424,8 +424,9 @@ function switchTab(name, btn) {
 // ---- Kanban ----
 function renderKanban() {
   const board = document.getElementById('kanban-board');
+  const filtered = window.filterByCountry ? window.filterByCountry(leads) : leads;
   board.innerHTML = STAGES.map(stage => {
-    const stageLeads = leads.filter(l => l.stage === stage.key);
+    const stageLeads = filtered.filter(l => l.stage === stage.key);
     const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
     return `
       <div class="kanban-col">
