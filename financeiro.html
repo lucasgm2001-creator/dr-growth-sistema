@@ -548,21 +548,38 @@ function renderPaymentsTable(payments) {
   }).join('');
 }
 
+const PLANOS = {
+  1: 'Enterprise', 2: 'Profissional', 3: 'Enterprise', 4: 'Básico', 5: 'Profissional',
+};
+
 function renderContracts() {
+  const statusFilter = document.getElementById('filter-contract-status')?.value || 'active';
+  const planFilter   = document.getElementById('filter-contract-plan')?.value || '';
   const daysUntil = d => d ? Math.ceil((new Date(d+'T12:00:00')-new Date())/86400000) : null;
-  document.getElementById('contracts-grid').innerHTML = allClients.map(c => {
+
+  let clients = allClients;
+  if (statusFilter === 'active') clients = clients.filter(c => c.active !== false && c.health !== 'ended');
+  if (statusFilter === 'ended')  clients = clients.filter(c => c.active === false || c.health === 'ended');
+  if (planFilter) clients = clients.filter(c => (PLANOS[c.id] || 'Profissional') === planFilter);
+
+  document.getElementById('contracts-grid').innerHTML = clients.map(c => {
     const days = daysUntil(c.renewal_date);
     const renewLabel = days === null ? '' : days < 0 ? `<span class="badge badge-red">Vencido há ${Math.abs(days)}d</span>` : days <= 30 ? `<span class="badge badge-yellow">Renova em ${days}d</span>` : `<span class="badge badge-muted">Renova em ${days}d</span>`;
     const hi = HEALTH_INFO[c.health]||HEALTH_INFO.green;
+    const plano = PLANOS[c.id] || 'Profissional';
+    const planColor = { Básico:'badge-muted', Profissional:'badge-blue', Premium:'badge-accent', Enterprise:'badge-green' };
     return `
       <div class="card" style="padding:18px;transition:all 0.18s;cursor:default"
         onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-md)'"
         onmouseleave="this.style.transform='';this.style.boxShadow=''">
-        <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center justify-between mb-2">
           <div style="font-size:14px;font-weight:700">${c.name}</div>
           <span class="badge ${hi.cls}">${hi.label}</span>
         </div>
-        <div class="text-muted text-sm mb-3">${c.service}</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <span class="badge badge-muted" style="font-size:10px">${c.service}</span>
+          <span class="badge ${planColor[plano]}" style="font-size:10px">📦 ${plano}</span>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
             <div class="text-muted" style="font-size:10px;margin-bottom:2px">VALOR MENSAL</div>
@@ -585,7 +602,7 @@ function renderContracts() {
         </div>
         ${renewLabel}
       </div>`;
-  }).join('');
+  }).join('') || `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📝</div><h3>Nenhum contrato encontrado</h3></div>`;
 }
 
 async function markPaid(id) {
