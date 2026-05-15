@@ -130,7 +130,183 @@
 
     <!-- TAB: Contratos -->
     <div class="tab-panel" id="tab-contratos">
+
+      <!-- Explicação contrato em risco -->
+      <div class="overdue-alert animate-in" style="display:flex;margin-bottom:16px;background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25)">
+        <div class="overdue-alert-icon">⚠️</div>
+        <div class="overdue-alert-text">
+          <strong>O que é contrato em risco?</strong>
+          <span>Contratos marcados como "Em risco" indicam clientes com pagamentos atrasados, baixo engajamento ou saúde "vermelha". Requerem ação imediata para evitar churn.</span>
+        </div>
+      </div>
+
+      <!-- Filtro ativos/encerrados -->
+      <div class="filter-bar animate-in" style="margin-bottom:16px">
+        <select class="filter-select" id="filter-contract-status" onchange="renderContracts()">
+          <option value="active">Contratos Ativos</option>
+          <option value="ended">Contratos Encerrados</option>
+          <option value="all">Todos</option>
+        </select>
+        <select class="filter-select" id="filter-contract-plan" onchange="renderContracts()">
+          <option value="">Todos os planos</option>
+          <option value="Básico">Básico</option>
+          <option value="Profissional">Profissional</option>
+          <option value="Premium">Premium</option>
+          <option value="Enterprise">Enterprise</option>
+        </select>
+      </div>
+
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:4px" id="contracts-grid" class="animate-in"></div>
+    </div>
+
+    <!-- TAB: Despesas -->
+    <div class="tab-panel" id="tab-despesas">
+      <div class="animate-in mt-2">
+
+        <div class="filter-bar mb-3">
+          <button class="btn btn-primary btn-sm" onclick="openDespesaModal()">+ Despesa</button>
+          <select class="filter-select" id="filter-despesa-tipo" onchange="filterDespesas()">
+            <option value="">Todas as categorias</option>
+            <option value="salario">Salários</option>
+            <option value="comissao">Comissionamento</option>
+            <option value="operacional">Operacional</option>
+            <option value="marketing">Marketing</option>
+            <option value="outro">Outros</option>
+          </select>
+        </div>
+
+        <!-- Resumo despesas -->
+        <div class="financial-overview animate-in" style="margin-bottom:16px">
+          <div class="fin-card" style="border-color:rgba(239,68,68,0.3)">
+            <div class="fin-card-label">Total Despesas (mês)</div>
+            <div class="fin-card-value" id="desp-total" style="color:var(--red)">—</div>
+            <div class="fin-card-sub">soma de todos os custos</div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-card-label">Salários</div>
+            <div class="fin-card-value" id="desp-salarios" style="color:var(--yellow)">—</div>
+            <div class="fin-card-sub">folha de pagamento</div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-card-label">Comissionamento</div>
+            <div class="fin-card-value" id="desp-comissao" style="color:var(--accent)">—</div>
+            <div class="fin-card-sub">comissões a pagar</div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-card-label">Operacional</div>
+            <div class="fin-card-value" id="desp-operacional" style="color:var(--blue)">—</div>
+            <div class="fin-card-sub">custos operacionais</div>
+          </div>
+        </div>
+
+        <div class="table-container animate-in">
+          <table>
+            <thead>
+              <tr><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Data</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="despesas-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Balanço Patrimonial -->
+    <div class="tab-panel" id="tab-balanco">
+      <div class="animate-in mt-2">
+
+        <div class="grid-2" style="gap:20px;margin-bottom:20px">
+
+          <!-- Ativo -->
+          <div class="card">
+            <div class="card-header" style="background:rgba(34,197,94,0.06);border-bottom:2px solid rgba(34,197,94,0.2)">
+              <span class="card-title" style="color:var(--green)">⬆ ATIVO</span>
+              <span class="text-muted text-sm" id="ativo-total">—</span>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:14px">
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Ativo Circulante</div>
+                <div id="ativo-circulante"></div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Ativo Não Circulante</div>
+                <div id="ativo-nao-circulante"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Passivo + PL -->
+          <div>
+            <div class="card mb-3">
+              <div class="card-header" style="background:rgba(239,68,68,0.06);border-bottom:2px solid rgba(239,68,68,0.2)">
+                <span class="card-title" style="color:var(--red)">⬇ PASSIVO</span>
+                <span class="text-muted text-sm" id="passivo-total">—</span>
+              </div>
+              <div class="card-body" id="passivo-body"></div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="background:rgba(99,102,241,0.06);border-bottom:2px solid rgba(99,102,241,0.2)">
+                <span class="card-title" style="color:var(--accent)">💎 PATRIMÔNIO LÍQUIDO</span>
+                <span class="text-muted text-sm" id="pl-total">—</span>
+              </div>
+              <div class="card-body" id="pl-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:rgba(34,197,94,0.3)">
+          <div class="card-body" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+            <div style="font-size:13px;color:var(--text-secondary)">Equação Patrimonial: <strong>Ativo = Passivo + Patrimônio Líquido</strong></div>
+            <div id="balanco-check" style="font-weight:700;font-size:14px;margin-left:auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Resultado -->
+    <div class="tab-panel" id="tab-resultado">
+      <div class="animate-in mt-2">
+
+        <div class="filter-bar mb-3">
+          <select class="filter-select" id="resultado-periodo" onchange="renderResultado()">
+            <option value="semanal">Semanal</option>
+            <option value="mensal" selected>Mensal</option>
+            <option value="semestral">Semestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+
+        <div class="financial-overview animate-in" style="margin-bottom:20px">
+          <div class="fin-card" style="border-color:rgba(34,197,94,0.35)">
+            <div class="fin-card-label">Receita Bruta</div>
+            <div class="fin-card-value" id="res-receita" style="color:var(--green)">—</div>
+            <div class="fin-card-sub" id="res-receita-sub">período selecionado</div>
+          </div>
+          <div class="fin-card" style="border-color:rgba(239,68,68,0.3)">
+            <div class="fin-card-label">Total Despesas</div>
+            <div class="fin-card-value" id="res-despesas" style="color:var(--red)">—</div>
+            <div class="fin-card-sub">custos do período</div>
+          </div>
+          <div class="fin-card" style="border-color:rgba(99,102,241,0.3)">
+            <div class="fin-card-label">Resultado Líquido</div>
+            <div class="fin-card-value" id="res-liquido" style="color:var(--accent)">—</div>
+            <div class="fin-card-sub">receita − despesas</div>
+          </div>
+          <div class="fin-card" style="border-color:rgba(234,179,8,0.3)">
+            <div class="fin-card-label">Margem de Lucro</div>
+            <div class="fin-card-value" id="res-margem" style="color:var(--yellow)">—</div>
+            <div class="fin-card-sub">% do faturamento</div>
+          </div>
+        </div>
+
+        <div class="card animate-in">
+          <div class="card-header">
+            <span class="card-title">Demonstração de Resultado (DRE)</span>
+            <span class="text-muted text-sm" id="res-periodo-label">—</span>
+          </div>
+          <div class="card-body" id="dre-body"></div>
+        </div>
+
+      </div>
     </div>
 
   </main>
