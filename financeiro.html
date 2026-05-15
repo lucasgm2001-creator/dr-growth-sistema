@@ -504,9 +504,10 @@ function updateKPIs() {
 }
 
 function renderMRR() {
-  const mrr = allClients.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
+  const clients = getFilteredClients();
+  const mrr = clients.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
   document.getElementById('mrr-total-label').textContent = `Total: ${fmt.currency(mrr)}/mês`;
-  const sorted = [...allClients].sort((a,b)=>b.monthly_value-a.monthly_value);
+  const sorted = [...clients].sort((a,b)=>b.monthly_value-a.monthly_value);
   document.getElementById('mrr-breakdown').innerHTML = sorted.map(c => {
     const pct = mrr > 0 ? Math.round((c.monthly_value/mrr)*100) : 0;
     return `
