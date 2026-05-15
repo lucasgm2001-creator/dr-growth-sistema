@@ -435,7 +435,13 @@ function filterTasks() {
   const resp = document.getElementById('filter-resp-task').value;
   const pri  = document.getElementById('filter-priority').value;
   const sta  = document.getElementById('filter-task-status').value;
-  renderTasksList(allTasks.filter(t=>{
+  const isAdmin = session.role === 'admin';
+
+  let tasks = allTasks;
+  // Não-admin vê somente suas próprias tarefas
+  if (!isAdmin) tasks = tasks.filter(t => t.responsible === session.name);
+
+  renderTasksList(tasks.filter(t=>{
     if (q && !t.title.toLowerCase().includes(q)) return false;
     if (resp && t.responsible!==resp) return false;
     if (pri && t.priority!==pri) return false;
