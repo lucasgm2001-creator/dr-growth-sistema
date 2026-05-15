@@ -86,6 +86,112 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" id="campaigns-grid" class="animate-in"></div>
     </div>
 
+    <!-- TAB: Por Cliente -->
+    <div class="tab-panel" id="tab-clientes">
+      <div class="animate-in mt-2">
+
+        <!-- Filtros -->
+        <div class="filter-bar mb-4">
+          <select class="filter-select" id="cliente-select" onchange="renderClienteView()">
+            <option value="">Selecione um cliente…</option>
+            <option>GrowthX Agency</option>
+            <option>MedTech Brasil</option>
+            <option>US Digital LLC</option>
+            <option>Academia Fit</option>
+            <option>Restaurante Sabor</option>
+          </select>
+          <select class="filter-select" id="cliente-periodo" onchange="renderClienteView()">
+            <option value="semana">Última semana</option>
+            <option value="mes" selected>Último mês</option>
+            <option value="trimestre">Último trimestre</option>
+            <option value="semestre">Último semestre</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+          <input type="date" id="periodo-inicio" style="display:none" class="filter-select" oninput="renderClienteView()">
+          <input type="date" id="periodo-fim"    style="display:none" class="filter-select" oninput="renderClienteView()">
+        </div>
+
+        <div id="cliente-view-empty" class="empty-state animate-in">
+          <div class="empty-icon">👤</div>
+          <h3>Selecione um cliente</h3>
+          <p>Escolha um cliente acima para ver os resultados consolidados.</p>
+        </div>
+
+        <div id="cliente-view-content" style="display:none">
+
+          <!-- Header cliente -->
+          <div class="card mb-4" style="padding:20px">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="avatar avatar-lg" id="cli-avatar" style="background:linear-gradient(135deg,#a855f7,#6366f1)"></div>
+              <div>
+                <div style="font-size:18px;font-weight:800" id="cli-nome">—</div>
+                <div style="font-size:13px;color:var(--text-muted)" id="cli-periodo-label">—</div>
+              </div>
+              <div style="margin-left:auto;text-align:right">
+                <div style="font-size:11px;color:var(--text-muted)">SALDO ORÇAMENTO</div>
+                <div style="font-size:22px;font-weight:800" id="cli-saldo">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPIs consolidados -->
+          <div class="kpi-grid mb-4">
+            <div class="kpi-card" style="border-color:rgba(234,67,53,0.3)">
+              <div class="kpi-top"><span class="kpi-label">Google Ads — Invest.</span><div class="kpi-icon" style="background:rgba(234,67,53,0.1)">🔍</div></div>
+              <div class="kpi-value" id="cli-g-invest" style="color:#ea4335">—</div>
+              <div class="kpi-change neutral" id="cli-g-leads">— leads</div>
+            </div>
+            <div class="kpi-card" style="border-color:rgba(24,119,242,0.3)">
+              <div class="kpi-top"><span class="kpi-label">Meta Ads — Invest.</span><div class="kpi-icon" style="background:rgba(24,119,242,0.1)">📘</div></div>
+              <div class="kpi-value" id="cli-m-invest" style="color:#1877f2">—</div>
+              <div class="kpi-change neutral" id="cli-m-leads">— leads</div>
+            </div>
+            <div class="kpi-card" style="border-color:rgba(168,85,247,0.3)">
+              <div class="kpi-top"><span class="kpi-label">Total de Leads</span><div class="kpi-icon" style="background:rgba(168,85,247,0.1)">🎯</div></div>
+              <div class="kpi-value" id="cli-total-leads" style="color:#a855f7">—</div>
+              <div class="kpi-change neutral" id="cli-cpl">CPL: —</div>
+            </div>
+            <div class="kpi-card" style="border-color:rgba(34,197,94,0.3)">
+              <div class="kpi-top"><span class="kpi-label">ROAS Médio</span><div class="kpi-icon" style="background:rgba(34,197,94,0.1)">📉</div></div>
+              <div class="kpi-value" id="cli-roas" style="color:var(--green)">—</div>
+              <div class="kpi-change neutral">retorno sobre ad spend</div>
+            </div>
+          </div>
+
+          <!-- Comparativo Google vs Meta -->
+          <div class="grid-2 mb-4">
+            <div class="card" style="border-color:rgba(234,67,53,0.25)">
+              <div class="card-header" style="background:rgba(234,67,53,0.05)">
+                <span class="card-title">🔍 Google Ads</span>
+              </div>
+              <div class="card-body" id="cli-google-detail"></div>
+            </div>
+            <div class="card" style="border-color:rgba(24,119,242,0.25)">
+              <div class="card-header" style="background:rgba(24,119,242,0.05)">
+                <span class="card-title">📘 Meta Ads</span>
+              </div>
+              <div class="card-body" id="cli-meta-detail"></div>
+            </div>
+          </div>
+
+          <!-- Campanhas do cliente -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Campanhas Ativas</span>
+            </div>
+            <div class="table-container" style="border:none;border-radius:0">
+              <table>
+                <thead>
+                  <tr><th>Campanha</th><th>Plataforma</th><th>Investimento</th><th>Leads</th><th>CPL</th><th>ROAS</th><th>Status</th></tr>
+                </thead>
+                <tbody id="cli-campanhas-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB: Métricas -->
     <div class="tab-panel" id="tab-metricas">
       <div class="animate-in mt-2">
