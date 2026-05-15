@@ -499,7 +499,8 @@ function filterLeads() {
   const q    = document.getElementById('search-leads').value.toLowerCase();
   const stage = document.getElementById('filter-stage').value;
   const resp  = document.getElementById('filter-resp').value;
-  renderLeadsTable(leads.filter(l => {
+  const base  = window.filterByCountry ? window.filterByCountry(leads) : leads;
+  renderLeadsTable(base.filter(l => {
     if (q && !l.name.toLowerCase().includes(q) && !(l.company||'').toLowerCase().includes(q)) return false;
     if (stage && l.stage !== stage) return false;
     if (resp && l.responsible !== resp) return false;
