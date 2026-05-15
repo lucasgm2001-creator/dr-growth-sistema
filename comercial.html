@@ -594,10 +594,12 @@ function renderPipeline() {
 function openNewLeadModal(stage = 'novo') {
   document.getElementById('modal-title').textContent = 'Novo Lead';
   document.getElementById('lead-id').value = '';
-  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
+  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes','lead-location','ai-lead-text'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('lead-nicho').value = '';
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-stage').value = stage;
-  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('ai-parse-result').style.display = 'none';
+  populateVendedoresSelect();
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -615,7 +617,25 @@ function openEditModal(id) {
   document.getElementById('lead-origin').value = l.origin||'';
   document.getElementById('lead-notes').value = l.notes||'';
   document.getElementById('lead-stage').value = l.stage;
-  document.getElementById('lead-responsible').value = l.responsible||'Daniel';
+  document.getElementById('lead-location').value = l.location||'';
+  document.getElementById('ai-lead-text').value = '';
+  document.getElementById('ai-parse-result').style.display = 'none';
+  populateVendedoresSelect();
+  // set nicho
+  const nichoSel = document.getElementById('lead-nicho');
+  if (l.nicho) {
+    const opt = Array.from(nichoSel.options).find(o => o.value === l.nicho);
+    nichoSel.value = opt ? l.nicho : '';
+    if (!opt) {
+      const o = new Option(l.nicho, l.nicho);
+      nichoSel.add(o);
+      nichoSel.value = l.nicho;
+    }
+  } else nichoSel.value = '';
+  // set responsible
+  const respSel = document.getElementById('lead-responsible');
+  const respOpt = Array.from(respSel.options).find(o => o.value === l.responsible);
+  if (respOpt) respSel.value = l.responsible;
   document.getElementById('delete-btn').style.display = 'inline-flex';
   document.getElementById('lead-modal').classList.add('show');
 }
