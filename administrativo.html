@@ -325,7 +325,8 @@ async function loadData() {
 
 // ---- CLIENTES ----
 function updateClientKPIs() {
-  const active = allClients.filter(c=>c.active!==false);
+  const base   = window.filterByCountry ? window.filterByCountry(allClients) : allClients;
+  const active = base.filter(c=>c.active!==false);
   const mrr    = active.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
   document.getElementById('kpi-clients').textContent = active.length;
   document.getElementById('kpi-mrr').textContent     = fmt.currency(mrr);
