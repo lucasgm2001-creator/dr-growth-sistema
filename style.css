@@ -242,7 +242,7 @@ img { display: block; max-width: 100%; }
   background: linear-gradient(135deg, var(--drg-navy), var(--drg-blue-mid));
   color: white;
   border-color: transparent;
-  box-shadow: 0 2px 12px rgba(68,114,216,0.35);
+  box-shadow: 0 2px 12px rgba(36,76,156,0.45);
 }
 
 .btn-primary:hover {
