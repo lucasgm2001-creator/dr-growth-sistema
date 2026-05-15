@@ -671,6 +671,199 @@ async function deletePayment() {
 }
 
 document.getElementById('pay-modal').addEventListener('click', e => { if (e.target===document.getElementById('pay-modal')) closeModal(); });
+document.getElementById('despesa-modal').addEventListener('click', e => { if (e.target===document.getElementById('despesa-modal')) closeDespesaModal(); });
+
+// ---- DESPESAS ----
+const DEMO_DESPESAS = [
+  { id:1, desc:'Salário — Gabriel Ramos',  tipo:'salario',    valor:3500, data:'2026-05-05', status:'paid' },
+  { id:2, desc:'Salário — Thamyris Lages', tipo:'salario',    valor:3000, data:'2026-05-05', status:'paid' },
+  { id:3, desc:'Salário — Lucas Moraes',   tipo:'salario',    valor:2800, data:'2026-05-05', status:'paid' },
+  { id:4, desc:'Comissão — Lucas Moraes',  tipo:'comissao',   valor:1200, data:'2026-05-10', status:'pending' },
+  { id:5, desc:'Ferramentas (SaaS)',        tipo:'operacional', valor:850, data:'2026-05-01', status:'paid' },
+  { id:6, desc:'Mídia paga — Meta Ads',    tipo:'marketing',   valor:2000, data:'2026-05-08', status:'paid' },
+  { id:7, desc:'Aluguel escritório',        tipo:'operacional', valor:1500, data:'2026-05-01', status:'paid' },
+  { id:8, desc:'Comissão — Gabriel Ramos', tipo:'comissao',    valor:400,  data:'2026-05-10', status:'pending' },
+];
+
+let allDespesas = [...DEMO_DESPESAS];
+
+const TIPO_INFO = {
+  salario:     { label:'Salários',       color:'var(--yellow)', cls:'badge-yellow' },
+  comissao:    { label:'Comissionamento',color:'var(--accent)', cls:'badge-accent' },
+  operacional: { label:'Operacional',    color:'var(--blue)',   cls:'badge-blue'   },
+  marketing:   { label:'Marketing',      color:'var(--purple)', cls:'badge-muted'  },
+  outro:       { label:'Outros',         color:'var(--text-muted)', cls:'badge-muted' },
+};
+
+function filterDespesas() { renderDespesasUI(); }
+
+function renderDespesasUI() {
+  const tipoFilter = document.getElementById('filter-despesa-tipo')?.value || '';
+  const filtered = tipoFilter ? allDespesas.filter(d => d.tipo === tipoFilter) : allDespesas;
+
+  const sum = (tipo) => allDespesas.filter(d=>d.tipo===tipo).reduce((s,d)=>s+(d.valor||0),0);
+  const total = allDespesas.reduce((s,d)=>s+(d.valor||0),0);
+
+  document.getElementById('desp-total').textContent     = fmt.currency(total);
+  document.getElementById('desp-salarios').textContent  = fmt.currency(sum('salario'));
+  document.getElementById('desp-comissao').textContent  = fmt.currency(sum('comissao'));
+  document.getElementById('desp-operacional').textContent = fmt.currency(sum('operacional') + sum('marketing') + sum('outro'));
+
+  const rows = filtered.map(d => {
+    const ti = TIPO_INFO[d.tipo] || TIPO_INFO.outro;
+    return `<tr>
+      <td><div class="td-main">${d.desc}</div></td>
+      <td><span class="badge ${ti.cls}">${ti.label}</span></td>
+      <td style="font-weight:700;color:var(--red)">${fmt.currency(d.valor)}</td>
+      <td>${fmt.date(d.data)}</td>
+      <td><span class="badge ${d.status==='paid'?'badge-green':'badge-yellow'}">${d.status==='paid'?'Pago':'A pagar'}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openEditDespesa(${d.id})">✏️</button></td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">💸</div><h3>Sem despesas</h3></div></td></tr>`;
+  document.getElementById('despesas-tbody').innerHTML = rows;
+}
+
+function openDespesaModal() {
+  document.getElementById('despesa-modal-title').textContent = 'Nova Despesa';
+  document.getElementById('desp-id').value = '';
+  ['desp-desc','desp-valor','desp-data'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('desp-tipo').value='salario';
+  document.getElementById('desp-status').value='pending';
+  document.getElementById('desp-delete-btn').style.display='none';
+  document.getElementById('despesa-modal').classList.add('show');
+}
+
+function openEditDespesa(id) {
+  const d = allDespesas.find(x=>x.id===id);
+  if (!d) return;
+  document.getElementById('despesa-modal-title').textContent = 'Editar Despesa';
+  document.getElementById('desp-id').value = d.id;
+  document.getElementById('desp-desc').value = d.desc||'';
+  document.getElementById('desp-tipo').value = d.tipo||'outro';
+  document.getElementById('desp-valor').value = d.valor||'';
+  document.getElementById('desp-data').value = d.data||'';
+  document.getElementById('desp-status').value = d.status||'pending';
+  document.getElementById('desp-delete-btn').style.display='inline-flex';
+  document.getElementById('despesa-modal').classList.add('show');
+}
+
+function closeDespesaModal() { document.getElementById('despesa-modal').classList.remove('show'); }
+
+function saveDespesa() {
+  const id = document.getElementById('desp-id').value;
+  const desc = document.getElementById('desp-desc').value.trim();
+  const valor = Number(document.getElementById('desp-valor').value);
+  if (!desc || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
+  const data = { desc, tipo:document.getElementById('desp-tipo').value, valor, data:document.getElementById('desp-data').value||null, status:document.getElementById('desp-status').value };
+  if (id) {
+    const idx = allDespesas.findIndex(d=>d.id==id);
+    if (idx>=0) allDespesas[idx]={...allDespesas[idx],...data};
+    showToast('Despesa atualizada!','success');
+  } else {
+    allDespesas.unshift({...data,id:Date.now()});
+    showToast('Despesa criada!','success');
+  }
+  closeDespesaModal(); renderDespesasUI();
+}
+
+function deleteDespesa() {
+  const id = document.getElementById('desp-id').value;
+  if (!id||!confirm('Excluir despesa?')) return;
+  allDespesas = allDespesas.filter(d=>d.id!=id);
+  closeDespesaModal(); renderDespesasUI();
+  showToast('Despesa excluída.','info');
+}
+
+// ---- BALANÇO PATRIMONIAL ----
+function renderBalanco() {
+  const mrr = allClients.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
+  const recebido = allPayments.filter(p=>p.status==='paid').reduce((s,p)=>s+(Number(p.amount)||0),0);
+  const totalDesp = allDespesas.reduce((s,d)=>s+(d.valor||0),0);
+  const aPagar = allPayments.filter(p=>p.status!=='paid').reduce((s,p)=>s+(Number(p.amount)||0),0);
+
+  const ativoCirc = { 'Caixa e Equivalentes': recebido * 0.6, 'Contas a Receber': aPagar, 'Adiantamentos': mrr * 0.1 };
+  const ativoNaoCirc = { 'Equipamentos / Hardware': 8500, 'Softwares e Licenças': 3200, 'Marca e Domínios': 2000 };
+  const totalAtivoCirc = Object.values(ativoCirc).reduce((s,v)=>s+v,0);
+  const totalAtivoNaoCirc = Object.values(ativoNaoCirc).reduce((s,v)=>s+v,0);
+  const totalAtivo = totalAtivoCirc + totalAtivoNaoCirc;
+
+  const passivo = { 'Salários a Pagar': allDespesas.filter(d=>d.tipo==='salario'&&d.status!=='paid').reduce((s,d)=>s+d.valor,0), 'Comissões a Pagar': allDespesas.filter(d=>d.tipo==='comissao'&&d.status!=='paid').reduce((s,d)=>s+d.valor,0), 'Fornecedores': totalDesp * 0.05 };
+  const totalPassivo = Object.values(passivo).reduce((s,v)=>s+v,0);
+  const pl = totalAtivo - totalPassivo;
+
+  document.getElementById('ativo-total').textContent = `Total: ${fmt.currency(totalAtivo)}`;
+  document.getElementById('passivo-total').textContent = `Total: ${fmt.currency(totalPassivo)}`;
+  document.getElementById('pl-total').textContent = fmt.currency(pl);
+
+  const rowStyle = (v) => `<div class="flex items-center justify-between" style="padding:8px 0;border-bottom:1px solid var(--border)">`;
+
+  document.getElementById('ativo-circulante').innerHTML = Object.entries(ativoCirc).map(([k,v])=>`
+    <div class="flex items-center justify-between" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">${k}</span><span style="font-weight:700;color:var(--green)">${fmt.currency(v)}</span>
+    </div>`).join('') + `<div class="flex items-center justify-between" style="padding:8px 0;font-weight:700"><span>Subtotal</span><span style="color:var(--green)">${fmt.currency(totalAtivoCirc)}</span></div>`;
+
+  document.getElementById('ativo-nao-circulante').innerHTML = Object.entries(ativoNaoCirc).map(([k,v])=>`
+    <div class="flex items-center justify-between" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">${k}</span><span style="font-weight:700;color:var(--green)">${fmt.currency(v)}</span>
+    </div>`).join('') + `<div class="flex items-center justify-between" style="padding:8px 0;font-weight:700"><span>Subtotal</span><span style="color:var(--green)">${fmt.currency(totalAtivoNaoCirc)}</span></div>`;
+
+  document.getElementById('passivo-body').innerHTML = Object.entries(passivo).map(([k,v])=>`
+    <div class="flex items-center justify-between" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:13px">${k}</span><span style="font-weight:700;color:var(--red)">${fmt.currency(v)}</span>
+    </div>`).join('');
+
+  document.getElementById('pl-body').innerHTML = `
+    <div class="flex items-center justify-between" style="padding:7px 0">
+      <span style="font-size:13px">Capital + Lucros Acumulados</span>
+      <span style="font-weight:800;font-size:18px;color:${pl>=0?'var(--green)':'var(--red)'}">${fmt.currency(pl)}</span>
+    </div>`;
+
+  const balanced = Math.abs(totalAtivo - (totalPassivo + pl)) < 1;
+  document.getElementById('balanco-check').innerHTML = balanced
+    ? `<span style="color:var(--green)">✓ Balanço conferido (Ativo = ${fmt.currency(totalAtivo)})</span>`
+    : `<span style="color:var(--red)">⚠ Divergência detectada</span>`;
+}
+
+// ---- RESULTADO ----
+function renderResultado() {
+  const periodo = document.getElementById('resultado-periodo')?.value || 'mensal';
+  const mrr = allClients.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
+  const totalDesp = allDespesas.reduce((s,d)=>s+(d.valor||0),0);
+
+  const multiplicador = { semanal: 1/4, mensal: 1, semestral: 6, anual: 12 };
+  const labels = { semanal:'Semana atual', mensal:'Mês atual (Maio/2026)', semestral:'Semestre (Jan-Jun/2026)', anual:'Ano 2026' };
+
+  const mult = multiplicador[periodo] || 1;
+  const receita = mrr * mult;
+  const despesas = totalDesp * mult;
+  const liquido = receita - despesas;
+  const margem = receita > 0 ? (liquido / receita * 100).toFixed(1) : 0;
+
+  document.getElementById('res-receita').textContent = fmt.currency(receita);
+  document.getElementById('res-receita-sub').textContent = labels[periodo];
+  document.getElementById('res-despesas').textContent = fmt.currency(despesas);
+  document.getElementById('res-liquido').textContent = fmt.currency(liquido);
+  document.getElementById('res-liquido').style.color = liquido >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('res-margem').textContent = margem + '%';
+  document.getElementById('res-periodo-label').textContent = labels[periodo];
+
+  const dreItems = [
+    { label:'(+) Receita Bruta de Serviços', value: receita, color:'var(--green)', bold:true },
+    { label:'(−) Deduções / Impostos (est. 8%)', value: -(receita*0.08), color:'var(--red)' },
+    { label:'(=) Receita Líquida', value: receita*0.92, color:'var(--green)', bold:true },
+    { label:'(−) Salários e Encargos', value: -(allDespesas.filter(d=>d.tipo==='salario').reduce((s,d)=>s+d.valor,0) * mult), color:'var(--red)' },
+    { label:'(−) Comissionamento', value: -(allDespesas.filter(d=>d.tipo==='comissao').reduce((s,d)=>s+d.valor,0) * mult), color:'var(--red)' },
+    { label:'(−) Despesas Operacionais', value: -(allDespesas.filter(d=>d.tipo==='operacional'||d.tipo==='marketing'||d.tipo==='outro').reduce((s,d)=>s+d.valor,0) * mult), color:'var(--red)' },
+    { label:'(=) RESULTADO LÍQUIDO', value: liquido, color: liquido>=0?'var(--green)':'var(--red)', bold:true, big:true },
+  ];
+
+  document.getElementById('dre-body').innerHTML = dreItems.map(item => `
+    <div class="flex items-center justify-between" style="padding:10px 0;border-bottom:1px solid var(--border);${item.big?'margin-top:6px':''}">
+      <span style="font-size:${item.big?'14px':'13px'};font-weight:${item.bold?'700':'400'}">${item.label}</span>
+      <span style="font-weight:${item.big?'800':'700'};font-size:${item.big?'18px':'14px'};color:${item.color}">${fmt.currency(item.value)}</span>
+    </div>`).join('');
+}
+
 loadData();
 </script>
 </body>
