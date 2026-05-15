@@ -360,6 +360,7 @@ async function loadLeads() {
     leads = DEMO_LEADS;
     history = DEMO_HISTORY;
   }
+  populateVendedoresSelect();
   updateSubtitle();
   renderKanban();
   renderLeadsTable(leads);
