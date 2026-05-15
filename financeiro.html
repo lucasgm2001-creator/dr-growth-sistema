@@ -528,7 +528,8 @@ function renderMRR() {
 function filterPayments() {
   const q   = document.getElementById('search-pay').value.toLowerCase();
   const sta = document.getElementById('filter-status').value;
-  renderPaymentsTable(allPayments.filter(p => {
+  const base = getFilteredPayments();
+  renderPaymentsTable(base.filter(p => {
     if (q && !(p.client_name||'').toLowerCase().includes(q)) return false;
     if (sta && p.status !== sta) return false;
     return true;
