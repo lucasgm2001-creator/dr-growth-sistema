@@ -440,7 +440,7 @@ function renderTasksList(tasks) {
       const pri = PRIORITY[t.priority]||{label:t.priority,cls:'badge-muted'};
       const sta = TASK_STATUS[t.status]||{label:t.status,cls:'badge-muted'};
       const over = isOverdue(t);
-      const canEdit = isAdmin || t.responsible === session.name;
+      const isResponsible = t.responsible === session.name;
       return `
         <div class="task-item">
           <div class="task-check ${t.status==='done'?'done':''}" onclick="toggleTask(${t.id},event)">${t.status==='done'?'✓':''}</div>
@@ -453,7 +453,7 @@ function renderTasksList(tasks) {
               ${t.due_date?`<span style="color:${over?'var(--red)':'var(--text-muted)'}">📅 ${fmt.relative(t.due_date)} (${fmt.date(t.due_date)})${over?' ⚠️':''}</span>`:''}
               <span class="badge ${pri.cls}">${pri.label}</span>
             </div>
-            ${canEdit && !isAdmin ? `
+            ${isResponsible ? `
             <div style="display:flex;gap:6px;margin-top:8px">
               ${['pending','in_progress','done'].map(s=>`
                 <button class="btn btn-sm ${t.status===s?'btn-primary':'btn-secondary'}" onclick="updateTaskStatus(${t.id},'${s}',event)">
