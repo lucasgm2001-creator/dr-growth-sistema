@@ -405,6 +405,7 @@ function switchTab(name, btn) {
   if (name === 'campanhas') { mb.textContent = '+ Campanha'; mb.onclick = openCampaignModal; mb.style.display = ''; }
   else if (name === 'conteudo') { mb.textContent = '+ Conteúdo'; mb.onclick = openContentModal; mb.style.display = ''; }
   else mb.style.display = 'none';
+  if (name === 'clientes') renderClienteView();
 }
 
 function updateKPIs() {
