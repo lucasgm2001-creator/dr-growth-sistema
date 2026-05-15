@@ -435,7 +435,7 @@ function renderCampaigns() {
     const pctBudget = c.budget > 0 ? Math.min(Math.round((c.spend/c.budget)*100), 100) : 0;
 
     return `
-      <div class="campaign-card" onclick="openEditCampaign(${c.id})">
+      <div class="campaign-card" onclick="openCampaignDetail(${c.id})" style="cursor:pointer">
         <div class="campaign-platform">
           <div class="platform-icon" style="background:${pi.color}18;font-size:20px">${pi.icon}</div>
           <div>
