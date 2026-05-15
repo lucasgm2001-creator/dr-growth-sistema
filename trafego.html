@@ -916,6 +916,11 @@ updateKPIs();
 renderCampaigns();
 renderMetrics();
 renderContent(contents);
+initCountrySelector('trafego', () => {
+  updateKPIs();
+  renderCampaigns();
+  renderMetrics();
+});
 </script>
 </body>
 </html>
