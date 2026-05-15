@@ -517,12 +517,13 @@ function updateKPIs() {
 }
 
 function renderCampaigns() {
-  const grid = document.getElementById('campaigns-grid');
-  if (!campaigns.length) {
+  const grid     = document.getElementById('campaigns-grid');
+  const filtered = getFilteredCampaigns();
+  if (!filtered.length) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🚀</div><h3>Sem campanhas</h3><p>Adicione a primeira campanha.</p></div>`;
     return;
   }
-  grid.innerHTML = campaigns.map(c => {
+  grid.innerHTML = filtered.map(c => {
     const pi = PLATFORM_INFO[c.platform] || { name:c.platform, icon:'📊', color:'#6366f1' };
     const si = STATUS_CAMP[c.status] || { label:c.status, cls:'badge-muted' };
     const roas = c.spend > 0 ? ((c.leads * 500) / c.spend).toFixed(1) : '—'; // estimated
