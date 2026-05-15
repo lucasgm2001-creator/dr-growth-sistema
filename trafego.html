@@ -799,6 +799,7 @@ function saveContent() {
   showToast('Conteúdo adicionado!', 'success');
 }
 
+document.getElementById('campaign-detail-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-detail-modal')) closeCampaignDetail(); });
 document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
 document.getElementById('content-modal').addEventListener('click', e => { if (e.target===document.getElementById('content-modal')) closeContentModal(); });
 
