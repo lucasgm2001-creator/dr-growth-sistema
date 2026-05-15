@@ -478,11 +478,16 @@ async function loadData() {
   renderContracts();
 }
 
+function getFilteredPayments() { return window.filterByCountry ? window.filterByCountry(allPayments) : allPayments; }
+function getFilteredClients()  { return window.filterByCountry ? window.filterByCountry(allClients)  : allClients;  }
+
 function updateKPIs() {
-  const paid    = allPayments.filter(p => p.status === 'paid');
-  const pending = allPayments.filter(p => p.status === 'pending');
-  const overdue = allPayments.filter(p => p.status === 'overdue');
-  const mrr     = allClients.reduce((s,c) => s+(Number(c.monthly_value)||0), 0);
+  const payments = getFilteredPayments();
+  const clients  = getFilteredClients();
+  const paid    = payments.filter(p => p.status === 'paid');
+  const pending = payments.filter(p => p.status === 'pending');
+  const overdue = payments.filter(p => p.status === 'overdue');
+  const mrr     = clients.reduce((s,c) => s+(Number(c.monthly_value)||0), 0);
   const sum = arr => arr.reduce((s,p) => s+(Number(p.amount)||0), 0);
 
   document.getElementById('fin-mrr').textContent      = fmt.currency(mrr);
