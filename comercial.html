@@ -233,6 +233,39 @@
   </div>
 </div>
 
+<!-- MODAL Comissão -->
+<div class="modal-overlay" id="comissao-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Ajustar Taxa de Comissão</h3>
+      <button class="modal-close" onclick="closeComissaoModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Vendedor</label>
+        <select class="form-control" id="com-vendedor">
+          <option value="Lucas">Lucas Moraes</option>
+          <option value="Daniel">Daniel Ramos</option>
+          <option value="Gabriel">Gabriel Ramos</option>
+          <option value="Thamyris">Thamyris Lages</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Taxa de Comissão (%)</label>
+        <input type="number" class="form-control" id="com-taxa" placeholder="Ex: 10" min="0" max="100" step="0.5">
+      </div>
+      <div class="form-group">
+        <label>Observação</label>
+        <input type="text" class="form-control" id="com-obs" placeholder="Motivo do ajuste…">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeComissaoModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveComissaoTaxa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
