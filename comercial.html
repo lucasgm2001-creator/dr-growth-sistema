@@ -677,6 +677,95 @@ async function deleteLead() {
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
 document.getElementById('comissao-modal').addEventListener('click', e => { if (e.target === document.getElementById('comissao-modal')) closeComissaoModal(); });
 
+// ---- PARSER DE IA (smart regex) ----
+function parseLeadWithAI() {
+  const text = document.getElementById('ai-lead-text').value.trim();
+  if (!text) { showToast('Cole o texto do lead primeiro.', 'error'); return; }
+
+  const lower = text.toLowerCase();
+  const set   = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val.trim(); };
+
+  // Nome
+  const nomeMatch = text.match(/(?:nome|name|cliente)\s*[:\-–]\s*([A-ZÀ-Ú][^\n\r,;]+)/i)
+                 || text.match(/^([A-ZÀ-Ú][a-zà-ú]+(?: [A-ZÀ-Ú][a-zà-ú]+)+)/m);
+  if (nomeMatch) set('lead-name', nomeMatch[1]);
+
+  // Empresa
+  const empMatch = text.match(/(?:empresa|company|negócio|negocio|loja|clínica|clinica)\s*[:\-–]\s*([^\n\r,;]+)/i);
+  if (empMatch) set('lead-company', empMatch[1]);
+
+  // Telefone
+  const foneMatch = text.match(/(?:\+?\d[\d\s\(\)\-]{8,17})/);
+  if (foneMatch) set('lead-phone', foneMatch[0]);
+
+  // E-mail
+  const emailMatch = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
+  if (emailMatch) set('lead-email', emailMatch[0]);
+
+  // Localização
+  const locMatch = text.match(/(?:cidade|localização|localizacao|estado|local|fica em|mora em|sou de)\s*[:\-–]?\s*([^\n\r,;]{2,40})/i);
+  if (locMatch) set('lead-location', locMatch[1]);
+
+  // Orçamento/Valor
+  const budgetMatch = text.match(/(?:orçamento|orcamento|budget|investimento|valor)\s*[:\-–]?\s*R?\$?\s*([\d.,]+(?:\s*mil)?)/i);
+  if (budgetMatch) {
+    let val = budgetMatch[1].replace(/\./g,'').replace(',','.');
+    if (/mil/i.test(budgetMatch[0])) val = parseFloat(val) * 1000;
+    else val = parseFloat(val);
+    if (!isNaN(val)) set('lead-value', Math.round(val));
+  }
+
+  // Nicho — tenta mapear palavras-chave
+  const nichoMap = [
+    ['saúde|estética|estetica|médico|medico|dentista|clínica|clinica', 'Saúde e Estética'],
+    ['educação|educacao|escola|curso|ensino', 'Educação'],
+    ['imóvel|imovel|imobiliária|imobiliaria|corretor', 'Imóveis'],
+    ['e-commerce|ecommerce|loja virtual|marketplace', 'E-commerce'],
+    ['b2b|software|tecnologia|saas|startup', 'Tecnologia / SaaS'],
+    ['restaurante|food|gastronomia|bar|lanchonete', 'Restaurante / Food'],
+    ['academia|fitness|personal|musculação', 'Academia / Fitness'],
+    ['advocac|jurídico|juridico|advogad', 'Jurídico / Advocacia'],
+    ['construção|construcao|reforma|engenharia', 'Construção / Reforma'],
+    ['moda|roupa|vestuário|vestuario|varejo', 'Moda e Varejo'],
+  ];
+  for (const [pattern, label] of nichoMap) {
+    if (new RegExp(pattern, 'i').test(lower)) {
+      const nichoSel = document.getElementById('lead-nicho');
+      const opt = Array.from(nichoSel.options).find(o => o.value === label);
+      if (opt) { nichoSel.value = label; break; }
+    }
+  }
+
+  // Serviço/Notas
+  const servicoMatch = text.match(/(?:serviço|servico|interesse|preciso de|quero|necessito)\s*[:\-–]?\s*([^\n\r.]{5,80})/i);
+  if (servicoMatch) {
+    const notesEl = document.getElementById('lead-notes');
+    if (notesEl && !notesEl.value) notesEl.value = servicoMatch[1].trim();
+  }
+
+  document.getElementById('ai-parse-result').style.display = '';
+  showToast('Campos preenchidos automaticamente! Confira antes de salvar.', 'success');
+}
+
+// ---- GERENCIAMENTO DE VENDEDORES (admin) ----
+// Expõe funções globais para o modal de vendedores (acessível via console ou admin panel)
+window.addVendedor = function(name, email = '') {
+  if (session.role !== 'admin') { showToast('Apenas admin pode gerenciar vendedores.', 'error'); return; }
+  const vends = getVendedores();
+  vends.push({ id: Date.now(), name, email });
+  saveVendedores(vends);
+  populateVendedoresSelect();
+  showToast(`Vendedor ${name} adicionado!`, 'success');
+};
+window.removeVendedor = function(name) {
+  if (session.role !== 'admin') { showToast('Apenas admin pode gerenciar vendedores.', 'error'); return; }
+  const vends = getVendedores().filter(v => v.name !== name);
+  saveVendedores(vends);
+  populateVendedoresSelect();
+  showToast(`Vendedor ${name} removido.`, 'info');
+};
+window.listVendedores = function() { return getVendedores(); };
+
 // ---- COMISSÕES ----
 function getComissaoTaxas() {
   try {
