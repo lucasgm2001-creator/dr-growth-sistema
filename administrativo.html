@@ -265,11 +265,13 @@ if (!session) throw new Error('Not authenticated');
 let allClients = [], allTasks = [];
 
 const DEMO_CLIENTS = [
-  { id:1, name:'GrowthX Agency',    service:'Gestão de Tráfego',   responsible:'Gabriel Ramos', start_date:'2025-11-01', renewal_date:'2026-11-01', monthly_value:12000, health:'green',  active:true },
-  { id:2, name:'MedTech Brasil',    service:'Social Media + Ads',  responsible:'Gabriel Ramos', start_date:'2026-01-10', renewal_date:'2026-07-10', monthly_value:4500,  health:'green',  active:true },
-  { id:3, name:'US Digital LLC',    service:'Full Marketing',      responsible:'Lucas Moraes',  start_date:'2026-02-01', renewal_date:'2026-08-01', monthly_value:8200,  health:'yellow', active:true },
-  { id:4, name:'Restaurante Sabor', service:'Instagram + Stories', responsible:'Gabriel Ramos', start_date:'2025-09-15', renewal_date:'2026-09-15', monthly_value:1800,  health:'red',    active:true },
-  { id:5, name:'Academia Fit',      service:'Google Ads',          responsible:'Gabriel Ramos', start_date:'2026-03-01', renewal_date:'2026-09-01', monthly_value:2400,  health:'green',  active:true },
+  { id:1, name:'GrowthX Agency',    service:'Gestão de Tráfego',    responsible:'Gabriel Ramos', start_date:'2025-11-01', renewal_date:'2026-11-01', monthly_value:12000, health:'green',  active:true, country:'br' },
+  { id:2, name:'MedTech Brasil',    service:'Social Media + Ads',   responsible:'Gabriel Ramos', start_date:'2026-01-10', renewal_date:'2026-07-10', monthly_value:4500,  health:'green',  active:true, country:'br' },
+  { id:3, name:'US Digital LLC',    service:'Full Marketing',       responsible:'Lucas Moraes',  start_date:'2026-02-01', renewal_date:'2026-08-01', monthly_value:8200,  health:'yellow', active:true, country:'us' },
+  { id:4, name:'Restaurante Sabor', service:'Instagram + Stories',  responsible:'Gabriel Ramos', start_date:'2025-09-15', renewal_date:'2026-09-15', monthly_value:1800,  health:'red',    active:true, country:'br' },
+  { id:5, name:'Academia Fit',      service:'Google Ads',           responsible:'Gabriel Ramos', start_date:'2026-03-01', renewal_date:'2026-09-01', monthly_value:2400,  health:'green',  active:true, country:'br' },
+  { id:6, name:'Miami Health Co.',  service:'Full Digital Marketing',responsible:'Lucas Moraes',  start_date:'2026-02-15', renewal_date:'2026-11-15', monthly_value:5200,  health:'green',  active:true, country:'us' },
+  { id:7, name:'SaaS Platform US',  service:'Google Ads + LinkedIn', responsible:'Lucas Moraes',  start_date:'2026-03-01', renewal_date:'2026-12-01', monthly_value:9500,  health:'green',  active:true, country:'us' },
 ];
 
 const DEMO_TASKS = [
