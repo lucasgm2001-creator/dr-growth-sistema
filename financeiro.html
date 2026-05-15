@@ -312,6 +312,48 @@
   </main>
 </div>
 
+<!-- MODAL Despesa -->
+<div class="modal-overlay" id="despesa-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="despesa-modal-title">Nova Despesa</h3>
+      <button class="modal-close" onclick="closeDespesaModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="desp-id">
+      <div class="form-group"><label>Descrição *</label><input type="text" class="form-control" id="desp-desc" placeholder="Ex: Salário — Gabriel, Aluguel…"></div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Categoria</label>
+          <select class="form-control" id="desp-tipo">
+            <option value="salario">Salários</option>
+            <option value="comissao">Comissionamento</option>
+            <option value="operacional">Operacional</option>
+            <option value="marketing">Marketing</option>
+            <option value="outro">Outros</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Valor (R$) *</label><input type="number" class="form-control" id="desp-valor" placeholder="0.00"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Data</label><input type="date" class="form-control" id="desp-data"></div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="desp-status">
+            <option value="pending">A pagar</option>
+            <option value="paid">Pago</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDespesaModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="desp-delete-btn" onclick="deleteDespesa()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveDespesa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="pay-modal">
   <div class="modal">
