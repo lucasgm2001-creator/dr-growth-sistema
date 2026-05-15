@@ -155,6 +155,50 @@
       </div>
     </div>
 
+    <!-- TAB: Relatório Diário -->
+    <div class="tab-panel" id="tab-relatorio">
+      <div class="animate-in mt-2">
+
+        <!-- Formulário para enviar relatório (todos que têm acesso) -->
+        <div class="card mb-4" id="relatorio-form-card">
+          <div class="card-header">
+            <span class="card-title">📋 Enviar Relatório do Dia</span>
+            <span class="text-muted text-sm" id="relatorio-data-hoje">—</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>O que foi feito hoje?</label>
+              <textarea class="form-control" id="rel-atividades" rows="3" style="resize:vertical" placeholder="Descreva as atividades realizadas…"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Pendências / Obstáculos</label>
+              <textarea class="form-control" id="rel-pendencias" rows="2" style="resize:vertical" placeholder="Algo que ficou pendente ou impediu o trabalho?"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Prioridades para amanhã</label>
+              <textarea class="form-control" id="rel-amanha" rows="2" style="resize:vertical" placeholder="O que será focado amanhã?"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="enviarRelatorio()">Enviar Relatório</button>
+          </div>
+        </div>
+
+        <!-- Lista de relatórios (admin vê todos, funcionário vê os próprios) -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" id="relatorios-titulo">Relatórios Enviados</span>
+            <select class="filter-select" id="filter-rel-autor" onchange="renderRelatorios()" style="min-width:160px" id="rel-filter-wrap">
+              <option value="">Todos os funcionários</option>
+              <option value="Daniel Ramos">Daniel Ramos</option>
+              <option value="Lucas Moraes">Lucas Moraes</option>
+              <option value="Gabriel Ramos">Gabriel Ramos</option>
+              <option value="Thamyris Lages">Thamyris Lages</option>
+            </select>
+          </div>
+          <div id="relatorios-list"></div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
