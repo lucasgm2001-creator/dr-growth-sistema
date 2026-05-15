@@ -933,7 +933,14 @@ function saveComissaoTaxa() {
   showToast(`Taxa de ${vendedor} atualizada para ${taxa}%!`, 'success');
 }
 
-loadLeads();
+loadLeads().then(() => {
+  initCountrySelector('comercial', () => {
+    renderKanban();
+    filterLeads();
+    renderPipeline();
+    updateSubtitle();
+  });
+});
 </script>
 </body>
 </html>
