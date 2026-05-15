@@ -126,7 +126,87 @@
       </div>
     </div>
 
+    <!-- Calendário -->
+    <div class="hall-section animate-in" style="animation-delay:0.25s;margin-top:20px">
+      <div class="hall-section-header" onclick="toggleSection('calendario')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;background:rgba(68,114,216,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📅</div>
+          <div>
+            <div style="font-size:14px;font-weight:700">Calendário</div>
+            <div style="font-size:11px;color:var(--text-muted)">Compromissos da empresa e feriados BR/EUA</div>
+          </div>
+        </div>
+        <span class="hall-section-toggle" id="calendario-toggle">▶</span>
+      </div>
+      <div class="hall-section-body" id="calendario-body">
+        <div class="cal-layout" style="display:grid;grid-template-columns:1fr 250px;gap:16px;align-items:start">
+          <div id="cal-grid" class="cal-container"></div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="card-header" style="padding:12px 14px">
+                <span class="card-title" style="font-size:13px">Próximos Compromissos</span>
+              </div>
+              <div id="cal-upcoming"></div>
+            </div>
+            <div class="card">
+              <div class="card-header" style="padding:12px 14px">
+                <span class="card-title" style="font-size:13px">Legenda</span>
+              </div>
+              <div id="cal-legend" style="padding:10px 14px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- MODAL Evento Calendário -->
+<div class="modal-overlay" id="cal-event-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3 id="cal-modal-title">Novo Compromisso</h3>
+      <button class="modal-close" onclick="closeCalEventModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Título *</label><input type="text" class="form-control" id="cal-ev-title" placeholder="Ex: Reunião com cliente"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Data *</label><input type="date" class="form-control" id="cal-ev-date"></div>
+        <div class="form-group"><label>Horário</label><input type="time" class="form-control" id="cal-ev-time"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Categoria</label>
+          <select class="form-control" id="cal-ev-category">
+            <option>Reunião</option><option>Financeiro</option><option>Comercial</option>
+            <option>Tráfego</option><option>Administrativo</option><option>Urgente</option>
+            <option>Cliente</option><option>Interno</option>
+          </select>
+        </div>
+        <div class="form-group"><label>País</label>
+          <select class="form-control" id="cal-ev-country">
+            <option value="both">Ambos</option>
+            <option value="br">Brasil</option>
+            <option value="us">EUA</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Responsável</label>
+        <select class="form-control" id="cal-ev-resp">
+          <option>Daniel Ramos</option><option>Lucas Moraes</option>
+          <option>Gabriel Ramos</option><option>Thamyris Lages</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Descrição</label>
+        <textarea class="form-control" id="cal-ev-desc" rows="2" style="resize:vertical" placeholder="Detalhes do compromisso…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCalEventModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="cal-delete-btn" onclick="deleteCalEvent()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveCalEvent()">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <script src="supabase-config.js"></script>
