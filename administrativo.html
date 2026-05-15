@@ -503,6 +503,17 @@ async function toggleTask(id, e) {
   showToast(t.status==='done'?'Tarefa concluída! ✓':'Tarefa reaberta.','success');
 }
 
+async function updateTaskStatus(id, newStatus, e) {
+  e.stopPropagation();
+  const t = allTasks.find(x=>x.id===id);
+  if (!t) return;
+  t.status = newStatus;
+  if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus}).eq('id',id);
+  updateTaskKPIs(); filterTasks();
+  const labels = { pending:'Pendente', in_progress:'Em andamento', done:'Concluído' };
+  showToast(`Status: ${labels[newStatus]}`, 'success');
+}
+
 // ---- Modais Cliente ----
 function openClientModal() {
   document.getElementById('client-modal-title').textContent='Novo Cliente';
