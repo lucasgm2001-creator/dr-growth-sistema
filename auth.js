@@ -70,16 +70,16 @@ const ADMIN_SECTION = {
 // ---- Usuários de demonstração ----
 const AUTH = {
   demoUsers: [
-    { email: 'daniel@drgrowth.com',   password: 'daniel123',   name: 'Daniel Rocha',   role: 'admin',      color: '#6366f1' },
+    { email: 'daniel@drgrowth.com',   password: 'daniel123',   name: 'Daniel Ramos',   role: 'admin',      color: '#6366f1' },
     { email: 'lucas@drgrowth.com',    password: 'lucas123',    name: 'Lucas Moraes',   role: 'comercial',  color: '#3b82f6' },
-    { email: 'gabriel@drgrowth.com',  password: 'gabriel123',  name: 'Gabriel Silva',  role: 'trafego',    color: '#a855f7' },
-    { email: 'thamyris@drgrowth.com', password: 'thamyris123', name: 'Thamyris Costa', role: 'financeiro', color: '#22c55e' },
+    { email: 'gabriel@drgrowth.com',  password: 'gabriel123',  name: 'Gabriel Ramos',  role: 'trafego',    color: '#a855f7' },
+    { email: 'thamyris@drgrowth.com', password: 'thamyris123', name: 'Thamyris Lages', role: 'financeiro', color: '#22c55e' },
   ],
 
   roleLabels: {
     admin:     'Gestor · Acesso total',
     comercial: 'Comercial EUA',
-    trafego:   'Tráfego & Marketing',
+    trafego:   'Tráfego & Administrativo',
     financeiro:'Administrativo & Financeiro',
   },
 
