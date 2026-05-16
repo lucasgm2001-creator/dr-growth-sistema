@@ -689,6 +689,7 @@ function saveContent() {
   closeContentModal();
   filterContent();
   showToast('Conteúdo adicionado!', 'success');
+  logActivity({ icon:'🎬', color:'#a855f7', msg:`Novo conteúdo programado — "${title}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
 }
 
 document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
