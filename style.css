@@ -3533,6 +3533,10 @@ body.hall-page { background: transparent; }
 .hall-quad .cal-cell.today { background: var(--accent-dim); border-color: var(--accent); }
 .hall-quad .cal-cell.other-month { background: #222230; color: #555570; }
 .hall-quad .cal-cell-num { color: #c8c8dc; }
+.hall-quad .cal-add-btn { color: #7070a0; }
+.hall-quad .cal-cell:hover .cal-add-btn { color: var(--orange); }
+.hall-quad .cal-chip.cal-chip-more { background: rgba(255,255,255,0.04); color: #7070a0; border-left-color: #3a3a52; }
+.hall-quad .cal-chip.cal-chip-more:hover { color: var(--orange); border-left-color: var(--orange); }
 .hall-quad .cal-day-name { color: #7070a0; }
 .hall-quad .cal-holiday { color: #8888aa; }
 .hall-quad .cal-period-label { color: #dcdce8; }
