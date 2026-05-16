@@ -381,6 +381,7 @@ async function saveTask() {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id', id);
     const idx = allTasks.findIndex(t => t.id == id);
     if (idx >= 0) allTasks[idx] = { ...allTasks[idx], ...data };
+    saveTasksLocal();
     showToast('Tarefa atualizada!', 'success');
     logActivity({ icon:'✏️', color:'#6366f1', msg:`Tarefa "${title}" atualizada`, sector:'tarefas' });
   } else {
@@ -389,7 +390,9 @@ async function saveTask() {
     if (window.drSupabase) {
       const { data: ins } = await window.drSupabase.from('tasks').insert(data).select().single();
       if (ins) allTasks.unshift(ins);
+      else allTasks.unshift({ ...data, id: newId });
     } else { allTasks.unshift({ ...data, id: newId }); }
+    saveTasksLocal();
     showToast('Tarefa criada!', 'success');
     logActivity({ icon:'📋', color:'#6366f1', msg:`Nova tarefa criada — "${title}" (resp: ${data.responsible})`, sector:'tarefas' });
   }
