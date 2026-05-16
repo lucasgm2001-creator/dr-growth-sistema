@@ -245,16 +245,18 @@ const STAGE_INFO = {
 };
 
 async function loadLeads() {
+  let loadedFromRemote = false;
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
-      if (!error && data?.length) allLeads = data;
-      else allLeads = DEMO_LEADS;
+      if (!error && data?.length) { allLeads = data; loadedFromRemote = true; saveLeadsLocal(); }
       const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
       if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
-    } catch { allLeads = DEMO_LEADS; history = DEMO_HISTORY; }
-  } else {
-    allLeads = DEMO_LEADS;
+    } catch {}
+  }
+  if (!loadedFromRemote) {
+    const local = loadLeadsLocal();
+    allLeads = local.length ? local : DEMO_LEADS;
     history = DEMO_HISTORY;
   }
   updateSubtitle();
