@@ -370,9 +370,9 @@ function initCountrySelector(module, onRefresh) {
   if (!el) return;
 
   const options = [
-    { id:'all', flag:'🌐', label:'Todos', desc:'Visão consolidada' },
+    { id:'us',  flag:'🇺🇸', label:'EUA',    desc:'US Operation' },
     { id:'br',  flag:'🇧🇷', label:'Brasil', desc:'Operação BR' },
-    { id:'us',  flag:'🇺🇸', label:'EUA', desc:'US Operation' },
+    { id:'all', flag:'🌐', label:'Todos',  desc:'Visão consolidada' },
   ];
 
   el.className = 'country-selector animate-in';
