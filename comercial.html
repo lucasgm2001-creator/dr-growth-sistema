@@ -974,6 +974,7 @@ async function saveLead() {
     if (!savedRemotely) leads.unshift({ ...data, id: Date.now() });
     showToast('Lead criado!', 'success');
   }
+  saveLeadsLocal();
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
 }
 
