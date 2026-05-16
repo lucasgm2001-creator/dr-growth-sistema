@@ -1612,25 +1612,20 @@ tbody td {
    ============================================ */
 
 /* ============================================
-   HALL RECEPTION THEME — Sky background
+   HALL BACKGROUND — azul DR Growth estático
    ============================================ */
 .hall-page .sky-bg {
   background:
-    radial-gradient(ellipse 90% 45% at 50% -5%, rgba(255, 195, 90, 0.13) 0%, transparent 55%),
-    radial-gradient(ellipse 35% 55% at 2% 42%, rgba(210, 140, 50, 0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 35% 55% at 98% 42%, rgba(210, 140, 50, 0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 110% 28% at 50% 102%, rgba(160, 110, 45, 0.09) 0%, transparent 55%),
-    linear-gradient(180deg, #07050f 0%, #0d0a1c 25%, #120e24 55%, #0f0b1e 80%, #0b0815 100%);
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(100, 160, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 0% 55%, rgba(60, 110, 220, 0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 60% at 100% 55%, rgba(60, 110, 220, 0.10) 0%, transparent 65%),
+    linear-gradient(180deg, #1a3d8f 0%, #2050b0 30%, #2558be 60%, #2050aa 100%) !important;
 }
 
 .hall-page #sky-sun,
 .hall-page #sky-moon,
-.hall-page #sky-lightning {
-  display: none !important;
-}
-
-/* Estrelas menos visíveis — recepção tem luz interna */
-.hall-page .sky-star { opacity: 0.25; }
+.hall-page #sky-lightning,
+.hall-page .sky-star { display: none !important; }
 
 .hall-page .page-content {
   max-width: 1100px;
