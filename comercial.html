@@ -941,14 +941,26 @@ async function saveLead() {
   if (!nicho) { showToast(nichoSel === 'outros' ? 'Descreva o nicho em "Outros".' : 'Selecione o nicho do lead.', 'error'); return; }
   const data = { name, nicho, region: document.getElementById('lead-region').value.trim(), company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value, country: document.getElementById('lead-country').value };
   if (id) {
-    if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+    try {
+      if (window.drSupabase) {
+        const { error } = await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+        if (error) throw error;
+      }
+    } catch (e) { console.warn('Supabase update falhou, salvando localmente:', e.message); }
     const idx = leads.findIndex(l => l.id == id);
     if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
     showToast('Lead atualizado!', 'success');
   } else {
     data.created_at = new Date().toISOString();
-    if (window.drSupabase) { const { data: ins } = await window.drSupabase.from('leads').insert(data).select().single(); if (ins) leads.unshift(ins); }
-    else leads.unshift({ ...data, id: Date.now() });
+    let savedRemotely = false;
+    try {
+      if (window.drSupabase) {
+        const { data: ins, error } = await window.drSupabase.from('leads').insert(data).select().single();
+        if (error) throw error;
+        if (ins) { leads.unshift(ins); savedRemotely = true; }
+      }
+    } catch (e) { console.warn('Supabase insert falhou, salvando localmente:', e.message); }
+    if (!savedRemotely) leads.unshift({ ...data, id: Date.now() });
     showToast('Lead criado!', 'success');
   }
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
