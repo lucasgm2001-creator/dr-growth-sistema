@@ -426,12 +426,13 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'' };
+  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'', vendedores:'' };
   const btn2 = document.getElementById('main-action-btn');
   btn2.textContent = actions[name] || '+ Novo Lead';
-  btn2.style.display = (name === 'pipeline' || name === 'metricas') ? 'none' : '';
+  btn2.style.display = (name === 'pipeline' || name === 'metricas' || name === 'vendedores') ? 'none' : '';
   if (name === 'metricas') renderMetrics();
-  if (name === 'pipeline') { renderPipeline(); renderSellersAdmin(); }
+  if (name === 'pipeline') renderPipeline();
+  if (name === 'vendedores') renderSellersAdmin();
 }
 
 // ---- Métricas personalizadas ----
