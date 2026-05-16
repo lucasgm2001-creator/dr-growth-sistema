@@ -658,9 +658,11 @@ function saveCampaign() {
     const idx = campaigns.findIndex(c=>c.id==id);
     if (idx>=0) campaigns[idx] = { ...campaigns[idx], ...data };
     showToast('Campanha atualizada!', 'success');
+    logActivity({ icon:'📊', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
   } else {
     campaigns.unshift({ ...data, id:Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
     showToast('Campanha criada!', 'success');
+    logActivity({ icon:'📣', color:'#a855f7', msg:`Nova campanha criada — "${name}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
   }
   closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
 }
@@ -668,9 +670,11 @@ function saveCampaign() {
 function deleteCampaign() {
   const id = document.getElementById('camp-id').value;
   if (!id || !confirm('Excluir campanha?')) return;
+  const camp = campaigns.find(c=>c.id==id);
   campaigns = campaigns.filter(c=>c.id!=id);
   closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
   showToast('Campanha excluída.', 'info');
+  if (camp) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
 }
 
 // ---- Modal Conteúdo ----
