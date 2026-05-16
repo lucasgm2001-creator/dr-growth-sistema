@@ -3531,6 +3531,10 @@ body.hall-page { background: transparent; }
 .hall-quad .aviso-form .btn-sm { flex-shrink: 0; }
 
 @media (max-width: 768px) {
+  .hall-page .page-content {
+    height: auto;
+    overflow: visible;
+  }
   .hall-quad-grid {
     grid-template-columns: 1fr;
     grid-template-rows: none;
