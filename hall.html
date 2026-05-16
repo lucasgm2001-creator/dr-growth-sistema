@@ -43,17 +43,6 @@
       <p>Recepção · DR Growth</p>
     </div>
     <div class="topbar-actions">
-      <!-- Time hoje — pill dropdown -->
-      <div class="team-pill-wrap" id="team-pill-wrap">
-        <button class="team-pill-btn" onclick="toggleTeamPanel(event)">
-          <span>👥</span>
-          <span id="team-pill-count">–</span>
-        </button>
-        <div class="team-pill-panel" id="team-pill-panel">
-          <div class="team-pill-title">Time hoje</div>
-          <div id="team-pill-list"></div>
-        </div>
-      </div>
       <div class="clock-row">
         <div class="clock-item">
           <span class="clock-tz">🇧🇷 São Paulo</span>
@@ -63,6 +52,18 @@
         <div class="clock-item">
           <span class="clock-tz">🇺🇸 Orlando, FL</span>
           <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
+        <div class="clock-divider"></div>
+        <!-- Time hoje — pill dropdown -->
+        <div class="team-pill-wrap" id="team-pill-wrap">
+          <button class="team-pill-btn" onclick="toggleTeamPanel(event)">
+            <span>👥</span>
+            <span id="team-pill-count">–</span>
+          </button>
+          <div class="team-pill-panel" id="team-pill-panel">
+            <div class="team-pill-title">Time hoje</div>
+            <div id="team-pill-list"></div>
+          </div>
         </div>
         <div class="clock-divider" id="weather-divider" style="display:none"></div>
         <div class="clock-item" id="weather-topbar" style="display:none">
