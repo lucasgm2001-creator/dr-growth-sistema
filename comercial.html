@@ -343,6 +343,7 @@ function removeSeller(short) {
 function renderSellersAdmin() {
   const el = document.getElementById('sellers-admin');
   if (!el) return;
+  if (session.role !== 'admin') { el.style.display = 'none'; return; }
   el.style.display = '';
   const sellers = getSellers();
   el.innerHTML = `
