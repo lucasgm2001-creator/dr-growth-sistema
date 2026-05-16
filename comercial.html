@@ -347,8 +347,9 @@ function switchTab(name, btn) {
 
 // ---- Métricas personalizadas ----
 function renderMetrics() {
-  const active  = leads.filter(l => !['fechado','perdido'].includes(l.stage));
-  const closed  = leads.filter(l => l.stage === 'fechado');
+  const vis1    = (window.filterByCountry || (x=>x))(leads);
+  const active  = vis1.filter(l => !['fechado','perdido'].includes(l.stage));
+  const closed  = vis1.filter(l => l.stage === 'fechado');
   const lost    = leads.filter(l => l.stage === 'perdido');
   const total   = leads.length;
   const pipeline = active.reduce((s,l) => s + (Number(l.value)||0), 0);
