@@ -599,6 +599,25 @@ function renderKanban() {
   }).join('');
 }
 
+function buildFollowupBadge(lead) {
+  if (!lead.followup_date && !lead.priority) return '';
+  const parts = [];
+  if (lead.followup_date) {
+    const diff = Math.floor((new Date(lead.followup_date + 'T12:00:00') - new Date()) / 86400000);
+    let color, label;
+    if (diff < 0)      { color='#ef4444'; label=`📅 Atrasado ${Math.abs(diff)}d`; }
+    else if (diff === 0){ color='#f97316'; label='📅 Hoje'; }
+    else if (diff === 1){ color='#eab308'; label='📅 Amanhã'; }
+    else               { color='#6366f1'; label=`📅 em ${diff}d`; }
+    parts.push(`<span class="followup-badge" style="background:${color}18;color:${color};border-color:${color}30">${label}</span>`);
+  }
+  if (lead.priority) {
+    const map = { alta:'🔴', media:'🟡', baixa:'🟢' };
+    parts.push(`<span class="followup-badge" style="background:var(--bg-hover);color:var(--text-muted)">${map[lead.priority]||''} ${lead.priority}</span>`);
+  }
+  return parts.length ? `<div class="followup-row">${parts.join('')}</div>` : '';
+}
+
 function buildCard(lead) {
   const now = new Date();
   const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
