@@ -374,27 +374,50 @@ async function addInteraction() {
   showToast('Interação registrada!', 'success');
 }
 
+function waNum(phone) {
+  if (!phone) return '';
+  let d = phone.replace(/\D/g, '');
+  if (!d) return '';
+  if (d.startsWith('0') && d.length > 10) d = d.slice(1);
+  if (d.startsWith('1') && d.length === 11) return d;
+  if (d.startsWith('55') && d.length >= 12) return d;
+  if (d.length === 10 || d.length === 11) return '55' + d;
+  return d;
+}
+
+function addPhoneToLead(id) {
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+  const phone = prompt(`Cadastrar telefone para ${lead.name}:\n(Ex: +55 11 99999-9999)`);
+  if (!phone || !phone.trim()) return;
+  lead.phone = phone.trim();
+  renderTable(allLeads);
+  if (selectedLeadId === id) selectLead(id);
+  if (window.drSupabase) window.drSupabase.from('leads').update({ phone: lead.phone }).eq('id', id).catch(() => {});
+  showToast('Telefone cadastrado!', 'success');
+}
+
 function quickCallLog(id) {
   const lead = allLeads.find(l => l.id === id);
   if (!lead) return;
-  const entry = { lead_id: id, user_name: session.name.split(' ')[0], action: `Ligação iniciada para ${lead.phone}`, created_at: new Date().toISOString() };
+  const entry = { lead_id: id, user_name: session.name.split(' ')[0], action: `WhatsApp iniciado para ${lead.phone}`, created_at: new Date().toISOString() };
   if (!history[id]) history[id] = [];
   history[id].push(entry);
   if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
   if (selectedLeadId === id) renderHistory(id);
-  showToast(`Ligação para ${lead.name} registrada!`, 'success');
+  showToast(`WhatsApp para ${lead.name} aberto!`, 'success');
 }
 
 function registerCallInteraction(e) {
   if (!selectedLeadId) return;
   const lead = allLeads.find(l => l.id === selectedLeadId);
   if (!lead) return;
-  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: `Ligação iniciada para ${lead.phone}`, created_at: new Date().toISOString() };
+  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: `WhatsApp iniciado para ${lead.phone}`, created_at: new Date().toISOString() };
   if (!history[selectedLeadId]) history[selectedLeadId] = [];
   history[selectedLeadId].push(entry);
   if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
   renderHistory(selectedLeadId);
-  showToast('Ligação registrada no histórico!', 'success');
+  showToast('Chamada registrada no histórico!', 'success');
 }
 
 function closeDetail() {
