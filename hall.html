@@ -365,10 +365,7 @@ function renderFeed(items) {
 }
 
 // ---- Mural de Avisos ----
-const AVISOS_DEFAULT = [
-  { id:1, text:'Reunião de alinhamento toda segunda às 9h (BR) / 8h (ET). Link no grupo do WhatsApp.', author:'Daniel', pinned:true, time: new Date(Date.now() - 2*86400000).toISOString() },
-  { id:2, text:'Prazo para envio de NFs: todo dia 20 do mês. Thamyris coordena.', author:'Daniel', pinned:false, time: new Date(Date.now() - 5*86400000).toISOString() },
-];
+const AVISOS_DEFAULT = [];
 
 function getAvisos() {
   try {
