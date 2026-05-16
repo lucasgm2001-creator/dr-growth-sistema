@@ -870,9 +870,10 @@ function parseLeadIA() {
 function openNewLeadModal(stage = 'novo') {
   document.getElementById('modal-title').textContent = 'Novo Lead';
   document.getElementById('lead-id').value = '';
-  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
+  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes','lead-region','lead-nicho-custom'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-nicho').value = '';
+  document.getElementById('lead-nicho-custom').style.display = 'none';
   document.getElementById('lead-stage').value = stage;
   populateSellersSelect();
   document.getElementById('lead-responsible').value = '';
