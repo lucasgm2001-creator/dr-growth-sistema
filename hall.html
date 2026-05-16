@@ -933,13 +933,8 @@ function renderScenario(scenario, h) {
   sun.style.cssText  = 'display:none';
   moon.style.cssText = 'display:none';
 
-  // Posição do sol (período diurno)
-  function sunPos(period, start, span, arcH) {
-    const pct = Math.max(0, Math.min(1, (h - start) / span));
-    const left = (4 + pct * 84).toFixed(1);
-    const top  = (arcH - Math.sin(Math.PI * pct) * (arcH * 0.7)).toFixed(1);
-    sun.style.cssText = `display:block;left:${left}%;top:${top}%`;
-  }
+  // Sol fixo no canto superior direito (posição via CSS)
+  function showSun() { sun.style.cssText = 'display:block'; }
 
   switch (scenario) {
 
