@@ -321,23 +321,8 @@
 const session = initPage('trafego.html');
 if (!session) throw new Error('Not authenticated');
 
-// ---- Demo Data ----
-let campaigns = [
-  { id:1, name:'Google Ads — MedTech',    client:'MedTech Brasil', platform:'google',   status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200,  clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.',            country:'br' },
-  { id:2, name:'Meta Ads — GrowthX',      client:'GrowthX Agency', platform:'meta',     status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em campanha de conversão.', country:'br' },
-  { id:3, name:'Google Ads — US Digital', client:'US Digital LLC',  platform:'google',   status:'active', budget:4000, objective:'Conversão',        spend:3890, impressions:67000,  clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.',    country:'us' },
-  { id:4, name:'Instagram — Academia Fit',client:'Academia Fit',    platform:'meta',     status:'paused', budget:800,  objective:'Engajamento',       spend:620,  impressions:28000,  clicks:940,  leads:12, notes:'Pausado para revisão de criativos.',       country:'br' },
-  { id:5, name:'LinkedIn — US Digital',   client:'US Digital LLC',  platform:'linkedin', status:'active', budget:1500, objective:'Tráfego',           spend:1200, impressions:15000,  clicks:480,  leads:22, notes:'B2B, CPL alto mas qualificado.',           country:'us' },
-];
-
-let contents = [
-  { id:1, title:'Post lançamento produto', client:'MedTech Brasil', platform:'Instagram', format:'Carrossel', date:'2026-05-16', status:'scheduled', desc:'Lançamento da nova linha de equipamentos.' },
-  { id:2, title:'Case de sucesso GrowthX', client:'GrowthX Agency', platform:'LinkedIn', format:'Feed', date:'2026-05-14', status:'published', desc:'Resultado de 300% de ROI em 3 meses.' },
-  { id:3, title:'Promoção academia', client:'Academia Fit', platform:'Instagram', format:'Stories', date:'2026-05-18', status:'revision', desc:'Desconto matrícula para novos alunos.' },
-  { id:4, title:'Tutorial produto digital', client:'US Digital LLC', platform:'LinkedIn', format:'Feed', date:'2026-05-20', status:'draft', desc:'Como usar a plataforma de analytics.' },
-  { id:5, title:'Reels bastidores', client:'Academia Fit', platform:'Instagram', format:'Reels', date:'2026-05-22', status:'scheduled', desc:'Dia a dia da academia.' },
-  { id:6, title:'Depoimento cliente', client:'MedTech Brasil', platform:'Facebook', format:'Feed', date:'2026-05-12', status:'published', desc:'Depoimento Dr. Carlos sobre o produto.' },
-];
+let campaigns = [];
+let contents  = [];
 
 const PLATFORM_INFO = {
   google:   { name:'Google Ads',  icon:'🔍', color:'#ea4335' },
