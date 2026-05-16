@@ -438,20 +438,25 @@ function switchTab(name, btn) {
   if (name === 'contratos') renderContracts();
 }
 
+function savePaymentsLocal() { try { localStorage.setItem('drg_payments', JSON.stringify(allPayments)); } catch {} }
+function loadPaymentsLocal() { try { return JSON.parse(localStorage.getItem('drg_payments') || '[]'); } catch { return []; } }
+function saveClientsLocal()  { try { localStorage.setItem('drg_clients',  JSON.stringify(allClients));  } catch {} }
+function loadClientsLocal()  { try { return JSON.parse(localStorage.getItem('drg_clients')  || '[]'); } catch { return []; } }
+
 async function loadData() {
+  let paymentsFromRemote = false, clientsFromRemote = false;
   if (window.drSupabase) {
     try {
       const [p, c] = await Promise.all([
         window.drSupabase.from('payments').select('*').order('due_date', { ascending:false }),
         window.drSupabase.from('clients').select('*').eq('active', true),
       ]);
-      allPayments = (!p.error && p.data?.length) ? p.data : DEMO_PAYMENTS;
-      allClients  = (!c.error && c.data?.length) ? c.data : DEMO_CLIENTS;
-    } catch { allPayments = DEMO_PAYMENTS; allClients = DEMO_CLIENTS; }
-  } else {
-    allPayments = DEMO_PAYMENTS;
-    allClients  = DEMO_CLIENTS;
+      if (!p.error && p.data?.length) { allPayments = p.data; paymentsFromRemote = true; savePaymentsLocal(); }
+      if (!c.error && c.data?.length) { allClients  = c.data; clientsFromRemote  = true; saveClientsLocal(); }
+    } catch {}
   }
+  if (!paymentsFromRemote) { const local = loadPaymentsLocal(); allPayments = local.length ? local : DEMO_PAYMENTS; }
+  if (!clientsFromRemote)  { const local = loadClientsLocal();  allClients  = local.length ? local : DEMO_CLIENTS;  }
   updateKPIs();
   renderMRR();
   renderPaymentsTable(allPayments);
