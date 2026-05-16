@@ -306,8 +306,10 @@ function renderTable(data) {
         <td>${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
         <td>${fmt.date(l.created_at)}</td>
         <td>
-          <div style="display:flex;gap:4px;flex-wrap:wrap">
-            ${l.phone ? `<a href="tel:${l.phone}" class="btn btn-sm" style="background:var(--green);color:#fff;text-decoration:none" onclick="event.stopPropagation();quickCallLog(${l.id})">📞</a>` : ''}
+          <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+            ${l.phone
+              ? `<a href="https://wa.me/${waNum(l.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="event.stopPropagation();quickCallLog(${l.id})" title="${l.phone}">📞</a>`
+              : ''}
             <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️ Editar</button>
           </div>
         </td>
