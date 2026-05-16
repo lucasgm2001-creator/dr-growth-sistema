@@ -916,7 +916,9 @@ function renderLeadsTable(data) {
       <td>${fmt.date(l.created_at)}</td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
-          ${l.phone ? `<a href="tel:${l.phone}" class="btn btn-sm" style="background:var(--green);color:#fff;text-decoration:none;padding:4px 8px" onclick="event.stopPropagation();quickCallLog(${l.id})" title="Ligar para ${l.phone}">📞</a>` : ''}
+          ${l.phone
+            ? `<a href="https://wa.me/${waNumber(l.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none;padding:4px 8px" onclick="event.stopPropagation();quickCallLog(${l.id})" title="WhatsApp: ${l.phone}">📞</a>`
+            : `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();addPhoneToLead(${l.id})" title="Cadastrar telefone" style="opacity:.6">📵</button>`}
           <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️</button>
         </div>
       </td>
