@@ -548,9 +548,16 @@ function postFeedItem() {
   showToast('Postado!', 'success');
 }
 
+function getActivityItems() {
+  try { return JSON.parse(localStorage.getItem('drg_activity') || '[]'); } catch { return []; }
+}
+
 function renderFeedAll() {
-  const userItems = getFeedItems();
-  const all = [...userItems, ...FEED_DEMO].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 20);
+  const userItems   = getFeedItems();
+  const activityItems = getActivityItems();
+  const all = [...userItems, ...activityItems, ...FEED_DEMO]
+    .sort((a,b) => new Date(b.time) - new Date(a.time))
+    .slice(0, 50);
   renderFeed(all);
 }
 
