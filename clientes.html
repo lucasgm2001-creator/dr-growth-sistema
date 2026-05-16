@@ -360,6 +360,7 @@ async function saveClient() {
     const idx = allClients.findIndex(c => c.id == id);
     if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
     showToast('Cliente atualizado!', 'success');
+    logActivity({ icon:'📋', color:'#f59e0b', msg:`Cliente ${name} atualizado`, sector:'administrativo' });
   } else {
     data.created_at = new Date().toISOString();
     if (window.drSupabase) {
@@ -367,6 +368,7 @@ async function saveClient() {
       if (ins) allClients.push(ins);
     } else { allClients.push({ ...data, id: Date.now() }); }
     showToast('Cliente criado!', 'success');
+    logActivity({ icon:'🤝', color:'#f59e0b', msg:`Novo cliente cadastrado — ${name}${data.service ? ' ('+data.service+')' : ''}`, sector:'administrativo' });
   }
 
   closeModal();
@@ -377,12 +379,14 @@ async function saveClient() {
 async function deleteClient() {
   const id = document.getElementById('client-id').value;
   if (!id || !confirm('Excluir este cliente?')) return;
+  const client = allClients.find(c => c.id == id);
   if (window.drSupabase) await window.drSupabase.from('clients').delete().eq('id', id);
   allClients = allClients.filter(c => c.id != id);
   closeModal();
   updateKPIs();
   filterClients();
   showToast('Cliente excluído.', 'info');
+  if (client) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Cliente ${client.name} removido`, sector:'administrativo' });
 }
 
 document.getElementById('client-modal').addEventListener('click', e => { if (e.target === document.getElementById('client-modal')) closeModal(); });
