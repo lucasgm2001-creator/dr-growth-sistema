@@ -833,12 +833,12 @@ function initSky() {
     const pct      = (h - 6) / 6;
     const leftPct  = (4 + pct * 50).toFixed(1);
     const topPct   = (42 - Math.sin(Math.PI * pct * 0.7) * 26).toFixed(1);
-    // Cedo: cobre/dourado no horizonte; mais tarde: azul profundo no topo
     const horizonColor = pct < 0.4 ? '#c47a3a' : '#6a8fbf';
     const midColor     = pct < 0.4 ? '#7a9fc0' : '#5a7db5';
     sky.style.background = `linear-gradient(to bottom, #234080 0%, ${midColor} 50%, ${horizonColor} 100%)`;
     sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
     moon.style.cssText = 'display:none';
+    addClouds(pct < 0.4 ? 3 : 5);
 
   } else if (h >= 12 && h < 18) {
     // Boa tarde — azul DR Growth profundo, sem brilho artificial
