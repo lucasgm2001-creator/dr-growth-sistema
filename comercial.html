@@ -318,6 +318,32 @@
   </div>
 </div>
 
+<!-- MODAL Comissão -->
+<div class="modal-overlay" id="commission-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3>💰 Registrar Comissão</h3>
+      <button class="modal-close" onclick="closeCommissionModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="commission-lead-info" style="background:var(--bg-hover);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text-secondary)"></div>
+      <input type="hidden" id="commission-lead-id">
+      <div class="form-group">
+        <label>Valor da Comissão</label>
+        <input type="number" class="form-control" id="commission-amount" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Observação (opcional)</label>
+        <input type="text" class="form-control" id="commission-notes" placeholder="Ex: 10% sobre contrato de R$5.000…">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCommissionModal()">Pular</button>
+      <button class="btn btn-primary" onclick="saveCommission()">Salvar Comissão</button>
+    </div>
+  </div>
+</div>
+
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
