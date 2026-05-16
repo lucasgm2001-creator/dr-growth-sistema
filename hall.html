@@ -342,17 +342,7 @@ updateDates();
 setInterval(updateDates, 30000);
 
 // ---- Feed de novidades ----
-const FEED_DEMO = [
-  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Marcos Souza</strong> adicionado ao funil', who:'Lucas', time: new Date(Date.now() - 15*60000).toISOString() },
-  { type:'payment', icon:'💰', color:'#22c55e', msg:'Pagamento de <strong>GrowthX Agency — R$12.000</strong> confirmado', who:'Thamyris', time: new Date(Date.now() - 45*60000).toISOString() },
-  { type:'task',    icon:'✅', color:'#22c55e', msg:'Tarefa <strong>Follow-up Sarah Johnson</strong> concluída', who:'Lucas', time: new Date(Date.now() - 90*60000).toISOString() },
-  { type:'campaign',icon:'📊', color:'#a855f7', msg:'Campanha <strong>Google Ads — MedTech</strong> otimizada', who:'Gabriel', time: new Date(Date.now() - 2*3600000).toISOString() },
-  { type:'lead',    icon:'📈', color:'#3b82f6', msg:'Lead <strong>Sarah Johnson</strong> movido para Reunião Agendada', who:'Lucas', time: new Date(Date.now() - 3*3600000).toISOString() },
-  { type:'client',  icon:'⭐', color:'#f59e0b', msg:'Cliente <strong>US Digital LLC</strong> marcado como atenção', who:'Gabriel', time: new Date(Date.now() - 5*3600000).toISOString() },
-  { type:'task',    icon:'📋', color:'#6366f1', msg:'Tarefa <strong>Configurar campanhas Google Ads</strong> em andamento', who:'Gabriel', time: new Date(Date.now() - 7*3600000).toISOString() },
-  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Paulo Andrade</strong> de E-commerce Plus entrou no funil', who:'Gabriel', time: new Date(Date.now() - 18*3600000).toISOString() },
-  { type:'payment', icon:'⚠️', color:'#ef4444', msg:'Pagamento de <strong>US Digital LLC — R$8.200</strong> está em atraso', who:'Sistema', time: new Date(Date.now() - 24*3600000).toISOString() },
-];
+const FEED_DEMO = [];
 
 function renderFeed(items) {
   if (!items.length) {
