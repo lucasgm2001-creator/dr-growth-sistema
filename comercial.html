@@ -989,6 +989,11 @@ document.getElementById('lead-phone').addEventListener('input', function() {
   if (detected) document.getElementById('lead-country').value = detected;
 });
 
+if (session.role === 'admin') {
+  const vendBtn = document.getElementById('tab-btn-vendedores');
+  if (vendBtn) vendBtn.style.display = '';
+}
+
 loadLeads().then(() => {
   populateSellersSelect();
   initCountrySelector('comercial', () => {
@@ -997,7 +1002,6 @@ loadLeads().then(() => {
     renderPipeline();
     renderMetrics();
   });
-  renderSellersAdmin();
 });
 </script>
 </body>
