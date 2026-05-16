@@ -290,13 +290,13 @@ STAGES.forEach(s => STAGE_INFO[s.key] = s);
 let leads = [], history = {}, draggedId = null, selectedLeadId = null;
 
 const DEMO_LEADS = [
-  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil',  email:'carlos@medtech.com',  phone:'(11) 99234-5678', stage:'proposta', value:4500,  responsible:'Lucas',   origin:'LinkedIn',  notes:'Interessado em tráfego pago.',    created_at:'2026-05-10' },
-  { id:2, name:'Sarah Johnson',   company:'US Digital LLC',  email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao',  value:8200,  responsible:'Lucas',   origin:'Indicação', notes:'Reunião 20/05.',                  created_at:'2026-05-08' },
-  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo',email:'fernanda@estudio.com',phone:'(21) 98765-4321', stage:'contato',  value:2800,  responsible:'Gabriel', origin:'Instagram', notes:'Primeiro contato via DM.',        created_at:'2026-05-12' },
-  { id:4, name:'Robert Davis',    company:'GrowthX Agency',  email:'robert@growthx.io',   phone:'+1 212 555-0147', stage:'fechado',  value:12000, responsible:'Lucas',   origin:'Google Ads',notes:'Contrato assinado.',              created_at:'2026-05-01' },
-  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', email:'paulo@ecomplus.com',  phone:'(41) 97654-3210', stage:'novo',     value:3200,  responsible:'Gabriel', origin:'Referência', notes:'',                              created_at:'2026-05-14' },
-  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+',  email:'amanda@saude.com',    phone:'(31) 96543-2109', stage:'perdido',  value:1800,  responsible:'Gabriel', origin:'Facebook',  notes:'Escolheu concorrente.',           created_at:'2026-05-03' },
-  { id:7, name:'Marcos Souza',    company:'TechStar',        email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo',     value:5500,  responsible:'Daniel',  origin:'LinkedIn',  notes:'',                              created_at:'2026-05-13' },
+  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil',  email:'carlos@medtech.com',  phone:'(11) 99234-5678', stage:'proposta', value:4500,  responsible:'Lucas',   origin:'LinkedIn',  notes:'Interessado em tráfego pago.',    created_at:'2026-05-10', country:'br' },
+  { id:2, name:'Sarah Johnson',   company:'US Digital LLC',  email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao',  value:8200,  responsible:'Lucas',   origin:'Indicação', notes:'Reunião 20/05.',                  created_at:'2026-05-08', country:'us' },
+  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo',email:'fernanda@estudio.com',phone:'(21) 98765-4321', stage:'contato',  value:2800,  responsible:'Gabriel', origin:'Instagram', notes:'Primeiro contato via DM.',        created_at:'2026-05-12', country:'br' },
+  { id:4, name:'Robert Davis',    company:'GrowthX Agency',  email:'robert@growthx.io',   phone:'+1 212 555-0147', stage:'fechado',  value:12000, responsible:'Lucas',   origin:'Google Ads',notes:'Contrato assinado.',              created_at:'2026-05-01', country:'us' },
+  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', email:'paulo@ecomplus.com',  phone:'(41) 97654-3210', stage:'novo',     value:3200,  responsible:'Gabriel', origin:'Referência', notes:'',                             created_at:'2026-05-14', country:'br' },
+  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+',  email:'amanda@saude.com',    phone:'(31) 96543-2109', stage:'perdido',  value:1800,  responsible:'Gabriel', origin:'Facebook',  notes:'Escolheu concorrente.',           created_at:'2026-05-03', country:'br' },
+  { id:7, name:'Marcos Souza',    company:'TechStar',        email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo',     value:5500,  responsible:'Daniel',  origin:'LinkedIn',  notes:'',                              created_at:'2026-05-13', country:'br' },
 ];
 
 const DEMO_HISTORY = {
