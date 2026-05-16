@@ -338,23 +338,22 @@ function renderSellersAdmin() {
   if (!el) return;
   el.style.display = '';
   const sellers = getSellers();
-  const isAdmin = session.role === 'admin';
   el.innerHTML = `
     <div class="card mt-4 animate-in">
       <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
         <span class="card-title">Vendedores Cadastrados</span>
-        ${isAdmin ? '<button class="btn btn-primary btn-sm" onclick="addSeller()">+ Adicionar Vendedor</button>' : ''}
+        <button class="btn btn-primary btn-sm" onclick="addSeller()">+ Adicionar Vendedor</button>
       </div>
       <div class="card-body">
         ${sellers.length === 0
-          ? `<div class="text-muted text-sm">${isAdmin ? 'Nenhum vendedor cadastrado. Clique em + Adicionar Vendedor.' : 'Nenhum vendedor cadastrado ainda. Peça ao admin para adicionar.'}</div>`
+          ? '<div class="text-muted text-sm">Nenhum vendedor cadastrado. Clique em + Adicionar Vendedor.</div>'
           : sellers.map(s => `
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
               <div style="display:flex;align-items:center;gap:10px">
                 <div class="avatar avatar-sm avatar-${fmt.avatarClass(s.short)}">${fmt.initials(s.name)}</div>
                 <span style="font-size:13px;font-weight:600">${s.name}</span>
               </div>
-              ${isAdmin ? `<button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeSeller('${s.short}')">Remover</button>` : ''}
+              <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeSeller('${s.short}')">Remover</button>
             </div>`).join('')
         }
       </div>
