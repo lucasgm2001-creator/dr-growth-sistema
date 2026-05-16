@@ -1605,8 +1605,7 @@ tbody td {
   position: relative;
 }
 
-.hall-greeting-inner,
-.hall-tabs {
+.hall-greeting-inner {
   background: rgba(8, 8, 18, 0.52);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1615,9 +1614,12 @@ tbody td {
   margin-bottom: 6px;
 }
 
-.hall-tabs {
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+/* Área de conteúdo principal do hall — fundo sólido para cobrir o céu */
+.hall-body {
+  background: var(--bg-primary);
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  min-height: calc(100vh - 220px);
 }
 
 .hall-greeting-inner {
