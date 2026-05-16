@@ -1666,10 +1666,9 @@ tbody td {
 
 /* Hall grid */
 .hall-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
+  display: flex;
   gap: 20px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .hall-left-col {
