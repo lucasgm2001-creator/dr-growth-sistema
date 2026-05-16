@@ -879,6 +879,12 @@ switchTab = function(name, btn) {
 };
 
 // Init
+initCountrySelector('trafego', () => {
+  updateKPIs();
+  renderCampaigns();
+  renderMetrics();
+  if (document.getElementById('tab-porcliente').classList.contains('active')) renderPorCliente();
+});
 updateKPIs();
 renderCampaigns();
 renderMetrics();
