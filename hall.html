@@ -85,16 +85,18 @@
 
       <!-- Coluna esquerda: Feed -->
       <div>
-        <div class="feed-card animate-in" style="animation-delay:0.1s">
-          <div class="feed-header">
+        <div class="hall-accordion animate-in" id="acc-feed" style="animation-delay:0.1s">
+          <div class="hall-acc-header" onclick="toggleAcc('acc-feed')">
             <div class="feed-live-dot"></div>
-            <h3>O que aconteceu</h3>
+            <span class="hall-acc-title">O que aconteceu</span>
             <span class="text-muted text-sm" id="feed-time-range">Últimas 24h</span>
+            <span class="hall-acc-chevron">›</span>
           </div>
-          <div class="feed-list" id="feed-list">
-            <div class="empty-state" style="padding:32px">
-              <div class="empty-icon">📡</div>
-              <p>Carregando novidades…</p>
+          <div class="hall-acc-body">
+            <div class="feed-list" id="feed-list"></div>
+            <div class="aviso-form" style="border-top:1px solid var(--border)">
+              <input type="text" id="feed-input" placeholder="Compartilhe o que aconteceu…" maxlength="200">
+              <button class="btn btn-primary btn-sm" onclick="postFeedItem()">Postar</button>
             </div>
           </div>
         </div>
@@ -104,29 +106,35 @@
       <div>
 
         <!-- Mural de Avisos -->
-        <div class="mural-card animate-in" style="animation-delay:0.15s">
-          <div class="mural-header">
-            <h3>📌 Mural de Avisos</h3>
-            <span id="aviso-admin-btn"></span>
+        <div class="hall-accordion animate-in" id="acc-mural" style="animation-delay:0.15s">
+          <div class="hall-acc-header" onclick="toggleAcc('acc-mural')">
+            <span style="font-size:15px;flex-shrink:0">&#128204;</span>
+            <span class="hall-acc-title">Mural de Avisos</span>
+            <span class="hall-acc-chevron">›</span>
           </div>
-          <div id="mural-list">
-            <div class="empty-state" style="padding:24px">
-              <div class="empty-icon">📌</div>
-              <p>Sem avisos no momento.</p>
+          <div class="hall-acc-body">
+            <div id="mural-list">
+              <div class="empty-state" style="padding:24px">
+                <p>Sem avisos no momento.</p>
+              </div>
             </div>
-          </div>
-          <div class="aviso-form" id="aviso-form" style="display:none">
-            <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
-            <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
+            <div class="aviso-form" id="aviso-form" style="border-top:1px solid var(--border)">
+              <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
+              <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
+            </div>
           </div>
         </div>
 
         <!-- Time hoje -->
-        <div class="team-card animate-in" style="animation-delay:0.2s">
-          <div class="team-header">
-            <h3>👥 Time hoje</h3>
+        <div class="hall-accordion animate-in" id="acc-team" style="animation-delay:0.2s">
+          <div class="hall-acc-header" onclick="toggleAcc('acc-team')">
+            <span style="font-size:15px;flex-shrink:0">&#128101;</span>
+            <span class="hall-acc-title">Time hoje</span>
+            <span class="hall-acc-chevron">›</span>
           </div>
-          <div id="team-list"></div>
+          <div class="hall-acc-body">
+            <div id="team-list"></div>
+          </div>
         </div>
 
       </div>
