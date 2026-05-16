@@ -640,15 +640,63 @@ function renderPipeline() {
     </div>`;
 }
 
+// ---- IA: Preencher lead automaticamente ----
+function toggleIASection() {
+  const sec = document.getElementById('ia-section');
+  sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+}
+
+function parseLeadIA() {
+  const text = document.getElementById('ia-text').value;
+  if (!text.trim()) { showToast('Cole o formulário primeiro.', 'error'); return; }
+
+  const lower = text.toLowerCase();
+
+  // Nome
+  const nameMatch = text.match(/nome[:\s]+([^\n\r]+)/i) || text.match(/^([A-Z][a-záéíóúãõâêô]+ [A-Z][a-záéíóúãõâêô]+)/m);
+  if (nameMatch) document.getElementById('lead-name').value = nameMatch[1].trim();
+
+  // Empresa
+  const compMatch = text.match(/empresa[:\s]+([^\n\r]+)/i) || text.match(/company[:\s]+([^\n\r]+)/i) || text.match(/negócio[:\s]+([^\n\r]+)/i);
+  if (compMatch) document.getElementById('lead-company').value = compMatch[1].trim();
+
+  // E-mail
+  const emailMatch = text.match(/[\w.-]+@[\w.-]+\.\w+/);
+  if (emailMatch) document.getElementById('lead-email').value = emailMatch[0];
+
+  // Telefone
+  const phoneMatch = text.match(/(\+?[\d\s\(\)\-]{9,20})/);
+  if (phoneMatch) document.getElementById('lead-phone').value = phoneMatch[1].trim();
+
+  // Nicho
+  const nichos = { saúde:'Saúde', saude:'Saúde', health:'Saúde', educação:'Educação', educacao:'Educação', 'e-commerce':'E-commerce', ecommerce:'E-commerce', tecnologia:'Tecnologia', tech:'Tecnologia', imobiliário:'Imobiliário', imobiliario:'Imobiliário', fitness:'Fitness', academia:'Fitness', alimentação:'Alimentação', alimentacao:'Alimentação', restaurante:'Alimentação', beleza:'Beleza', salão:'Beleza', jurídico:'Jurídico', juridico:'Jurídico', financeiro:'Financeiro' };
+  for (const [key, val] of Object.entries(nichos)) {
+    if (lower.includes(key)) { document.getElementById('lead-nicho').value = val; break; }
+  }
+
+  // Valor
+  const valueMatch = text.match(/(?:valor|orçamento|budget)[:\s]*R?\$?\s*([\d.,]+)/i);
+  if (valueMatch) document.getElementById('lead-value').value = valueMatch[1].replace(/\./g,'').replace(',','.');
+
+  // Notas: colar o texto original nas observações
+  document.getElementById('lead-notes').value = text.trim();
+
+  document.getElementById('ia-section').style.display = 'none';
+  document.getElementById('ia-text').value = '';
+  showToast('Campos preenchidos! Revise antes de salvar.', 'success');
+}
+
 // ---- Modal ----
 function openNewLeadModal(stage = 'novo') {
   document.getElementById('modal-title').textContent = 'Novo Lead';
   document.getElementById('lead-id').value = '';
   ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('lead-origin').value = '';
+  document.getElementById('lead-nicho').value = '';
   document.getElementById('lead-stage').value = stage;
-  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('lead-responsible').value = 'Lucas';
   document.getElementById('delete-btn').style.display = 'none';
+  document.getElementById('ia-section').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
 
@@ -663,10 +711,12 @@ function openEditModal(id) {
   document.getElementById('lead-phone').value = l.phone||'';
   document.getElementById('lead-value').value = l.value||'';
   document.getElementById('lead-origin').value = l.origin||'';
+  document.getElementById('lead-nicho').value = l.nicho||'';
   document.getElementById('lead-notes').value = l.notes||'';
   document.getElementById('lead-stage').value = l.stage;
-  document.getElementById('lead-responsible').value = l.responsible||'Daniel';
+  document.getElementById('lead-responsible').value = l.responsible||'DR Growth';
   document.getElementById('delete-btn').style.display = 'inline-flex';
+  document.getElementById('ia-section').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
 
@@ -675,8 +725,11 @@ function closeModal() { document.getElementById('lead-modal').classList.remove('
 async function saveLead() {
   const id = document.getElementById('lead-id').value;
   const name = document.getElementById('lead-name').value.trim();
+  const nicho = document.getElementById('lead-nicho').value;
+  const stage = document.getElementById('lead-stage').value;
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
-  const data = { name, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage: document.getElementById('lead-stage').value, responsible: document.getElementById('lead-responsible').value };
+  if (!nicho) { showToast('Selecione o nicho do lead.', 'error'); return; }
+  const data = { name, nicho, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value };
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = leads.findIndex(l => l.id == id);
