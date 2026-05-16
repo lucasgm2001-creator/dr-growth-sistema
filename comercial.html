@@ -799,9 +799,22 @@ function parseLeadIA() {
   }
 
   // Nicho
-  const nichos = { saúde:'Saúde', saude:'Saúde', health:'Saúde', educação:'Educação', educacao:'Educação', 'e-commerce':'E-commerce', ecommerce:'E-commerce', tecnologia:'Tecnologia', tech:'Tecnologia', imobiliário:'Imobiliário', imobiliario:'Imobiliário', fitness:'Fitness', academia:'Fitness', alimentação:'Alimentação', alimentacao:'Alimentação', restaurante:'Alimentação', beleza:'Beleza', salão:'Beleza', jurídico:'Jurídico', juridico:'Jurídico', financeiro:'Financeiro' };
-  for (const [key, val] of Object.entries(nichos)) {
-    if (lower.includes(key)) { document.getElementById('lead-nicho').value = val; usedPatterns.push(key); break; }
+  const nichos = [
+    { keys:['house clean','houseclean','cleaning','limpeza'],   val:'House Cleaning' },
+    { keys:['flooring','floor','piso','hardwood','vinyl'],      val:'Flooring' },
+    { keys:['tile','azulejo','porcelanato','grout'],            val:'Tile' },
+    { keys:['carpent','carpintar','marcenaria','woodwork'],     val:'Carpentry' },
+    { keys:['paint','pintura','pintor'],                        val:'Painting' },
+    { keys:['landscape','landscap','jardim','garden','lawn'],   val:'Landscape' },
+    { keys:['electr','eletric','elétric','electrical'],         val:'Electricist' },
+    { keys:['junk','removal','debris','hauling','lixo'],        val:'Junk Removal' },
+  ];
+  for (const n of nichos) {
+    if (n.keys.some(k => lower.includes(k))) {
+      document.getElementById('lead-nicho').value = n.val;
+      usedPatterns.push(n.val);
+      break;
+    }
   }
 
   // Valor
