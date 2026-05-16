@@ -372,9 +372,10 @@ function renderMetrics() {
       <div class="metric-kpi-sub">${k.sub}</div>
     </div>`).join('');
 
-  // Markets: Lucas = EUA, others = Brasil (by responsible)
-  const usLeads = leads.filter(l => l.responsible === 'Lucas');
-  const brLeads = leads.filter(l => l.responsible !== 'Lucas');
+  // Markets: by country field
+  const vis2    = (window.filterByCountry || (x=>x))(leads);
+  const usLeads = vis2.filter(l => l.country === 'us');
+  const brLeads = vis2.filter(l => !l.country || l.country === 'br');
   const usPipeline = usLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
   const brPipeline = brLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
   const usConv = usLeads.length ? Math.round((usLeads.filter(l=>l.stage==='fechado').length/usLeads.length)*100) : 0;
