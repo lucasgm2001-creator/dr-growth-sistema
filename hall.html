@@ -788,13 +788,7 @@ setTimeout(showPulso, 700);
 // ============================================================
 // HALL TABS
 // ============================================================
-function switchHallTab(name, btn) {
-  document.querySelectorAll('.hall-tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.hall-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('htab-' + name).classList.add('active');
-  btn.classList.add('active');
-  if (name === 'calendario') renderCalendar();
-}
+function switchHallTab() {} // tabs removidas — conteúdo sempre visível
 
 // ============================================================
 // WEATHER + SKY SYSTEM
