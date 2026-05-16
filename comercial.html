@@ -311,6 +311,7 @@ function populateSellersSelect() {
 }
 
 function addSeller() {
+  if (session.role !== 'admin' && session.role !== 'comercial') return;
   if (session.role !== 'admin') return;
   const name = prompt('Nome completo do vendedor:');
   if (!name || !name.trim()) return;
