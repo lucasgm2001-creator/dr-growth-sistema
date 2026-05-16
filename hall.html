@@ -460,29 +460,35 @@ document.getElementById('aviso-input')?.addEventListener('keydown', e => {
 });
 
 // ---- Time hoje ----
-const TEAM = [
-  { name:'Daniel Ramos',   role:'Gestor / Admin',              color:'#244c9c', status:'online', activity:'Revisando métricas' },
-  { name:'Lucas Moraes',   role:'Comercial',                   color:'#3b82f6', status:'online', activity:'Follow-up de leads' },
-  { name:'Gabriel Ramos',  role:'Tráfego & Administrativo',    color:'#a855f7', status:'online', activity:'Otimizando campanhas' },
-  { name:'Thamyris Lages', role:'Administrativo & Financeiro', color:'#22c55e', status:'away',   activity:'Emitindo NFs' },
+const TEAM_ALL = [
+  { name:'Daniel Ramos',   role:'Gestor / Admin',              color:'#244c9c' },
+  { name:'Lucas Moraes',   role:'Comercial EUA',               color:'#244c94' },
+  { name:'Gabriel Ramos',  role:'Tráfego & Administrativo',    color:'#a855f7' },
+  { name:'Thamyris Lages', role:'Administrativo & Financeiro', color:'#22c55e' },
 ];
 
-const statusLabels = { online:'● Online', away:'◌ Ocupado', offline:'○ Offline' };
-const statusColors = { online:'var(--green)', away:'var(--yellow)', offline:'var(--text-muted)' };
+const statusLabels = { online:'● Online', offline:'○ Offline' };
+const statusColors = { online:'var(--green)', offline:'var(--text-muted)' };
 
 function renderTeam() {
-  document.getElementById('team-list').innerHTML = TEAM.map(m => `
+  const currentSession = AUTH.getSession();
+  const currentName = currentSession ? currentSession.name : null;
+
+  document.getElementById('team-list').innerHTML = TEAM_ALL.map(m => {
+    const isMe = currentName && m.name === currentName;
+    const status = isMe ? 'online' : 'offline';
+    return `
     <div class="team-member">
       <div class="avatar" style="background:linear-gradient(135deg,${m.color},${m.color}88)">${fmt.initials(m.name)}</div>
       <div class="team-member-info">
-        <div class="tm-name">${m.name}</div>
+        <div class="tm-name">${m.name}${isMe ? ' <span style="font-size:10px;color:var(--text-muted)">(você)</span>' : ''}</div>
         <div class="tm-role">${m.role}</div>
-        <div class="text-muted" style="font-size:11px;margin-top:2px">↳ ${m.activity}</div>
       </div>
-      <div class="team-status" style="color:${statusColors[m.status]}">
-        ${statusLabels[m.status]}
+      <div class="team-status" style="color:${statusColors[status]}">
+        ${statusLabels[status]}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ---- Feed input (todos podem postar) ----
