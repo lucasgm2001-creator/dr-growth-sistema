@@ -276,12 +276,13 @@ const session = initPage('comercial.html');
 if (!session) throw new Error('Not authenticated');
 
 const STAGES = [
-  { key:'novo',     label:'Novo Lead',        color:'#6366f1' },
-  { key:'contato',  label:'Contato Feito',     color:'#3b82f6' },
-  { key:'reuniao',  label:'Reunião Agendada',  color:'#a855f7' },
-  { key:'proposta', label:'Proposta Enviada',  color:'#f97316' },
-  { key:'fechado',  label:'Fechado',           color:'#22c55e' },
-  { key:'perdido',  label:'Perdido',           color:'#ef4444' },
+  { key:'novo',          label:'Novo Lead',            color:'#6366f1' },
+  { key:'contato',       label:'Lead Engajado',         color:'#3b82f6' },
+  { key:'seminteracao',  label:'Lead Sem Interação',    color:'#64748b' },
+  { key:'reuniao',       label:'Reunião Agendada',      color:'#a855f7' },
+  { key:'proposta',      label:'Proposta Enviada',      color:'#f97316' },
+  { key:'fechado',       label:'Fechado',               color:'#22c55e' },
+  { key:'perdido',       label:'Perdido',               color:'#ef4444' },
 ];
 
 const STAGE_INFO = {};
