@@ -539,8 +539,31 @@ function initTodo() {
 
 document.addEventListener('DOMContentLoaded', initTodo);
 
+// ============================================================
+//  ACTIVITY LOG — log compartilhado entre todos os setores
+// ============================================================
+function logActivity(opts) {
+  const session = AUTH.getSession ? AUTH.getSession() : null;
+  const who = opts.who || (session ? session.name.split(' ')[0] : 'Sistema');
+  const entry = {
+    id: Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    time: new Date().toISOString(),
+    icon:   opts.icon   || '📌',
+    color:  opts.color  || '#6366f1',
+    msg:    opts.msg    || '',
+    sector: opts.sector || '',
+    who,
+  };
+  try {
+    const existing = JSON.parse(localStorage.getItem('drg_activity') || '[]');
+    existing.unshift(entry);
+    localStorage.setItem('drg_activity', JSON.stringify(existing.slice(0, 400)));
+  } catch(e) {}
+}
+
 // Expõe globalmente
 window.AUTH       = AUTH;
+window.logActivity = logActivity;
 window.SECTIONS   = SECTIONS;
 window.fmt        = fmt;
 window.initPage   = initPage;
