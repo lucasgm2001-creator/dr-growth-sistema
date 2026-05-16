@@ -2365,11 +2365,12 @@ body.hall-page { background: transparent; }
 #sky-sun {
   position: absolute;
   border-radius: 50%;
-  width: 56px; height: 56px;
-  background: radial-gradient(circle at 40% 40%, #fde68a, #f59e0b);
-  box-shadow: 0 0 40px #f59e0b99, 0 0 90px #f59e0b44;
+  width: 36px; height: 36px;
+  top: 6%; right: 8%;
+  background: radial-gradient(circle at 38% 38%, #fef3c7, #fbbf24 60%, #f59e0b);
+  box-shadow: 0 0 22px #f59e0b88, 0 0 55px #f59e0b33;
   display: none;
-  transition: all 4s ease;
+  transition: all 3s ease;
 }
 
 #sky-moon {
