@@ -356,24 +356,38 @@ setInterval(updateDates, 30000);
 // ---- Feed de novidades ----
 const FEED_DEMO = [];
 
+const SECTOR_LABELS = {
+  comercial:     { label:'Comercial',     color:'#3b82f6' },
+  trafego:       { label:'Tráfego',       color:'#a855f7' },
+  financeiro:    { label:'Financeiro',    color:'#22c55e' },
+  administrativo:{ label:'Administrativo',color:'#f59e0b' },
+  tarefas:       { label:'Tarefas',       color:'#6366f1' },
+  hall:          { label:'Hall',          color:'#f59e0b' },
+};
+
 function renderFeed(items) {
   if (!items.length) {
-    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3><p>Nenhuma novidade nas últimas 24h.</p></div>`;
+    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3><p>Nenhuma novidade ainda.</p></div>`;
     return;
   }
 
-  document.getElementById('feed-list').innerHTML = items.map((item, i) => `
+  document.getElementById('feed-list').innerHTML = items.map((item, i) => {
+    const sec = item.sector ? SECTOR_LABELS[item.sector] : null;
+    const secBadge = sec ? `<span class="feed-sector-badge" style="color:${sec.color};border-color:${sec.color}30;background:${sec.color}12">${sec.label}</span>` : '';
+    return `
     <div class="feed-item animate-in" style="animation-delay:${i * 0.04}s">
       <div class="feed-icon" style="background:${item.color}18;font-size:18px">${item.icon}</div>
       <div class="feed-content">
         <div class="feed-msg">${item.msg}</div>
         <div class="feed-meta">
+          ${secBadge}
           <div class="avatar avatar-sm avatar-${fmt.avatarClass(item.who)}">${fmt.initials(item.who)}</div>
           ${item.who}
         </div>
       </div>
       <div class="feed-time">${fmt.timeAgo(item.time)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // ---- Mural de Avisos ----
