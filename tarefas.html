@@ -192,15 +192,20 @@ const DEMO_TASKS = [
 const PRIORITY = { high:{ label:'Alta', cls:'priority-high' }, medium:{ label:'Média', cls:'priority-medium' }, low:{ label:'Baixa', cls:'priority-low' } };
 const STATUS   = { pending:{ label:'Pendente', cls:'badge-yellow' }, in_progress:{ label:'Em andamento', cls:'badge-accent' }, done:{ label:'Concluído', cls:'badge-green' } };
 
+function saveTasksLocal() { try { localStorage.setItem('drg_tasks', JSON.stringify(allTasks)); } catch {} }
+function loadTasksLocal() { try { return JSON.parse(localStorage.getItem('drg_tasks') || '[]'); } catch { return []; } }
+
 async function loadTasks() {
+  let loadedFromRemote = false;
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('tasks').select('*').order('due_date');
-      if (!error && data?.length) allTasks = data;
-      else allTasks = DEMO_TASKS;
-    } catch { allTasks = DEMO_TASKS; }
-  } else {
-    allTasks = DEMO_TASKS;
+      if (!error && data?.length) { allTasks = data; loadedFromRemote = true; saveTasksLocal(); }
+    } catch {}
+  }
+  if (!loadedFromRemote) {
+    const local = loadTasksLocal();
+    allTasks = local.length ? local : DEMO_TASKS;
   }
   updateKPIs();
   renderTasks(allTasks);
