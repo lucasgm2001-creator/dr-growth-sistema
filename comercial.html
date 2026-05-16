@@ -403,7 +403,7 @@ function renderMetrics() {
 
   // Lead sources
   const sourceCount = {};
-  leads.forEach(l => { if (l.origin) sourceCount[l.origin] = (sourceCount[l.origin]||0) + 1; });
+  vis1.forEach(l => { if (l.origin) sourceCount[l.origin] = (sourceCount[l.origin]||0) + 1; });
   const sortedSources = Object.entries(sourceCount).sort((a,b) => b[1]-a[1]);
   const maxSrc = sortedSources[0]?.[1] || 1;
   const srcColors = { LinkedIn:'#0a66c2', Instagram:'#e1306c', 'Google Ads':'#4285f4', Facebook:'#1877f2', Indicação:'#22c55e', Referência:'#a855f7', Outro:'#64748b' };
