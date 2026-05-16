@@ -1831,6 +1831,17 @@ tbody td {
   flex-shrink: 0;
 }
 
+.feed-sector-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 99px;
+  border: 1px solid;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* Mural de avisos */
 .mural-card {
   background: var(--bg-card);
