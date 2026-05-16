@@ -12,7 +12,8 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
   </div>
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
@@ -44,19 +45,16 @@
         <div class="sector-icon" style="background:rgba(59,130,246,0.15)">📈</div>
         <div>
           <div class="sector-name" style="color:#3b82f6">Comercial</div>
-          <div class="text-muted">Andar 02 · Funil de Vendas & Gestão de Leads</div>
+          <div class="text-muted">Andar 01 · Funil de Vendas & Gestão de Leads</div>
         </div>
       </div>
       <div class="sector-tabs" style="--tab-color:#3b82f6">
         <button class="sector-tab active" onclick="switchTab('funil', this)">◈ Funil Kanban</button>
         <button class="sector-tab" onclick="switchTab('leads', this)">◉ Lista de Leads</button>
         <button class="sector-tab" onclick="switchTab('pipeline', this)">💰 Pipeline</button>
-        <button class="sector-tab" onclick="switchTab('comissoes', this)">🏆 Comissões</button>
+        <button class="sector-tab" onclick="switchTab('metricas', this)">📊 Métricas</button>
       </div>
     </div>
-
-    <!-- Seletor de País -->
-    <div id="country-selector"></div>
 
     <!-- TAB: Funil Kanban -->
     <div class="tab-panel active" id="tab-funil" style="overflow-x:auto">
@@ -127,33 +125,27 @@
       </div>
     </div>
 
-    <!-- TAB: Comissões -->
-    <div class="tab-panel" id="tab-comissoes">
-      <div class="animate-in mt-2">
-
-        <div id="comissao-admin-bar" style="display:none" class="filter-bar mb-3">
-          <span style="font-weight:600;font-size:13px;color:var(--text-secondary)">🔑 Edição de comissões (somente admin)</span>
-          <button class="btn btn-secondary btn-sm" onclick="openVendedorModal()">👤 Vendedores</button>
-          <button class="btn btn-primary btn-sm" onclick="openComissaoModal()">+ Ajustar Taxa</button>
-        </div>
-
-        <!-- Cards por vendedor -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px" id="comissao-cards"></div>
-
-        <!-- Tabela de comissões detalhada -->
+    <!-- TAB: Métricas -->
+    <div class="tab-panel" id="tab-metricas">
+      <div class="metrics-kpi-row animate-in" id="met-kpis"></div>
+      <div class="grid-2 animate-in mt-2">
         <div class="card">
-          <div class="card-header">
-            <span class="card-title">Histórico de Comissões</span>
-            <span class="text-muted text-sm" id="comissao-period">Maio / 2026</span>
-          </div>
-          <div class="table-container" style="border:none;border-radius:0">
-            <table>
-              <thead>
-                <tr><th>Vendedor</th><th>Cliente Fechado</th><th>Valor Contrato</th><th>Taxa (%)</th><th>Comissão</th><th>Status</th></tr>
-              </thead>
-              <tbody id="comissao-tbody"></tbody>
-            </table>
-          </div>
+          <div class="card-header"><span class="card-title">🌎 Mercado: Brasil vs EUA</span></div>
+          <div class="card-body" id="met-markets"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📥 Origem dos Leads</span></div>
+          <div class="card-body" id="met-sources"></div>
+        </div>
+      </div>
+      <div class="grid-2 animate-in mt-4">
+        <div class="card">
+          <div class="card-header"><span class="card-title">🏆 Taxa de Fechamento por Responsável</span></div>
+          <div class="card-body" id="met-closers"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">⏱ Velocidade do Funil</span></div>
+          <div class="card-body" id="met-velocity"></div>
         </div>
       </div>
     </div>
@@ -181,7 +173,7 @@
 
 <!-- MODAL Lead -->
 <div class="modal-overlay" id="lead-modal">
-  <div class="modal" style="max-width:680px">
+  <div class="modal">
     <div class="modal-header">
       <h3 id="modal-title">Novo Lead</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
@@ -189,36 +181,44 @@
     <div class="modal-body">
       <input type="hidden" id="lead-id">
 
-      <!-- IA Parser -->
-      <div style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:14px;margin-bottom:18px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span style="font-size:16px">🤖</span>
-          <span style="font-size:13px;font-weight:700;color:var(--accent)">Preenchimento automático com IA</span>
-          <span style="font-size:11px;color:var(--text-muted)">(opcional)</span>
+      <!-- Seção IA: Colar formulário do WhatsApp -->
+      <div style="margin-bottom:16px">
+        <button class="btn btn-secondary btn-sm w-full" onclick="toggleIASection()" id="ia-toggle-btn"
+          style="justify-content:flex-start;gap:8px;border-style:dashed">
+          <span style="font-size:14px">&#10024;</span> Preencher com IA — cole o formulário do lead
+        </button>
+        <div id="ia-section" style="display:none;margin-top:10px">
+          <textarea class="form-control" id="ia-text" rows="5" placeholder="Cole aqui o formulário que o lead enviou no WhatsApp… A IA vai preencher os campos automaticamente." style="resize:vertical;font-size:12px"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary btn-sm" onclick="parseLeadIA()">&#10024; Analisar e Preencher</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('ia-section').style.display='none';document.getElementById('ia-text').value=''">Cancelar</button>
+          </div>
         </div>
-        <textarea class="form-control" id="ai-lead-text" rows="3" style="resize:vertical;font-size:12px" placeholder="Cole aqui o formulário enviado pelo lead via WhatsApp ou qualquer texto com as informações…"></textarea>
-        <button class="btn btn-secondary btn-sm" style="margin-top:8px;border-color:rgba(99,102,241,0.4);color:var(--accent)" onclick="parseLeadWithAI()">🤖 Interpretar e preencher</button>
-        <div id="ai-parse-result" style="display:none;margin-top:6px;font-size:11px;color:var(--green)">✓ Campos preenchidos — confira e ajuste antes de salvar.</div>
       </div>
 
       <div class="grid-2">
-        <div class="form-group"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
-        <div class="form-group">
-          <label>Nicho <span style="color:var(--red)">*</span></label>
-          <select class="form-control" id="lead-nicho">
-            <option value="">Selecione</option>
-            <option>Saúde e Estética</option><option>Educação</option><option>Imóveis</option>
-            <option>E-commerce</option><option>Serviços B2B</option><option>Restaurante / Food</option>
-            <option>Academia / Fitness</option><option>Clínica / Consultório</option>
-            <option>Tecnologia / SaaS</option><option>Moda e Varejo</option>
-            <option>Jurídico / Advocacia</option><option>Construção / Reforma</option>
-            <option>Outros</option>
-          </select>
-        </div>
+        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="lead-name" placeholder="Nome do contato"></div>
+        <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa"></div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="lead-company" placeholder="Nome da empresa"></div>
-        <div class="form-group"><label>Localização</label><input type="text" class="form-control" id="lead-location" placeholder="Cidade / Estado"></div>
+        <div class="form-group">
+          <label>Nicho *</label>
+          <select class="form-control" id="lead-nicho">
+            <option value="">Selecione o nicho</option>
+            <option>Saúde</option><option>Educação</option><option>E-commerce</option>
+            <option>Tecnologia</option><option>Imobiliário</option><option>Fitness</option>
+            <option>Alimentação</option><option>Beleza</option><option>Jurídico</option>
+            <option>Financeiro</option><option>Outros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estágio *</label>
+          <select class="form-control" id="lead-stage">
+            <option value="novo">Novo Lead</option><option value="contato">Contato Feito</option>
+            <option value="reuniao">Reunião Agendada</option><option value="proposta">Proposta Enviada</option>
+            <option value="fechado">Fechado</option><option value="perdido">Perdido</option>
+          </select>
+        </div>
       </div>
       <div class="grid-2">
         <div class="form-group"><label>E-mail</label><input type="email" class="form-control" id="lead-email" placeholder="email@empresa.com"></div>
@@ -235,19 +235,12 @@
           </select>
         </div>
       </div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Responsável (Vendedor)</label>
-          <select class="form-control" id="lead-responsible" id="lead-responsible"></select>
-        </div>
-        <div class="form-group">
-          <label>Estágio <span style="color:var(--red)">*</span></label>
-          <select class="form-control" id="lead-stage">
-            <option value="novo">Novo Lead</option><option value="contato">Contato Feito</option>
-            <option value="reuniao">Reunião Agendada</option><option value="proposta">Proposta Enviada</option>
-            <option value="fechado">Fechado</option><option value="perdido">Perdido</option>
-          </select>
-        </div>
+      <div class="form-group">
+        <label>Vendedor Responsável</label>
+        <select class="form-control" id="lead-responsible">
+          <option value="DR Growth">DR Growth</option>
+          <option value="Lucas">Lucas Moraes</option>
+        </select>
       </div>
       <div class="form-group">
         <label>Observações</label>
@@ -258,63 +251,6 @@
       <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deleteLead()" style="display:none;margin-right:auto">Excluir</button>
       <button class="btn btn-primary" onclick="saveLead()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL Vendedores -->
-<div class="modal-overlay" id="vendedor-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Gerenciar Vendedores</h3>
-      <button class="modal-close" onclick="closeVendedorModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div id="vendedores-list" style="margin-bottom:16px"></div>
-      <div style="border-top:1px solid var(--border);padding-top:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">ADICIONAR VENDEDOR</div>
-        <div class="grid-2">
-          <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="new-vend-name" placeholder="Nome completo"></div>
-          <div class="form-group"><label>E-mail (opcional)</label><input type="email" class="form-control" id="new-vend-email" placeholder="email@…"></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeVendedorModal()">Fechar</button>
-      <button class="btn btn-primary" onclick="addVendedorFromModal()">+ Adicionar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL Comissão -->
-<div class="modal-overlay" id="comissao-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>Ajustar Taxa de Comissão</h3>
-      <button class="modal-close" onclick="closeComissaoModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Vendedor</label>
-        <select class="form-control" id="com-vendedor">
-          <option value="Lucas">Lucas Moraes</option>
-          <option value="Daniel">Daniel Ramos</option>
-          <option value="Gabriel">Gabriel Ramos</option>
-          <option value="Thamyris">Thamyris Lages</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Taxa de Comissão (%)</label>
-        <input type="number" class="form-control" id="com-taxa" placeholder="Ex: 10" min="0" max="100" step="0.5">
-      </div>
-      <div class="form-group">
-        <label>Observação</label>
-        <input type="text" class="form-control" id="com-obs" placeholder="Motivo do ajuste…">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeComissaoModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveComissaoTaxa()">Salvar</button>
     </div>
   </div>
 </div>
@@ -339,35 +275,14 @@ STAGES.forEach(s => STAGE_INFO[s.key] = s);
 
 let leads = [], history = {}, draggedId = null, selectedLeadId = null;
 
-// ---- VENDEDORES ----
-function getVendedores() {
-  try {
-    const raw = localStorage.getItem('drg_vendedores');
-    return raw ? JSON.parse(raw) : [
-      { id: 1, name: 'DR Growth', email: 'empresa@drgrowth.com' },
-      { id: 2, name: 'Lucas Moraes', email: 'lucas@drgrowth.com' },
-    ];
-  } catch { return [{ id:1, name:'DR Growth' }, { id:2, name:'Lucas Moraes' }]; }
-}
-function saveVendedores(v) { localStorage.setItem('drg_vendedores', JSON.stringify(v)); }
-
-function populateVendedoresSelect() {
-  const sel = document.getElementById('lead-responsible');
-  if (!sel) return;
-  const vends = getVendedores();
-  sel.innerHTML = vends.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
-}
-
 const DEMO_LEADS = [
-  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil',   email:'carlos@medtech.com',  phone:'(11) 99234-5678', stage:'proposta', value:4500,  responsible:'Lucas Moraes', origin:'LinkedIn',   notes:'Interessado em tráfego pago.',   created_at:'2026-05-10', country:'br' },
-  { id:2, name:'Sarah Johnson',   company:'US Digital LLC',   email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao',  value:8200,  responsible:'Lucas Moraes', origin:'Indicação',  notes:'Reunião 20/05.',                 created_at:'2026-05-08', country:'us' },
-  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo', email:'fernanda@estudio.com',phone:'(21) 98765-4321', stage:'contato',  value:2800,  responsible:'Lucas Moraes', origin:'Instagram',  notes:'Primeiro contato via DM.',       created_at:'2026-05-12', country:'br' },
-  { id:4, name:'Robert Davis',    company:'GrowthX Agency',   email:'robert@growthx.io',   phone:'+1 212 555-0147', stage:'fechado',  value:12000, responsible:'Lucas Moraes', origin:'Google Ads', notes:'Contrato assinado.',             created_at:'2026-05-01', country:'us' },
-  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus',  email:'paulo@ecomplus.com',  phone:'(41) 97654-3210', stage:'novo',     value:3200,  responsible:'Lucas Moraes', origin:'Referência', notes:'',                             created_at:'2026-05-14', country:'br' },
-  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+',   email:'amanda@saude.com',    phone:'(31) 96543-2109', stage:'perdido',  value:1800,  responsible:'Lucas Moraes', origin:'Facebook',   notes:'Escolheu concorrente.',          created_at:'2026-05-03', country:'br' },
-  { id:7, name:'Marcos Souza',    company:'TechStar',         email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo',     value:5500,  responsible:'Lucas Moraes', origin:'LinkedIn',   notes:'',                             created_at:'2026-05-13', country:'br' },
-  { id:8, name:'Jennifer White',  company:'Miami Health Co.',  email:'jwhite@mhco.com',    phone:'+1 786 555-0310', stage:'contato',  value:6800,  responsible:'Lucas Moraes', origin:'LinkedIn',   notes:'Interesse em Full Marketing.',   created_at:'2026-05-11', country:'us' },
-  { id:9, name:'Michael Torres',  company:'SaaS Platform US',  email:'mt@saasplatform.io', phone:'+1 212 555-0988', stage:'proposta', value:9500,  responsible:'Lucas Moraes', origin:'Google Ads', notes:'Proposta enviada por e-mail.',   created_at:'2026-05-09', country:'us' },
+  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil',  email:'carlos@medtech.com',  phone:'(11) 99234-5678', stage:'proposta', value:4500,  responsible:'Lucas',   origin:'LinkedIn',  notes:'Interessado em tráfego pago.',    created_at:'2026-05-10' },
+  { id:2, name:'Sarah Johnson',   company:'US Digital LLC',  email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao',  value:8200,  responsible:'Lucas',   origin:'Indicação', notes:'Reunião 20/05.',                  created_at:'2026-05-08' },
+  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo',email:'fernanda@estudio.com',phone:'(21) 98765-4321', stage:'contato',  value:2800,  responsible:'Gabriel', origin:'Instagram', notes:'Primeiro contato via DM.',        created_at:'2026-05-12' },
+  { id:4, name:'Robert Davis',    company:'GrowthX Agency',  email:'robert@growthx.io',   phone:'+1 212 555-0147', stage:'fechado',  value:12000, responsible:'Lucas',   origin:'Google Ads',notes:'Contrato assinado.',              created_at:'2026-05-01' },
+  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', email:'paulo@ecomplus.com',  phone:'(41) 97654-3210', stage:'novo',     value:3200,  responsible:'Gabriel', origin:'Referência', notes:'',                              created_at:'2026-05-14' },
+  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+',  email:'amanda@saude.com',    phone:'(31) 96543-2109', stage:'perdido',  value:1800,  responsible:'Gabriel', origin:'Facebook',  notes:'Escolheu concorrente.',           created_at:'2026-05-03' },
+  { id:7, name:'Marcos Souza',    company:'TechStar',        email:'marcos@techstar.com', phone:'(51) 99887-6655', stage:'novo',     value:5500,  responsible:'Daniel',  origin:'LinkedIn',  notes:'',                              created_at:'2026-05-13' },
 ];
 
 const DEMO_HISTORY = {
@@ -389,7 +304,6 @@ async function loadLeads() {
     leads = DEMO_LEADS;
     history = DEMO_HISTORY;
   }
-  populateVendedoresSelect();
   updateSubtitle();
   renderKanban();
   renderLeadsTable(leads);
@@ -410,22 +324,128 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 
+  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'' };
   const btn2 = document.getElementById('main-action-btn');
-  if (name === 'pipeline' || name === 'comissoes') {
-    btn2.style.display = 'none';
-  } else {
-    btn2.textContent = '+ Novo Lead';
-    btn2.style.display = '';
-  }
-  if (name === 'comissoes') renderComissoes();
+  btn2.textContent = actions[name] || '+ Novo Lead';
+  btn2.style.display = (name === 'pipeline' || name === 'metricas') ? 'none' : '';
+  if (name === 'metricas') renderMetrics();
+}
+
+// ---- Métricas personalizadas ----
+function renderMetrics() {
+  const active  = leads.filter(l => !['fechado','perdido'].includes(l.stage));
+  const closed  = leads.filter(l => l.stage === 'fechado');
+  const lost    = leads.filter(l => l.stage === 'perdido');
+  const total   = leads.length;
+  const pipeline = active.reduce((s,l) => s + (Number(l.value)||0), 0);
+  const closedVal= closed.reduce((s,l) => s + (Number(l.value)||0), 0);
+  const avgTicket= closed.length ? closedVal / closed.length : 0;
+  const convRate = total ? Math.round((closed.length / total) * 100) : 0;
+  const lostRate = total ? Math.round((lost.length / total) * 100) : 0;
+
+  // KPI row
+  document.getElementById('met-kpis').innerHTML = [
+    { label:'Leads Totais',       value: total,               color:'var(--blue)',   sub: `${active.length} ativos` },
+    { label:'Pipeline Ativo',     value: fmt.currency(pipeline), color:'var(--accent)', sub: `${active.length} leads` },
+    { label:'Receita Fechada',    value: fmt.currency(closedVal),color:'var(--green)', sub: `${closed.length} contratos` },
+    { label:'Ticket Médio',       value: avgTicket ? fmt.currency(avgTicket) : '—', color:'var(--yellow)', sub:'deals fechados' },
+    { label:'Taxa de Conversão',  value: convRate + '%',      color:'var(--green)',  sub:`${lostRate}% perdidos` },
+    { label:'Leads Perdidos',     value: lost.length,         color:'var(--red)',    sub:'este período' },
+  ].map(k => `
+    <div class="metric-kpi">
+      <div class="metric-kpi-label">${k.label}</div>
+      <div class="metric-kpi-value" style="color:${k.color}">${k.value}</div>
+      <div class="metric-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // Markets: Lucas = EUA, others = Brasil (by responsible)
+  const usLeads = leads.filter(l => l.responsible === 'Lucas');
+  const brLeads = leads.filter(l => l.responsible !== 'Lucas');
+  const usPipeline = usLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
+  const brPipeline = brLeads.filter(l=>!['fechado','perdido'].includes(l.stage)).reduce((s,l)=>s+(Number(l.value)||0),0);
+  const usConv = usLeads.length ? Math.round((usLeads.filter(l=>l.stage==='fechado').length/usLeads.length)*100) : 0;
+  const brConv = brLeads.length ? Math.round((brLeads.filter(l=>l.stage==='fechado').length/brLeads.length)*100) : 0;
+  const totalPip = (usPipeline + brPipeline) || 1;
+
+  document.getElementById('met-markets').innerHTML = `
+    <div style="margin-bottom:18px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:13px;font-weight:700">🇺🇸 EUA <span style="font-size:10px;color:var(--text-muted);font-weight:400">(Lucas · ${usLeads.length} leads)</span></span>
+        <span style="font-size:13px;font-weight:700;color:var(--blue)">${fmt.currency(usPipeline)}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(usPipeline/totalPip*100)}%;background:var(--blue)"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Conversão: ${usConv}% · ${usLeads.filter(l=>l.stage==='fechado').length} fechados</div>
+    </div>
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:13px;font-weight:700">🇧🇷 Brasil <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${brLeads.length} leads)</span></span>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${fmt.currency(brPipeline)}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(brPipeline/totalPip*100)}%;background:var(--green)"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Conversão: ${brConv}% · ${brLeads.filter(l=>l.stage==='fechado').length} fechados</div>
+    </div>`;
+
+  // Lead sources
+  const sourceCount = {};
+  leads.forEach(l => { if (l.origin) sourceCount[l.origin] = (sourceCount[l.origin]||0) + 1; });
+  const sortedSources = Object.entries(sourceCount).sort((a,b) => b[1]-a[1]);
+  const maxSrc = sortedSources[0]?.[1] || 1;
+  const srcColors = { LinkedIn:'#0a66c2', Instagram:'#e1306c', 'Google Ads':'#4285f4', Facebook:'#1877f2', Indicação:'#22c55e', Referência:'#a855f7', Outro:'#64748b' };
+  document.getElementById('met-sources').innerHTML = sortedSources.map(([src, count]) => `
+    <div style="margin-bottom:12px">
+      <div class="flex items-center justify-between mb-1">
+        <span style="font-size:12px;font-weight:600">${src}</span>
+        <span style="font-size:13px;font-weight:700;color:${srcColors[src]||'var(--accent)'}">${count} lead${count>1?'s':''}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(count/maxSrc*100)}%;background:${srcColors[src]||'var(--accent)'}"></div></div>
+    </div>`).join('') || '<div class="text-muted">Sem dados de origem.</div>';
+
+  // Win rate by closer
+  const closers = ['Daniel','Lucas','Gabriel','Thamyris'];
+  document.getElementById('met-closers').innerHTML = closers.map(name => {
+    const mine   = leads.filter(l => l.responsible === name);
+    const won    = mine.filter(l => l.stage === 'fechado');
+    const rate   = mine.length ? Math.round((won.length / mine.length) * 100) : 0;
+    const value  = won.reduce((s,l) => s+(Number(l.value)||0), 0);
+    return `<div style="margin-bottom:14px">
+      <div class="flex items-center justify-between mb-1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(name)}">${fmt.initials(name)}</div>
+          <span style="font-size:12px;font-weight:600">${name}</span>
+          <span style="font-size:10px;color:var(--text-muted)">${mine.length} leads</span>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">${rate}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${rate}%"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:3px">${won.length} fechados · ${fmt.currency(value)}</div>
+    </div>`;
+  }).join('');
+
+  // Funnel velocity
+  const stageOrder = ['novo','contato','reuniao','proposta','fechado'];
+  const avgDays = { novo:2, contato:5, reuniao:8, proposta:12, fechado:18 }; // demo estimates
+  document.getElementById('met-velocity').innerHTML = `
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Tempo médio estimado por estágio até o fechamento:</div>
+    ${stageOrder.map((s,i) => {
+      const stageLeads = leads.filter(l => l.stage === s);
+      const info = STAGE_INFO[s];
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${info?.color};flex-shrink:0"></div>
+        <div style="flex:1;font-size:12px;font-weight:600">${info?.label}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${stageLeads.length} leads</div>
+        <div style="font-size:12px;font-weight:700;color:${info?.color}">~${avgDays[s]}d</div>
+      </div>`;
+    }).join('')}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted)">
+      Ciclo médio total estimado: <strong style="color:var(--accent)">~18 dias</strong>
+    </div>`
 }
 
 // ---- Kanban ----
 function renderKanban() {
   const board = document.getElementById('kanban-board');
-  const filtered = window.filterByCountry ? window.filterByCountry(leads) : leads;
   board.innerHTML = STAGES.map(stage => {
-    const stageLeads = filtered.filter(l => l.stage === stage.key);
+    const stageLeads = leads.filter(l => l.stage === stage.key);
     const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
     return `
       <div class="kanban-col">
@@ -498,8 +518,7 @@ function filterLeads() {
   const q    = document.getElementById('search-leads').value.toLowerCase();
   const stage = document.getElementById('filter-stage').value;
   const resp  = document.getElementById('filter-resp').value;
-  const base  = window.filterByCountry ? window.filterByCountry(leads) : leads;
-  renderLeadsTable(base.filter(l => {
+  renderLeadsTable(leads.filter(l => {
     if (q && !l.name.toLowerCase().includes(q) && !(l.company||'').toLowerCase().includes(q)) return false;
     if (stage && l.stage !== stage) return false;
     if (resp && l.responsible !== resp) return false;
@@ -625,12 +644,10 @@ function renderPipeline() {
 function openNewLeadModal(stage = 'novo') {
   document.getElementById('modal-title').textContent = 'Novo Lead';
   document.getElementById('lead-id').value = '';
-  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes','lead-location','ai-lead-text'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('lead-nicho').value = '';
+  ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-stage').value = stage;
-  document.getElementById('ai-parse-result').style.display = 'none';
-  populateVendedoresSelect();
+  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -648,25 +665,7 @@ function openEditModal(id) {
   document.getElementById('lead-origin').value = l.origin||'';
   document.getElementById('lead-notes').value = l.notes||'';
   document.getElementById('lead-stage').value = l.stage;
-  document.getElementById('lead-location').value = l.location||'';
-  document.getElementById('ai-lead-text').value = '';
-  document.getElementById('ai-parse-result').style.display = 'none';
-  populateVendedoresSelect();
-  // set nicho
-  const nichoSel = document.getElementById('lead-nicho');
-  if (l.nicho) {
-    const opt = Array.from(nichoSel.options).find(o => o.value === l.nicho);
-    nichoSel.value = opt ? l.nicho : '';
-    if (!opt) {
-      const o = new Option(l.nicho, l.nicho);
-      nichoSel.add(o);
-      nichoSel.value = l.nicho;
-    }
-  } else nichoSel.value = '';
-  // set responsible
-  const respSel = document.getElementById('lead-responsible');
-  const respOpt = Array.from(respSel.options).find(o => o.value === l.responsible);
-  if (respOpt) respSel.value = l.responsible;
+  document.getElementById('lead-responsible').value = l.responsible||'Daniel';
   document.getElementById('delete-btn').style.display = 'inline-flex';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -674,14 +673,10 @@ function openEditModal(id) {
 function closeModal() { document.getElementById('lead-modal').classList.remove('show'); }
 
 async function saveLead() {
-  const id    = document.getElementById('lead-id').value;
-  const name  = document.getElementById('lead-name').value.trim();
-  const nicho = document.getElementById('lead-nicho').value;
-  const stage = document.getElementById('lead-stage').value;
-  if (!name)  { showToast('Nome é obrigatório.', 'error'); return; }
-  if (!nicho) { showToast('Nicho é obrigatório.', 'error'); return; }
-  if (!stage) { showToast('Estágio é obrigatório.', 'error'); return; }
-  const data = { name, nicho, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), location: document.getElementById('lead-location').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value };
+  const id = document.getElementById('lead-id').value;
+  const name = document.getElementById('lead-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+  const data = { name, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage: document.getElementById('lead-stage').value, responsible: document.getElementById('lead-responsible').value };
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = leads.findIndex(l => l.id == id);
@@ -706,240 +701,7 @@ async function deleteLead() {
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
-document.getElementById('comissao-modal').addEventListener('click', e => { if (e.target === document.getElementById('comissao-modal')) closeComissaoModal(); });
-
-// ---- PARSER DE IA (smart regex) ----
-function parseLeadWithAI() {
-  const text = document.getElementById('ai-lead-text').value.trim();
-  if (!text) { showToast('Cole o texto do lead primeiro.', 'error'); return; }
-
-  const lower = text.toLowerCase();
-  const set   = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val.trim(); };
-
-  // Nome
-  const nomeMatch = text.match(/(?:nome|name|cliente)\s*[:\-–]\s*([A-ZÀ-Ú][^\n\r,;]+)/i)
-                 || text.match(/^([A-ZÀ-Ú][a-zà-ú]+(?: [A-ZÀ-Ú][a-zà-ú]+)+)/m);
-  if (nomeMatch) set('lead-name', nomeMatch[1]);
-
-  // Empresa
-  const empMatch = text.match(/(?:empresa|company|negócio|negocio|loja|clínica|clinica)\s*[:\-–]\s*([^\n\r,;]+)/i);
-  if (empMatch) set('lead-company', empMatch[1]);
-
-  // Telefone
-  const foneMatch = text.match(/(?:\+?\d[\d\s\(\)\-]{8,17})/);
-  if (foneMatch) set('lead-phone', foneMatch[0]);
-
-  // E-mail
-  const emailMatch = text.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/);
-  if (emailMatch) set('lead-email', emailMatch[0]);
-
-  // Localização
-  const locMatch = text.match(/(?:cidade|localização|localizacao|estado|local|fica em|mora em|sou de)\s*[:\-–]?\s*([^\n\r,;]{2,40})/i);
-  if (locMatch) set('lead-location', locMatch[1]);
-
-  // Orçamento/Valor
-  const budgetMatch = text.match(/(?:orçamento|orcamento|budget|investimento|valor)\s*[:\-–]?\s*R?\$?\s*([\d.,]+(?:\s*mil)?)/i);
-  if (budgetMatch) {
-    let val = budgetMatch[1].replace(/\./g,'').replace(',','.');
-    if (/mil/i.test(budgetMatch[0])) val = parseFloat(val) * 1000;
-    else val = parseFloat(val);
-    if (!isNaN(val)) set('lead-value', Math.round(val));
-  }
-
-  // Nicho — tenta mapear palavras-chave
-  const nichoMap = [
-    ['saúde|estética|estetica|médico|medico|dentista|clínica|clinica', 'Saúde e Estética'],
-    ['educação|educacao|escola|curso|ensino', 'Educação'],
-    ['imóvel|imovel|imobiliária|imobiliaria|corretor', 'Imóveis'],
-    ['e-commerce|ecommerce|loja virtual|marketplace', 'E-commerce'],
-    ['b2b|software|tecnologia|saas|startup', 'Tecnologia / SaaS'],
-    ['restaurante|food|gastronomia|bar|lanchonete', 'Restaurante / Food'],
-    ['academia|fitness|personal|musculação', 'Academia / Fitness'],
-    ['advocac|jurídico|juridico|advogad', 'Jurídico / Advocacia'],
-    ['construção|construcao|reforma|engenharia', 'Construção / Reforma'],
-    ['moda|roupa|vestuário|vestuario|varejo', 'Moda e Varejo'],
-  ];
-  for (const [pattern, label] of nichoMap) {
-    if (new RegExp(pattern, 'i').test(lower)) {
-      const nichoSel = document.getElementById('lead-nicho');
-      const opt = Array.from(nichoSel.options).find(o => o.value === label);
-      if (opt) { nichoSel.value = label; break; }
-    }
-  }
-
-  // Serviço/Notas
-  const servicoMatch = text.match(/(?:serviço|servico|interesse|preciso de|quero|necessito)\s*[:\-–]?\s*([^\n\r.]{5,80})/i);
-  if (servicoMatch) {
-    const notesEl = document.getElementById('lead-notes');
-    if (notesEl && !notesEl.value) notesEl.value = servicoMatch[1].trim();
-  }
-
-  document.getElementById('ai-parse-result').style.display = '';
-  showToast('Campos preenchidos automaticamente! Confira antes de salvar.', 'success');
-}
-
-// ---- GERENCIAMENTO DE VENDEDORES (admin) ----
-// Expõe funções globais para o modal de vendedores (acessível via console ou admin panel)
-window.addVendedor = function(name, email = '') {
-  if (session.role !== 'admin') { showToast('Apenas admin pode gerenciar vendedores.', 'error'); return; }
-  const vends = getVendedores();
-  vends.push({ id: Date.now(), name, email });
-  saveVendedores(vends);
-  populateVendedoresSelect();
-  showToast(`Vendedor ${name} adicionado!`, 'success');
-};
-window.removeVendedor = function(name) {
-  if (session.role !== 'admin') { showToast('Apenas admin pode gerenciar vendedores.', 'error'); return; }
-  const vends = getVendedores().filter(v => v.name !== name);
-  saveVendedores(vends);
-  populateVendedoresSelect();
-  showToast(`Vendedor ${name} removido.`, 'info');
-};
-window.listVendedores = function() { return getVendedores(); };
-
-function openVendedorModal() {
-  renderVendedoresList();
-  document.getElementById('new-vend-name').value = '';
-  document.getElementById('new-vend-email').value = '';
-  document.getElementById('vendedor-modal').classList.add('show');
-}
-function closeVendedorModal() { document.getElementById('vendedor-modal').classList.remove('show'); }
-
-function renderVendedoresList() {
-  const vends = getVendedores();
-  document.getElementById('vendedores-list').innerHTML = vends.map(v => `
-    <div class="flex items-center gap-2" style="padding:8px 0;border-bottom:1px solid var(--border)">
-      <div class="avatar avatar-sm avatar-${fmt.avatarClass(v.name.split(' ')[0])}">${fmt.initials(v.name)}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600">${v.name}</div>
-        ${v.email ? `<div style="font-size:11px;color:var(--text-muted)">${v.email}</div>` : ''}
-      </div>
-      <button class="btn btn-ghost btn-sm" style="color:var(--red);font-size:11px" onclick="removeVendedorFromModal('${v.name}')">Remover</button>
-    </div>`).join('') || '<div class="text-muted text-sm">Nenhum vendedor cadastrado.</div>';
-}
-
-function addVendedorFromModal() {
-  const name = document.getElementById('new-vend-name').value.trim();
-  const email = document.getElementById('new-vend-email').value.trim();
-  if (!name) { showToast('Nome obrigatório.', 'error'); return; }
-  window.addVendedor(name, email);
-  document.getElementById('new-vend-name').value = '';
-  document.getElementById('new-vend-email').value = '';
-  renderVendedoresList();
-}
-
-function removeVendedorFromModal(name) {
-  window.removeVendedor(name);
-  renderVendedoresList();
-}
-
-document.getElementById('vendedor-modal').addEventListener('click', e => { if (e.target === document.getElementById('vendedor-modal')) closeVendedorModal(); });
-
-// ---- COMISSÕES ----
-function getComissaoTaxas() {
-  try {
-    const raw = localStorage.getItem('drg_comissao_taxas');
-    return raw ? JSON.parse(raw) : { Lucas: 10, Daniel: 5, Gabriel: 5, Thamyris: 5 };
-  } catch { return { Lucas: 10, Daniel: 5, Gabriel: 5, Thamyris: 5 }; }
-}
-
-function saveComissaoTaxas(obj) {
-  localStorage.setItem('drg_comissao_taxas', JSON.stringify(obj));
-}
-
-function renderComissoes() {
-  const isAdmin = session.role === 'admin';
-  document.getElementById('comissao-admin-bar').style.display = isAdmin ? 'flex' : 'none';
-
-  const taxas = getComissaoTaxas();
-  const fechados = leads.filter(l => l.stage === 'fechado');
-  const vendedores = ['Lucas', 'Daniel', 'Gabriel', 'Thamyris'];
-
-  const cards = vendedores.map(v => {
-    const negociosFechados = fechados.filter(l => l.responsible === v);
-    const totalValor = negociosFechados.reduce((s, l) => s + (Number(l.value) || 0), 0);
-    const taxa = taxas[v] || 0;
-    const comissao = totalValor * (taxa / 100);
-    return `
-      <div class="card" style="padding:18px">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="avatar avatar-${fmt.avatarClass(v)}">${fmt.initials(v)}</div>
-          <div style="font-size:14px;font-weight:700">${v}</div>
-          <span class="badge badge-accent" style="margin-left:auto">${taxa}%</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div>
-            <div class="text-muted" style="font-size:10px">NEGÓCIOS FECHADOS</div>
-            <div style="font-size:20px;font-weight:800;color:var(--blue)">${negociosFechados.length}</div>
-          </div>
-          <div>
-            <div class="text-muted" style="font-size:10px">VALOR TOTAL</div>
-            <div style="font-size:16px;font-weight:800;color:var(--green)">${fmt.currency(totalValor)}</div>
-          </div>
-          <div style="grid-column:1/-1">
-            <div class="text-muted" style="font-size:10px">COMISSÃO A PAGAR</div>
-            <div style="font-size:22px;font-weight:800;color:var(--accent)">${fmt.currency(comissao)}</div>
-          </div>
-        </div>
-        ${isAdmin ? `<button class="btn btn-ghost btn-sm w-full mt-2" onclick="openComissaoModalFor('${v}')">✏️ Editar taxa</button>` : ''}
-      </div>`;
-  }).join('');
-  document.getElementById('comissao-cards').innerHTML = cards;
-
-  const nomes = { Lucas: 'Lucas Moraes', Daniel: 'Daniel Ramos', Gabriel: 'Gabriel Ramos', Thamyris: 'Thamyris Lages' };
-  const rows = fechados.map(l => {
-    const taxa = taxas[l.responsible] || 0;
-    const com = (Number(l.value) || 0) * (taxa / 100);
-    return `<tr>
-      <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>${nomes[l.responsible] || l.responsible}</div></td>
-      <td>${l.name} · ${l.company || '—'}</td>
-      <td style="font-weight:700;color:var(--green)">${fmt.currency(Number(l.value) || 0)}</td>
-      <td>${taxa}%</td>
-      <td style="font-weight:700;color:var(--accent)">${fmt.currency(com)}</td>
-      <td><span class="badge badge-yellow">A pagar</span></td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🏆</div><h3>Nenhum negócio fechado</h3></div></td></tr>`;
-  document.getElementById('comissao-tbody').innerHTML = rows;
-}
-
-function openComissaoModal() {
-  document.getElementById('com-vendedor').value = 'Lucas';
-  document.getElementById('com-taxa').value = '';
-  document.getElementById('com-obs').value = '';
-  document.getElementById('comissao-modal').classList.add('show');
-}
-
-function openComissaoModalFor(vendedor) {
-  const taxas = getComissaoTaxas();
-  document.getElementById('com-vendedor').value = vendedor;
-  document.getElementById('com-taxa').value = taxas[vendedor] || 0;
-  document.getElementById('com-obs').value = '';
-  document.getElementById('comissao-modal').classList.add('show');
-}
-
-function closeComissaoModal() { document.getElementById('comissao-modal').classList.remove('show'); }
-
-function saveComissaoTaxa() {
-  if (session.role !== 'admin') { showToast('Apenas o admin pode alterar taxas.', 'error'); return; }
-  const vendedor = document.getElementById('com-vendedor').value;
-  const taxa = Number(document.getElementById('com-taxa').value);
-  if (isNaN(taxa) || taxa < 0 || taxa > 100) { showToast('Taxa inválida (0-100%).', 'error'); return; }
-  const taxas = getComissaoTaxas();
-  taxas[vendedor] = taxa;
-  saveComissaoTaxas(taxas);
-  closeComissaoModal();
-  renderComissoes();
-  showToast(`Taxa de ${vendedor} atualizada para ${taxa}%!`, 'success');
-}
-
-loadLeads().then(() => {
-  initCountrySelector('comercial', () => {
-    renderKanban();
-    filterLeads();
-    renderPipeline();
-    updateSubtitle();
-  });
-});
+loadLeads();
 </script>
 </body>
 </html>
