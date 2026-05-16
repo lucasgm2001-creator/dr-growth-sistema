@@ -483,6 +483,8 @@ async function updateTaskStatus(id, newStatus, e) {
   updateTaskKPIs(); filterTasks();
   const labels = { pending:'Pendente', in_progress:'Em andamento', done:'Concluído' };
   showToast(`Status: ${labels[newStatus]}`, 'success');
+  if (newStatus === 'done') logActivity({ icon:'✅', color:'#22c55e', msg:`Tarefa concluída — "${t.title}"`, sector:'administrativo' });
+  else if (newStatus === 'in_progress') logActivity({ icon:'⚙️', color:'#f59e0b', msg:`Tarefa em andamento — "${t.title}"`, sector:'administrativo' });
 }
 
 // ---- Modais Cliente ----
