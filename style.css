@@ -1660,9 +1660,9 @@ tbody td {
 
 /* Área de conteúdo principal do hall */
 .hall-body {
-  background: rgba(10, 20, 60, 0.35);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(6, 6, 12, 0.60);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 16px 16px 0 0;
   padding: 16px;
   flex: 1;
