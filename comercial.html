@@ -856,7 +856,7 @@ function parseLeadIA() {
   const leftover = text.split(/\n/)
     .map(l => l.trim())
     .filter(l => l && !usedPatterns.some(p => l.toLowerCase().includes(p.toLowerCase().trim())))
-    .filter(l => !l.match(/^(nome|empresa|email|e-mail|phone|telefone|company|business|whatsapp|negócio|valor|budget|orçamento)[:\s]/i))
+    .filter(l => !l.match(/^(nome|empresa|email|e-mail|phone|telefone|company|company_name|business|whatsapp|negócio|valor|budget|orçamento|state|region|city|qual_tipo_de_servi)[:\s_]/i))
     .join('\n').trim();
 
   document.getElementById('lead-notes').value = leftover;
