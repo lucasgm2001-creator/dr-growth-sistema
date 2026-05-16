@@ -417,6 +417,7 @@ async function saveLead() {
     const idx = allLeads.findIndex(l => l.id == id);
     if (idx >= 0) allLeads[idx] = { ...allLeads[idx], ...data };
     showToast('Lead atualizado!', 'success');
+    logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
   } else {
     const newId = Date.now();
     data.created_at = new Date().toISOString();
@@ -425,6 +426,7 @@ async function saveLead() {
       if (ins) allLeads.unshift(ins);
     } else { allLeads.unshift({ ...data, id: newId }); }
     showToast('Lead criado!', 'success');
+    logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${data.company ? ' ('+data.company+')' : ''}`, sector:'comercial' });
   }
 
   closeModal();
@@ -435,12 +437,14 @@ async function saveLead() {
 async function deleteLead() {
   const id = document.getElementById('lead-id').value;
   if (!id || !confirm('Excluir este lead?')) return;
+  const lead = allLeads.find(l => l.id == id);
   if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
   allLeads = allLeads.filter(l => l.id != id);
   closeModal();
   updateSubtitle();
   renderTable(allLeads);
   showToast('Lead excluído.', 'info');
+  if (lead) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Lead ${lead.name} removido`, sector:'comercial' });
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
