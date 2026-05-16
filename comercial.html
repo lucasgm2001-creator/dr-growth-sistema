@@ -351,6 +351,13 @@ function renderSellersAdmin() {
 }
 
 // Detecta país automaticamente pelo telefone
+function onNichoChange() {
+  const sel = document.getElementById('lead-nicho');
+  const custom = document.getElementById('lead-nicho-custom');
+  custom.style.display = sel.value === 'outros' ? '' : 'none';
+  if (sel.value !== 'outros') custom.value = '';
+}
+
 function detectCountryFromPhone(phone) {
   const p = phone.trim();
   if (p.startsWith('+1'))  return 'us';
