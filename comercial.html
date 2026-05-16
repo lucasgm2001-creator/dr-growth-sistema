@@ -458,8 +458,9 @@ function renderMetrics() {
 // ---- Kanban ----
 function renderKanban() {
   const board = document.getElementById('kanban-board');
+  const visible = (window.filterByCountry || (x=>x))(leads);
   board.innerHTML = STAGES.map(stage => {
-    const stageLeads = leads.filter(l => l.stage === stage.key);
+    const stageLeads = visible.filter(l => l.stage === stage.key);
     const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
     return `
       <div class="kanban-col">
