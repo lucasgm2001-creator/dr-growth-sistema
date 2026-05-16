@@ -390,6 +390,7 @@ async function deleteClient() {
   const client = allClients.find(c => c.id == id);
   if (window.drSupabase) await window.drSupabase.from('clients').delete().eq('id', id);
   allClients = allClients.filter(c => c.id != id);
+  saveClientsLocal();
   closeModal();
   updateKPIs();
   filterClients();
