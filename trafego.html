@@ -356,6 +356,84 @@ function switchTab(name, btn) {
   if (name === 'campanhas') { mb.textContent = '+ Campanha'; mb.onclick = openCampaignModal; mb.style.display = ''; }
   else if (name === 'conteudo') { mb.textContent = '+ Conteúdo'; mb.onclick = openContentModal; mb.style.display = ''; }
   else mb.style.display = 'none';
+  if (name === 'porcliente') renderPorCliente();
+}
+
+function renderPorCliente() {
+  const grid = document.getElementById('por-cliente-grid');
+  // Agrupar campanhas por cliente
+  const clientMap = {};
+  campaigns.forEach(c => {
+    if (!clientMap[c.client]) clientMap[c.client] = { name: c.client, campaigns: [] };
+    clientMap[c.client].campaigns.push(c);
+  });
+  // Incluir campanhas Meta
+  metaData.forEach(c => {
+    const clientName = c.name.replace(/^[^\—–-]+[—–-]\s*/,'').split(' — ')[0] || c.name;
+    const key = clientName;
+    if (!clientMap[key]) clientMap[key] = { name: key, campaigns: [] };
+    clientMap[key].campaigns.push({ ...c, fromMeta: true, platform:'meta', name: c.name, spend: parseFloat((c.insights.spend||'0').replace(/[^0-9,.]/g,'').replace(',','.')), leads: c.insights.leads||0, clicks: parseInt((c.insights.clicks||'0').replace(/\D/g,'')), impressions: parseInt((c.insights.impressions||'0').replace(/\D/g,'')) });
+  });
+
+  const clients = Object.values(clientMap);
+  if (!clients.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>Sem dados de clientes</h3></div>`;
+    return;
+  }
+
+  grid.innerHTML = clients.map(cl => {
+    const totalSpend     = cl.campaigns.reduce((s,c) => s + (c.spend||0), 0);
+    const totalLeads     = cl.campaigns.reduce((s,c) => s + (c.leads||0), 0);
+    const totalClicks    = cl.campaigns.reduce((s,c) => s + (c.clicks||0), 0);
+    const totalImpress   = cl.campaigns.reduce((s,c) => s + (c.impressions||0), 0);
+    const cpl            = totalLeads > 0 ? (totalSpend / totalLeads).toFixed(2) : null;
+    const googleCamps    = cl.campaigns.filter(c => c.platform === 'google');
+    const metaCamps      = cl.campaigns.filter(c => c.platform === 'meta');
+
+    return `
+    <div class="card" style="padding:18px;cursor:default">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="avatar avatar-lg" style="background:linear-gradient(135deg,#244c9c,#3b82f6)">${fmt.initials(cl.name)}</div>
+        <div>
+          <div style="font-size:15px;font-weight:700">${cl.name}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${cl.campaigns.length} campanha${cl.campaigns.length>1?'s':''} ativas</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div class="fin-card" style="padding:12px">
+          <div class="fin-card-label">Investimento</div>
+          <div style="font-size:16px;font-weight:800;color:var(--red)">R$ ${totalSpend.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div>
+        </div>
+        <div class="fin-card" style="padding:12px">
+          <div class="fin-card-label">Leads</div>
+          <div style="font-size:16px;font-weight:800;color:var(--accent)">${totalLeads}</div>
+        </div>
+        <div class="fin-card" style="padding:12px">
+          <div class="fin-card-label">Cliques</div>
+          <div style="font-size:16px;font-weight:800">${totalClicks.toLocaleString('pt-BR')}</div>
+        </div>
+        <div class="fin-card" style="padding:12px">
+          <div class="fin-card-label">CPL Médio</div>
+          <div style="font-size:16px;font-weight:800;color:var(--green)">${cpl ? 'R$ '+Number(cpl).toLocaleString('pt-BR',{minimumFractionDigits:2}) : '—'}</div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Por Plataforma</div>
+      ${googleCamps.length ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="color:#ea4335;font-size:13px">&#9679;</span>
+        <span style="font-size:12px;font-weight:600;flex:1">Google Ads</span>
+        <span style="font-size:12px;color:var(--text-muted)">${googleCamps.reduce((s,c)=>s+(c.leads||0),0)} leads</span>
+        <span style="font-size:12px;font-weight:700;color:var(--red)">R$ ${googleCamps.reduce((s,c)=>s+(c.spend||0),0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</span>
+      </div>` : ''}
+      ${metaCamps.length ? `<div style="display:flex;align-items:center;gap:8px">
+        <span style="color:#1877f2;font-size:13px">&#9679;</span>
+        <span style="font-size:12px;font-weight:600;flex:1">Meta Ads</span>
+        <span style="font-size:12px;color:var(--text-muted)">${metaCamps.reduce((s,c)=>s+(c.leads||0),0)} leads</span>
+        <span style="font-size:12px;font-weight:700;color:var(--red)">R$ ${metaCamps.reduce((s,c)=>s+(c.spend||0),0).toLocaleString('pt-BR',{minimumFractionDigits:0})}</span>
+      </div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function updateKPIs() {
