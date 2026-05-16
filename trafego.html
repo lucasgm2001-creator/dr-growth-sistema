@@ -373,9 +373,10 @@ function switchTab(name, btn) {
 
 function renderPorCliente() {
   const grid = document.getElementById('por-cliente-grid');
+  const visCamps = (window.filterByCountry || (x=>x))(campaigns);
   // Agrupar campanhas por cliente
   const clientMap = {};
-  campaigns.forEach(c => {
+  visCamps.forEach(c => {
     if (!clientMap[c.client]) clientMap[c.client] = { name: c.client, campaigns: [] };
     clientMap[c.client].campaigns.push(c);
   });
