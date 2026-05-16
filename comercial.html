@@ -481,9 +481,12 @@ function renderMetrics() {
       <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(count/maxSrc*100)}%;background:${srcColors[src]||'var(--accent)'}"></div></div>
     </div>`).join('') || '<div class="text-muted">Sem dados de origem.</div>';
 
-  // Win rate by closer
-  const closers = ['Daniel','Lucas','Gabriel','Thamyris'];
-  document.getElementById('met-closers').innerHTML = closers.map(name => {
+  // Win rate by closer (apenas vendedores)
+  const closers = getSellers();
+  document.getElementById('met-closers').innerHTML = !closers.length
+    ? '<div class="text-muted text-sm">Nenhum vendedor cadastrado.</div>'
+    : closers.map(s => {
+    const name = s.short;
     const mine   = vis1.filter(l => l.responsible === name);
     const won    = mine.filter(l => l.stage === 'fechado');
     const rate   = mine.length ? Math.round((won.length / mine.length) * 100) : 0;
