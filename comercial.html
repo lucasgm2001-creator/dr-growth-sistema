@@ -400,15 +400,20 @@ STAGES.forEach(s => STAGE_INFO[s.key] = s);
 
 let leads = [], history = {}, draggedId = null, selectedLeadId = null;
 
+function saveLeadsLocal() { try { localStorage.setItem('drg_leads', JSON.stringify(leads)); } catch {} }
+function loadLeadsLocal() { try { return JSON.parse(localStorage.getItem('drg_leads') || '[]'); } catch { return []; } }
+
 async function loadLeads() {
+  let loadedFromRemote = false;
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
-      if (!error && data) leads = data;
+      if (!error && data) { leads = data; loadedFromRemote = true; }
       const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
       if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
     } catch {}
   }
+  if (!loadedFromRemote) leads = loadLeadsLocal();
   updateSubtitle();
   renderKanban();
   renderLeadsTable(leads);
