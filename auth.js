@@ -402,6 +402,55 @@ function initCountrySelector(module, onRefresh) {
     current === 'all' ? items : items.filter(i => !i.country || i.country === current);
 }
 
+// ============================================================
+//  SFX Global (Web Audio API — sem arquivos externos)
+// ============================================================
+const SFX = (() => {
+  let ctx = null;
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+  function tone(freq, type, duration, vol, delay = 0) {
+    try {
+      const c = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain); gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, c.currentTime + delay);
+      gain.gain.setValueAtTime(0, c.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(vol, c.currentTime + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration);
+      osc.start(c.currentTime + delay);
+      osc.stop(c.currentTime + delay + duration + 0.05);
+    } catch (_) {}
+  }
+  return {
+    click()   { tone(600, 'sine', 0.06, 0.06); },
+    success() { tone(660, 'sine', 0.12, 0.12); tone(880, 'sine', 0.18, 0.09, 0.11); },
+    error()   { tone(220, 'sawtooth', 0.14, 0.08); },
+    open()    { tone(440, 'sine', 0.22, 0.10); tone(554, 'sine', 0.22, 0.08, 0.14); },
+    done()    { tone(880, 'sine', 0.10, 0.16); tone(660, 'sine', 0.28, 0.08, 0.09); },
+  };
+})();
+
+// Injetar sons nos botões primários automaticamente
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-primary');
+    if (btn && !btn.dataset.nosfx) SFX.click();
+  });
+});
+
+// Toast com som
+const _origShowToast = showToast;
+function showToast(message, type = 'info') {
+  _origShowToast(message, type);
+  if (type === 'success') SFX.success();
+  else if (type === 'error') SFX.error();
+}
+
 // Expõe globalmente
 window.AUTH       = AUTH;
 window.SECTIONS   = SECTIONS;
@@ -410,3 +459,4 @@ window.initPage   = initPage;
 window.showToast  = showToast;
 window.renderElevator = renderElevator;
 window.initCountrySelector = initCountrySelector;
+window.SFX        = SFX;
