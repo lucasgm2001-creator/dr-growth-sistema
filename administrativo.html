@@ -582,11 +582,13 @@ async function saveTask() {
     const idx=allTasks.findIndex(t=>t.id==id);
     if (idx>=0) allTasks[idx]={...allTasks[idx],...data};
     showToast('Tarefa atualizada!','success');
+    logActivity({ icon:'✏️', color:'#f59e0b', msg:`Tarefa "${title}" atualizada`, sector:'administrativo' });
   } else {
     data.created_at=new Date().toISOString();
     if (window.drSupabase) { const {data:ins}=await window.drSupabase.from('tasks').insert(data).select().single(); if (ins) allTasks.unshift(ins); }
     else allTasks.unshift({...data,id:Date.now()});
     showToast('Tarefa criada!','success');
+    logActivity({ icon:'📋', color:'#f59e0b', msg:`Nova tarefa criada — "${title}" (resp: ${data.responsible})`, sector:'administrativo' });
   }
   closeTaskModal(); updateTaskKPIs(); filterTasks();
 }
