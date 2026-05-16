@@ -174,15 +174,20 @@ const HEALTH_INFO = {
   red:    { label:'Em risco',  cls:'badge-red',    dot:'red',    icon:'⚠' },
 };
 
+function saveClientsLocal() { try { localStorage.setItem('drg_clients', JSON.stringify(allClients)); } catch {} }
+function loadClientsLocal() { try { return JSON.parse(localStorage.getItem('drg_clients') || '[]'); } catch { return []; } }
+
 async function loadClients() {
+  let loadedFromRemote = false;
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('clients').select('*').order('name');
-      if (!error && data?.length) allClients = data;
-      else allClients = DEMO_CLIENTS;
-    } catch { allClients = DEMO_CLIENTS; }
-  } else {
-    allClients = DEMO_CLIENTS;
+      if (!error && data?.length) { allClients = data; loadedFromRemote = true; saveClientsLocal(); }
+    } catch {}
+  }
+  if (!loadedFromRemote) {
+    const local = loadClientsLocal();
+    allClients = local.length ? local : DEMO_CLIENTS;
   }
   updateKPIs();
   renderGrid(allClients);
