@@ -1141,10 +1141,17 @@ async function initSky() {
   if (window._weather) showWeatherBadge(window._weather, scenario);
 }
 
-initSky();
-setInterval(initSky, 900000);
-// Revalida clima a cada 30 min
-setInterval(async () => { window._weather = await fetchWeather(); initSky(); }, 1800000);
+// Sky system desativado — fundo estático azul DR Growth
+(function() {
+  const sky = document.getElementById('sky-bg');
+  if (sky) sky.style.background = '';
+  ['sky-sun','sky-moon','sky-lightning'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('weather-divider') && (document.getElementById('weather-divider').style.display = 'none');
+  document.getElementById('weather-topbar')  && (document.getElementById('weather-topbar').style.display  = 'none');
+})();
 
 // ============================================================
 // CALENDAR
