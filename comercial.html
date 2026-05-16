@@ -806,23 +806,39 @@ function parseLeadIA() {
     }
   }
 
-  // Nicho
+  // Nicho — tenta extrair do campo "qual_tipo_de_servico..." ou varredura geral no texto
+  const serviceFieldMatch = text.match(/qual[_\s]+tipo[_\s]+de[_\s]+servi[cç]o[^:\n]*[:\s]+([^\n\r]+)/i)
+    || text.match(/type[_\s]+of[_\s]+service[^:\n]*[:\s]+([^\n\r]+)/i)
+    || text.match(/service[_\s]+type[^:\n]*[:\s]+([^\n\r]+)/i)
+    || text.match(/servi[cç]o[^:\n]*[:\s]+([^\n\r]+)/i);
+  const serviceText = serviceFieldMatch ? serviceFieldMatch[1].toLowerCase() : lower;
+  if (serviceFieldMatch) usedPatterns.push(serviceFieldMatch[0]);
+
   const nichos = [
-    { keys:['house clean','houseclean','cleaning','limpeza'],   val:'House Cleaning' },
-    { keys:['flooring','floor','piso','hardwood','vinyl'],      val:'Flooring' },
-    { keys:['tile','azulejo','porcelanato','grout'],            val:'Tile' },
-    { keys:['carpent','carpintar','marcenaria','woodwork'],     val:'Carpentry' },
-    { keys:['paint','pintura','pintor'],                        val:'Painting' },
-    { keys:['landscape','landscap','jardim','garden','lawn'],   val:'Landscape' },
-    { keys:['electr','eletric','elétric','electrical'],         val:'Electricist' },
-    { keys:['junk','removal','debris','hauling','lixo'],        val:'Junk Removal' },
+    { keys:['house clean','houseclean','cleaning','clean','limpeza'],  val:'House Cleaning' },
+    { keys:['flooring','floor','piso','hardwood','vinyl','laminate'],  val:'Flooring' },
+    { keys:['tile','azulejo','porcelanato','grout','ceramic'],         val:'Tile' },
+    { keys:['carpent','carpenter','carpintar','marcenaria','woodwork'],val:'Carpentry' },
+    { keys:['paint','pintura','pintor'],                               val:'Painting' },
+    { keys:['landscape','landscap','jardim','garden','lawn','mow'],    val:'Landscape' },
+    { keys:['electr','eletric','elétric','electrical','wiring'],       val:'Electricist' },
+    { keys:['junk','removal','debris','hauling','lixo','trash'],       val:'Junk Removal' },
   ];
+  let nichoMatched = false;
   for (const n of nichos) {
-    if (n.keys.some(k => lower.includes(k))) {
+    if (n.keys.some(k => serviceText.includes(k))) {
       document.getElementById('lead-nicho').value = n.val;
+      document.getElementById('lead-nicho-custom').style.display = 'none';
       usedPatterns.push(n.val);
+      nichoMatched = true;
       break;
     }
+  }
+  // Se havia campo de serviço mas não bateu nenhum nicho, coloca no campo "Outros"
+  if (!nichoMatched && serviceFieldMatch) {
+    document.getElementById('lead-nicho').value = 'outros';
+    document.getElementById('lead-nicho-custom').style.display = '';
+    document.getElementById('lead-nicho-custom').value = serviceFieldMatch[1].trim();
   }
 
   // Valor
