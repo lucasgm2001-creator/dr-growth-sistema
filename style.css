@@ -3404,7 +3404,7 @@ body.hall-page { background: transparent; }
    ============================================ */
 .hall-quad-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.25fr;
   grid-template-rows: 1fr 1fr;
   gap: 14px;
   flex: 1;
