@@ -399,27 +399,8 @@ if (!session) throw new Error('Not authenticated');
 
 let allPayments = [], allClients = [];
 
-const DEMO_PAYMENTS = [
-  { id:1, client_name:'GrowthX Agency',    description:'Serviços maio/2026', amount:12000, due_date:'2026-05-10', paid_date:'2026-05-09', status:'paid',    country:'br' },
-  { id:2, client_name:'MedTech Brasil',    description:'Serviços maio/2026', amount:4500,  due_date:'2026-05-15', paid_date:null,         status:'pending', country:'br' },
-  { id:3, client_name:'US Digital LLC',    description:'Serviços maio/2026', amount:8200,  due_date:'2026-05-12', paid_date:null,         status:'overdue', country:'us' },
-  { id:4, client_name:'Restaurante Sabor', description:'Serviços maio/2026', amount:1800,  due_date:'2026-05-05', paid_date:null,         status:'overdue', country:'br' },
-  { id:5, client_name:'Academia Fit',      description:'Serviços maio/2026', amount:2400,  due_date:'2026-05-20', paid_date:null,         status:'pending', country:'br' },
-  { id:6, client_name:'GrowthX Agency',    description:'Serviços abr/2026',  amount:12000, due_date:'2026-04-10', paid_date:'2026-04-08', status:'paid',    country:'br' },
-  { id:7, client_name:'MedTech Brasil',    description:'Serviços abr/2026',  amount:4500,  due_date:'2026-04-15', paid_date:'2026-04-14', status:'paid',    country:'br' },
-  { id:8, client_name:'Miami Health Co.',  description:'Serviços maio/2026', amount:5200,  due_date:'2026-05-18', paid_date:null,         status:'pending', country:'us' },
-  { id:9, client_name:'SaaS Platform US',  description:'Serviços maio/2026', amount:9500,  due_date:'2026-05-22', paid_date:null,         status:'pending', country:'us' },
-];
-
-const DEMO_CLIENTS = [
-  { id:1, name:'GrowthX Agency',    service:'Gestão de Tráfego',   responsible:'Gabriel Ramos', monthly_value:12000, renewal_date:'2026-11-01', health:'green',  country:'br' },
-  { id:2, name:'MedTech Brasil',    service:'Social Media + Ads',  responsible:'Gabriel Ramos', monthly_value:4500,  renewal_date:'2026-07-10', health:'green',  country:'br' },
-  { id:3, name:'US Digital LLC',    service:'Full Marketing',      responsible:'Lucas Moraes',  monthly_value:8200,  renewal_date:'2026-08-01', health:'yellow', country:'us' },
-  { id:4, name:'Restaurante Sabor', service:'Instagram + Stories', responsible:'Gabriel Ramos', monthly_value:1800,  renewal_date:'2026-09-15', health:'red',    country:'br' },
-  { id:5, name:'Academia Fit',      service:'Google Ads',          responsible:'Gabriel Ramos', monthly_value:2400,  renewal_date:'2026-09-01', health:'green',  country:'br' },
-  { id:6, name:'Miami Health Co.',  service:'Full Digital Marketing',responsible:'Lucas Moraes', monthly_value:5200, renewal_date:'2026-11-01', health:'green',  country:'us' },
-  { id:7, name:'SaaS Platform US',  service:'Google Ads + LinkedIn',responsible:'Lucas Moraes',  monthly_value:9500, renewal_date:'2026-12-01', health:'green',  country:'us' },
-];
+const DEMO_PAYMENTS = [];
+const DEMO_CLIENTS  = [];
 
 const STATUS_INFO = {
   paid:    { label:'Pago',     cls:'badge-green' },
