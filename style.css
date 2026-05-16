@@ -2652,6 +2652,96 @@ body.hall-page { background: transparent; }
   margin-top: 1px;
 }
 
+/* ============================================
+   HALL ACCORDION CARDS
+   ============================================ */
+.hall-accordion {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.hall-acc-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition);
+}
+
+.hall-acc-header:hover { background: var(--bg-hover); }
+
+.hall-acc-title {
+  font-size: 14px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.hall-acc-chevron {
+  color: var(--text-muted);
+  font-size: 16px;
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.hall-accordion.open .hall-acc-chevron { transform: rotate(90deg); }
+
+.hall-acc-body {
+  display: none;
+  border-top: 1px solid var(--border);
+}
+
+.hall-accordion.open .hall-acc-body {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+/* "editado" tag no mural */
+.aviso-edited {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-left: 4px;
+}
+
+/* Country selector */
+.country-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.country-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition);
+  flex: 1;
+  min-width: 120px;
+}
+
+.country-card:hover { border-color: var(--border-light); background: var(--bg-hover); }
+
+.country-card.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.country-card-flag { font-size: 20px; flex-shrink: 0; }
+.country-card-name { font-size: 13px; font-weight: 700; }
+.country-card-desc { font-size: 11px; color: var(--text-muted); }
+
 /* Tooltip */
 [data-tooltip] {
   position: relative;
