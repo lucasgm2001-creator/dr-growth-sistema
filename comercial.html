@@ -626,6 +626,7 @@ function buildCard(lead) {
           <span>Há ${daysAgo === 0 ? 'hoje' : daysAgo + 'd'}</span>
         </div>
       </div>
+      ${buildFollowupBadge(lead)}
     </div>`;
 }
 
