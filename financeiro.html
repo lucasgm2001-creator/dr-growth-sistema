@@ -757,10 +757,12 @@ function saveDespesa() {
   if (id) {
     const idx = allDespesas.findIndex(d=>d.id==id);
     if (idx>=0) allDespesas[idx]={...allDespesas[idx],...data};
+    saveDespesasLocal();
     showToast('Despesa atualizada!','success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${desc}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
   } else {
     allDespesas.unshift({...data,id:Date.now()});
+    saveDespesasLocal();
     showToast('Despesa criada!','success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${desc}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
