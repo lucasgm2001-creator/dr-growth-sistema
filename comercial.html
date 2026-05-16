@@ -745,7 +745,7 @@ async function saveLead() {
   const stage = document.getElementById('lead-stage').value;
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
   if (!nicho) { showToast('Selecione o nicho do lead.', 'error'); return; }
-  const data = { name, nicho, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value };
+  const data = { name, nicho, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value, country: document.getElementById('lead-country').value };
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = leads.findIndex(l => l.id == id);
