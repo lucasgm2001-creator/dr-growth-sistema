@@ -668,18 +668,8 @@ document.getElementById('pay-modal').addEventListener('click', e => { if (e.targ
 document.getElementById('despesa-modal').addEventListener('click', e => { if (e.target===document.getElementById('despesa-modal')) closeDespesaModal(); });
 
 // ---- DESPESAS ----
-const DEMO_DESPESAS = [
-  { id:1, desc:'Salário — Gabriel Ramos',  tipo:'salario',    valor:3500, data:'2026-05-05', status:'paid' },
-  { id:2, desc:'Salário — Thamyris Lages', tipo:'salario',    valor:3000, data:'2026-05-05', status:'paid' },
-  { id:3, desc:'Salário — Lucas Moraes',   tipo:'salario',    valor:2800, data:'2026-05-05', status:'paid' },
-  { id:4, desc:'Comissão — Lucas Moraes',  tipo:'comissao',   valor:1200, data:'2026-05-10', status:'pending' },
-  { id:5, desc:'Ferramentas (SaaS)',        tipo:'operacional', valor:850, data:'2026-05-01', status:'paid' },
-  { id:6, desc:'Mídia paga — Meta Ads',    tipo:'marketing',   valor:2000, data:'2026-05-08', status:'paid' },
-  { id:7, desc:'Aluguel escritório',        tipo:'operacional', valor:1500, data:'2026-05-01', status:'paid' },
-  { id:8, desc:'Comissão — Gabriel Ramos', tipo:'comissao',    valor:400,  data:'2026-05-10', status:'pending' },
-];
-
-let allDespesas = [...DEMO_DESPESAS];
+const DEMO_DESPESAS = [];
+let allDespesas = [];
 
 const TIPO_INFO = {
   salario:     { label:'Salários',       color:'var(--yellow)', cls:'badge-yellow' },
