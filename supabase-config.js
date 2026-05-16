@@ -4,8 +4,8 @@
 //  Acesse: https://supabase.com/dashboard → seu projeto → Settings → API
 // ============================================================
 
-const SUPABASE_URL  = 'https://SEU_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+const SUPABASE_URL  = 'https://hevtlwnyarthvqmihsuk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EvUJlkF4A72EAodK9lawfg_qEaRuKQL';
 
 // Inicializa o cliente Supabase (usando CDN via index.html)
 const supabase = window.supabase
