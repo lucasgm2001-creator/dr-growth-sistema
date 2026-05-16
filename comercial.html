@@ -754,9 +754,27 @@ function parseLeadIA() {
   const lower = text.toLowerCase();
   const usedPatterns = [];
 
-  // Nome
-  const nameMatch = text.match(/nome[:\s]+([^\n\r]+)/i) || text.match(/^([A-Z][a-záéíóúãõâêô]+ [A-Z][a-záéíóúãõâêô]+)/m);
-  if (nameMatch) { document.getElementById('lead-name').value = nameMatch[1].trim(); usedPatterns.push(nameMatch[0]); }
+  // Nome — cobre "Name: John Smith", "Full Name: ...", "Nome: ...", "First Name + Last Name" separados, ou nome no início do texto
+  let detectedName = null;
+  const namePatterns = [
+    /(?:full\s*name|name|nome)[:\s]+([^\n\r]+)/i,
+    /(?:first\s*name)[:\s]+([^\n\r]+)/i,
+  ];
+  for (const pat of namePatterns) {
+    const m = text.match(pat);
+    if (m) { detectedName = m[1].trim(); usedPatterns.push(m[0]); break; }
+  }
+  // Se encontrou só first name, tenta pegar last name na linha seguinte ou no padrão "Last Name: ..."
+  if (detectedName && !detectedName.includes(' ')) {
+    const lastMatch = text.match(/last\s*name[:\s]+([^\n\r]+)/i);
+    if (lastMatch) { detectedName += ' ' + lastMatch[1].trim(); usedPatterns.push(lastMatch[0]); }
+  }
+  // Fallback: primeira linha com ao menos dois tokens que pareçam nome próprio
+  if (!detectedName) {
+    const firstLine = text.split(/\n/).map(l => l.trim()).find(l => /^[A-Z][a-záéíóúãõâêôçA-Z]+(?: [A-Z][a-záéíóúãõâêôçA-Z]+)+$/.test(l));
+    if (firstLine) { detectedName = firstLine; usedPatterns.push(firstLine); }
+  }
+  if (detectedName) document.getElementById('lead-name').value = detectedName;
 
   // Empresa
   const compMatch = text.match(/empresa[:\s]+([^\n\r]+)/i) || text.match(/company[:\s]+([^\n\r]+)/i) || text.match(/negócio[:\s]+([^\n\r]+)/i) || text.match(/business[:\s]+([^\n\r]+)/i);
