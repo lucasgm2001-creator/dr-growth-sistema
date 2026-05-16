@@ -249,15 +249,14 @@
         <div class="form-group">
           <label>Vendedor Responsável</label>
           <select class="form-control" id="lead-responsible">
-            <option value="DR Growth">DR Growth</option>
-            <option value="Lucas">Lucas Moraes</option>
+            <option value="">— Selecione o vendedor —</option>
           </select>
         </div>
         <div class="form-group">
           <label>Operação</label>
-          <select class="form-control" id="lead-country">
-            <option value="br">🇧🇷 Brasil</option>
+          <select class="form-control" id="lead-country" onchange="onCountrySelectChange()">
             <option value="us">🇺🇸 EUA</option>
+            <option value="br">🇧🇷 Brasil</option>
           </select>
         </div>
       </div>
