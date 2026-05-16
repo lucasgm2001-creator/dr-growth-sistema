@@ -329,17 +329,12 @@ function selectLead(id) {
   document.getElementById('detail-phone').textContent = lead.phone || '—';
 
   const callBtns = document.getElementById('detail-call-btns');
+  callBtns.style.display = 'flex';
   if (lead.phone) {
-    const digits = lead.phone.replace(/\D/g, '');
-    const waNum = digits.startsWith('55') ? digits : '55' + digits;
-    callBtns.style.display = 'flex';
     callBtns.innerHTML = `
-      <a href="tel:${lead.phone}" class="btn btn-sm" style="background:var(--green);color:#fff;text-decoration:none" onclick="registerCallInteraction(event)">📞 Ligar</a>
-      <a href="https://wa.me/${waNum}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none">💬 WhatsApp</a>
-    `;
+      <a href="https://wa.me/${waNum(lead.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="registerCallInteraction(event)">📞 Chamar no WhatsApp</a>`;
   } else {
-    callBtns.style.display = 'none';
-    callBtns.innerHTML = '';
+    callBtns.innerHTML = `<button class="btn btn-sm" style="border:1px dashed var(--border);color:var(--text-muted)" onclick="addPhoneToLead(${lead.id})">+ Cadastrar telefone</button>`;
   }
 
   renderHistory(id);
