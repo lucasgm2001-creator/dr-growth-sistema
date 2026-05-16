@@ -558,7 +558,9 @@ function logActivity(opts) {
     const existing = JSON.parse(localStorage.getItem('drg_activity') || '[]');
     existing.unshift(entry);
     localStorage.setItem('drg_activity', JSON.stringify(existing.slice(0, 400)));
-  } catch(e) {}
+  } catch(e) {
+    console.warn('[logActivity] Falha ao salvar atividade:', e);
+  }
 }
 
 // Expõe globalmente
