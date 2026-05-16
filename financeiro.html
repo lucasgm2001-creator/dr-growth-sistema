@@ -646,11 +646,13 @@ async function savePayment() {
     const idx = allPayments.findIndex(p => p.id==id);
     if (idx>=0) allPayments[idx] = { ...allPayments[idx], ...data };
     showToast('Lançamento atualizado!', 'success');
+    logActivity({ icon:'💰', color:'#22c55e', msg:`Lançamento de ${client} atualizado`, sector:'financeiro' });
   } else {
     data.created_at = new Date().toISOString();
     if (window.drSupabase) { const { data:ins } = await window.drSupabase.from('payments').insert(data).select().single(); if (ins) allPayments.unshift(ins); }
     else allPayments.unshift({ ...data, id:Date.now() });
     showToast('Lançamento criado!', 'success');
+    logActivity({ icon:'💰', color:'#22c55e', msg:`Recebimento registrado — ${client} · ${fmt.currency(amount)}`, sector:'financeiro' });
   }
   closeModal(); updateKPIs(); filterPayments();
 }
