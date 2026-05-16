@@ -371,58 +371,74 @@ function saveAvisos(avisos) {
 function renderMural() {
   const avisos = getAvisos();
   const isAdmin = session.role === 'admin';
-
-  // Botão de novo aviso (só admin)
-  const adminBtn = document.getElementById('aviso-admin-btn');
-  if (isAdmin) {
-    adminBtn.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="toggleAvisoForm()">+ Novo</button>`;
-    document.getElementById('aviso-form').style.display = 'flex';
-  }
+  const myName  = session.name.split(' ')[0];
 
   if (!avisos.length) {
-    document.getElementById('mural-list').innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📌</div><p>Sem avisos.</p></div>`;
+    document.getElementById('mural-list').innerHTML = `<div class="empty-state" style="padding:20px"><p>Sem avisos no momento.</p></div>`;
     return;
   }
 
   const sorted = [...avisos].sort((a,b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
-  document.getElementById('mural-list').innerHTML = sorted.map(a => `
+  document.getElementById('mural-list').innerHTML = sorted.map(a => {
+    const isOwn = a.author === myName || a.authorFull === session.name;
+    return `
     <div class="aviso-item">
-      ${a.pinned ? '<div class="aviso-pinned">📌 fixado</div>' : ''}
-      <div class="aviso-text">${a.text}</div>
+      ${a.pinned ? '<div class="aviso-pinned">&#128204; fixado</div>' : ''}
+      <div class="aviso-text">${a.text}${a.editedAt ? ' <span class="aviso-edited">· editado</span>' : ''}</div>
       <div class="aviso-author">
         <div class="avatar avatar-sm avatar-${fmt.avatarClass(a.author)}">${fmt.initials(a.author)}</div>
         ${a.author} · ${fmt.timeAgo(a.time)}
-        ${isAdmin ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px;margin-left:auto;color:var(--text-muted)" onclick="removeAviso(${a.id})">✕</button>` : ''}
+        ${isOwn ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px;margin-left:auto;color:var(--text-muted)" onclick="editAviso(${a.id})">editar</button>` : ''}
+        ${(isAdmin || isOwn) ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px;color:var(--text-muted)" onclick="removeAviso(${a.id})">remover</button>` : ''}
       </div>
-    </div>`).join('');
-}
-
-function toggleAvisoForm() {
-  const form = document.getElementById('aviso-form');
-  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    </div>`;
+  }).join('');
 }
 
 function postAviso() {
   const input = document.getElementById('aviso-input');
   const text  = input.value.trim();
   if (!text) return;
-
   const avisos = getAvisos();
-  avisos.unshift({ id: Date.now(), text, author: session.name.split(' ')[0], pinned: false, time: new Date().toISOString() });
+  avisos.unshift({ id: Date.now(), text, author: session.name.split(' ')[0], authorFull: session.name, pinned: false, time: new Date().toISOString() });
   saveAvisos(avisos);
   input.value = '';
   renderMural();
   showToast('Aviso postado!', 'success');
 }
 
-function removeAviso(id) {
-  const avisos = getAvisos().filter(a => a.id !== id);
+function editAviso(id) {
+  const avisos = getAvisos();
+  const a = avisos.find(x => x.id === id);
+  if (!a) return;
+  const myName = session.name.split(' ')[0];
+  if (a.author !== myName && a.authorFull !== session.name) {
+    showToast('Você só pode editar seus próprios avisos.', 'error');
+    return;
+  }
+  const newText = prompt('Editar aviso:', a.text);
+  if (newText === null || !newText.trim()) return;
+  a.text = newText.trim();
+  a.editedAt = new Date().toISOString();
   saveAvisos(avisos);
+  renderMural();
+  showToast('Aviso editado.', 'success');
+}
+
+function removeAviso(id) {
+  const isAdmin = session.role === 'admin';
+  const myName  = session.name.split(' ')[0];
+  const avisos  = getAvisos();
+  const a       = avisos.find(x => x.id === id);
+  if (a && !isAdmin && a.author !== myName && a.authorFull !== session.name) {
+    showToast('Você só pode remover seus próprios avisos.', 'error');
+    return;
+  }
+  saveAvisos(avisos.filter(x => x.id !== id));
   renderMural();
 }
 
-// Enter para postar aviso
 document.getElementById('aviso-input')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') postAviso();
 });
