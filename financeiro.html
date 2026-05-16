@@ -682,6 +682,10 @@ document.getElementById('despesa-modal').addEventListener('click', e => { if (e.
 const DEMO_DESPESAS = [];
 let allDespesas = [];
 
+function saveDespesasLocal() { try { localStorage.setItem('drg_despesas', JSON.stringify(allDespesas)); } catch {} }
+function loadDespesasLocal() { try { return JSON.parse(localStorage.getItem('drg_despesas') || '[]'); } catch { return []; } }
+allDespesas = loadDespesasLocal();
+
 const TIPO_INFO = {
   salario:     { label:'Salários',       color:'var(--yellow)', cls:'badge-yellow' },
   comissao:    { label:'Comissionamento',color:'var(--accent)', cls:'badge-accent' },
