@@ -2522,7 +2522,27 @@ body.hall-page { background: transparent; }
 /* ============================================
    CALENDAR
    ============================================ */
-.cal-wrap { max-width: 960px; }
+.cal-wrap { width: 100%; }
+
+/* Compact grid for narrow column */
+.cal-grid-compact .cal-cell {
+  min-height: 52px;
+  padding: 4px;
+}
+.cal-grid-compact .cal-cell-num {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.cal-grid-compact .cal-chip {
+  font-size: 8px;
+  padding: 1px 3px;
+}
+.cal-grid-compact .cal-holiday {
+  font-size: 8px;
+}
+.cal-grid-compact .cal-day-name {
+  font-size: 10px;
+}
 
 /* ---- Toolbar (view switcher + nav) ---- */
 .cal-toolbar {
