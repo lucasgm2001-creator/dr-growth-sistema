@@ -637,8 +637,8 @@ function renderPipeline() {
   }).join('');
 
   // Resumo
-  const closed = leads.filter(l=>l.stage==='fechado');
-  const lost   = leads.filter(l=>l.stage==='perdido');
+  const closed = vis.filter(l=>l.stage==='fechado');
+  const lost   = vis.filter(l=>l.stage==='perdido');
   const txConv = active.length > 0 ? Math.round((closed.length/(closed.length+lost.length+active.length))*100) : 0;
   document.getElementById('pipeline-summary').innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
