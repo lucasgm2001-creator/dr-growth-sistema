@@ -469,8 +469,43 @@ function renderTeam() {
     </div>`).join('');
 }
 
+// ---- Feed input (todos podem postar) ----
+function getFeedItems() {
+  try { return JSON.parse(localStorage.getItem('drg_feed') || '[]'); } catch { return []; }
+}
+function saveFeedItems(items) { localStorage.setItem('drg_feed', JSON.stringify(items)); }
+
+function postFeedItem() {
+  const input = document.getElementById('feed-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  const items = getFeedItems();
+  items.unshift({
+    id: Date.now(), type:'update', icon:'💬', color:'#244c9c',
+    msg: text, who: session.name.split(' ')[0], time: new Date().toISOString(),
+    authorFull: session.name, editable: true
+  });
+  saveFeedItems(items);
+  input.value = '';
+  renderFeedAll();
+  showToast('Postado!', 'success');
+}
+
+function renderFeedAll() {
+  const userItems = getFeedItems();
+  const all = [...userItems, ...FEED_DEMO].sort((a,b) => new Date(b.time) - new Date(a.time)).slice(0, 20);
+  renderFeed(all);
+}
+
+// ---- Accordion toggle ----
+function toggleAcc(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
+
 // ---- Init ----
-renderFeed(FEED_DEMO);
+renderFeedAll();
 renderMural();
 renderTeam();
 </script>
