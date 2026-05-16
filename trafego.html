@@ -665,7 +665,7 @@ function saveCampaign() {
   const id   = document.getElementById('camp-id').value;
   const name = document.getElementById('camp-name').value.trim();
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
-  const data = { name, client:document.getElementById('camp-client').value.trim(), platform:document.getElementById('camp-platform').value, status:document.getElementById('camp-status').value, budget:Number(document.getElementById('camp-budget').value)||0, objective:document.getElementById('camp-objective').value, notes:document.getElementById('camp-notes').value.trim() };
+  const data = { name, client:document.getElementById('camp-client').value.trim(), platform:document.getElementById('camp-platform').value, status:document.getElementById('camp-status').value, budget:Number(document.getElementById('camp-budget').value)||0, objective:document.getElementById('camp-objective').value, notes:document.getElementById('camp-notes').value.trim(), country:document.getElementById('camp-country').value };
   if (id) {
     const idx = campaigns.findIndex(c=>c.id==id);
     if (idx>=0) campaigns[idx] = { ...campaigns[idx], ...data };
