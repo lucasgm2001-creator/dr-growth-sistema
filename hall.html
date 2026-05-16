@@ -568,6 +568,15 @@ renderFeedAll();
 renderMural();
 renderTeam();
 renderCalendar();
+
+// Atualiza o feed ao vivo quando outra aba/página registra nova atividade
+window.addEventListener('storage', e => {
+  if (e.key === 'drg_activity') renderFeedAll();
+  if (e.key === 'drg_avisos')   renderMural();
+});
+
+// Fallback: re-renderiza o feed a cada 8s (caso a página fique aberta)
+setInterval(renderFeedAll, 8000);
 </script>
 
 <!-- ============================================================
