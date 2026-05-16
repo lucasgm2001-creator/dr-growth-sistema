@@ -181,6 +181,25 @@
       </div>
     </div>
 
+    <!-- TAB: Agenda de Contatos -->
+    <div class="tab-panel" id="tab-agenda">
+      <div class="filter-bar animate-in" style="margin-top:4px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-agenda" placeholder="Buscar por nome, empresa ou telefone…" oninput="filterAgenda()">
+        </div>
+        <select class="filter-select" id="agenda-filter-resp" onchange="filterAgenda()">
+          <option value="">Todos os vendedores</option>
+        </select>
+        <select class="filter-select" id="agenda-filter-phone" onchange="filterAgenda()">
+          <option value="">Todos</option>
+          <option value="com">Com telefone</option>
+          <option value="sem">Sem telefone</option>
+        </select>
+      </div>
+      <div id="agenda-grid" class="animate-in mt-3"></div>
+    </div>
+
     <!-- TAB: Comissões -->
     <div class="tab-panel" id="tab-comissoes">
       <div id="commissions-content"></div>
