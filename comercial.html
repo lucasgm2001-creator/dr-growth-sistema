@@ -210,7 +210,7 @@
       <div class="grid-2">
         <div class="form-group">
           <label>Nicho *</label>
-          <select class="form-control" id="lead-nicho">
+          <select class="form-control" id="lead-nicho" onchange="onNichoChange()">
             <option value="">Selecione o nicho</option>
             <option>House Cleaning</option>
             <option>Flooring</option>
@@ -220,8 +220,11 @@
             <option>Landscape</option>
             <option>Electricist</option>
             <option>Junk Removal</option>
-            <option>Outros</option>
+            <option value="outros"><em>Outros — escreva</em></option>
           </select>
+          <input type="text" class="form-control" id="lead-nicho-custom"
+            placeholder="Descreva o tipo de serviço…"
+            style="display:none;margin-top:6px;font-style:italic">
         </div>
         <div class="form-group">
           <label>Estágio *</label>
