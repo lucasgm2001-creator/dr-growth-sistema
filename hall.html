@@ -794,83 +794,331 @@ function switchHallTab(name, btn) {
 }
 
 // ============================================================
-// SKY BACKGROUND (fuso: São Paulo)
+// WEATHER + SKY SYSTEM
 // ============================================================
-function initSky() {
-  const sky = document.getElementById('sky-bg');
-  if (!sky) return;
-  const h = getSPHour(); // hora em São Paulo
+window._weather = null;
+let _lightningTimer = null;
 
-  sky.querySelectorAll('.sky-star, .sky-cloud').forEach(el => el.remove());
+// Busca clima via Open-Meteo (sem API key)
+async function fetchWeather() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(async pos => {
+      try {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&current=weather_code,temperature_2m,apparent_temperature&timezone=auto&forecast_days=1`;
+        const res = await fetch(url);
+        const d   = await res.json();
+        resolve({ code: d.current.weather_code, temp: Math.round(d.current.temperature_2m), feels: Math.round(d.current.apparent_temperature), lat, lon });
+      } catch { resolve(null); }
+    }, () => resolve(null), { timeout: 8000 });
+  });
+}
 
-  const sun  = document.getElementById('sky-sun');
-  const moon = document.getElementById('sky-moon');
-
-  function addStars(count, maxTop, loLow, loHigh, hiLow, hiHigh, maxSz) {
-    for (let i = 0; i < count; i++) {
-      const s = document.createElement('div');
-      s.className = 'sky-star';
-      const sz  = (Math.random() * (maxSz || 1.8) + 0.4).toFixed(1);
-      const lo  = (Math.random() * (loHigh - loLow) + loLow).toFixed(2);
-      const hi  = (Math.random() * (hiHigh - hiLow) + hiLow).toFixed(2);
-      s.style.cssText = `left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*(maxTop||72)).toFixed(1)}%;width:${sz}px;height:${sz}px;--lo:${lo};--hi:${hi};--dur:${(Math.random()*3+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s`;
-      sky.appendChild(s);
-    }
+// Mapeia código WMO + hora → cenário visual
+function getScenario(code, h) {
+  const day = h >= 6 && h < 20;
+  if (code === null || code === undefined) {
+    if (h >= 6  && h < 12) return 'manha-limpa';
+    if (h >= 12 && h < 18) return 'tarde-limpa';
+    if (h >= 18)            return 'noite-limpa';
+    return 'madrugada';
   }
+  if (code >= 95)                         return day ? 'tempestade-dia'   : 'tempestade-noite';
+  if (code >= 80 || (code>=61&&code<=67)) return day ? 'chuva-dia'        : 'chuva-noite';
+  if (code >= 51 && code <= 57)           return day ? 'garoa-dia'        : 'garoa-noite';
+  if (code >= 71 && code <= 86)           return day ? 'neve-dia'         : 'neve-noite';
+  if (code >= 45 && code <= 48)           return day ? 'neblina-dia'      : 'neblina-noite';
+  if (code === 3)                         return day ? 'nublado-dia'      : 'nublado-noite';
+  if (code === 2)                         return day ? (h<12?'manha-nuvem':'tarde-nuvem') : 'noite-nuvem';
+  if (code === 1)                         return day ? (h<12?'manha-limpa':'tarde-limpa') : 'noite-limpa';
+  // code 0 = limpo
+  if (h >= 6  && h < 12) return 'manha-limpa';
+  if (h >= 12 && h < 18) return 'tarde-limpa';
+  if (h >= 18)            return 'noite-limpa';
+  return 'madrugada';
+}
 
-  function addClouds(count) {
-    for (let i = 0; i < count; i++) {
-      const c = document.createElement('div');
-      c.className = 'sky-cloud';
-      c.style.cssText = `left:${(Math.random()*75+5).toFixed(1)}%;top:${(Math.random()*30+8).toFixed(1)}%;opacity:${(Math.random()*0.18+0.06).toFixed(2)};width:${(70+Math.random()*90).toFixed(0)}px;animation-duration:${(50+Math.random()*50).toFixed(0)}s;animation-delay:${(Math.random()*30).toFixed(1)}s`;
-      sky.appendChild(c);
-    }
-  }
-
-  const moonEmoji = getMoonEmoji();
-
-  if (h >= 6 && h < 12) {
-    // Bom dia — aurora suave, horizonte quente, azul DR Growth no topo
-    const pct      = (h - 6) / 6;
-    const leftPct  = (4 + pct * 50).toFixed(1);
-    const topPct   = (42 - Math.sin(Math.PI * pct * 0.7) * 26).toFixed(1);
-    const horizonColor = pct < 0.4 ? '#c47a3a' : '#6a8fbf';
-    const midColor     = pct < 0.4 ? '#7a9fc0' : '#5a7db5';
-    sky.style.background = `linear-gradient(to bottom, #234080 0%, ${midColor} 50%, ${horizonColor} 100%)`;
-    sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
-    moon.style.cssText = 'display:none';
-    addClouds(pct < 0.4 ? 3 : 5);
-
-  } else if (h >= 12 && h < 18) {
-    // Boa tarde — azul DR Growth profundo, sem brilho artificial
-    const pct      = (h - 12) / 6;
-    const leftPct  = (54 + pct * 36).toFixed(1);
-    const topPct   = (16 + Math.sin(Math.PI * pct * 0.7) * 22).toFixed(1);
-    sky.style.background = 'linear-gradient(to bottom, #234080 0%, #24448d 45%, #4a6fa8 100%)';
-    sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
-    moon.style.cssText = 'display:none';
-
-  } else if (h >= 18) {
-    // Boa noite — céu escuro com estrelas e lua
-    sky.style.background = 'linear-gradient(to bottom, #010108 0%, #060612 55%, #0b0b1a 100%)';
-    moon.style.cssText = 'display:block;top:7%;right:12%;background:none;box-shadow:none;width:auto;height:auto;border-radius:0;font-size:36px;line-height:1';
-    moon.textContent = moonEmoji;
-    sun.style.cssText = 'display:none';
-    addStars(160, 72, 0.08, 0.30, 0.38, 0.92);
-
-  } else {
-    // Boa madrugada (0–5) — escuro com algumas nuvens e poucas estrelas
-    sky.style.background = 'linear-gradient(to bottom, #010108 0%, #07070f 55%, #0e0e1c 100%)';
-    moon.style.cssText = 'display:block;top:10%;right:18%;background:none;box-shadow:none;width:auto;height:auto;border-radius:0;font-size:30px;line-height:1';
-    moon.textContent = moonEmoji;
-    sun.style.cssText = 'display:none';
-    addStars(55, 72, 0.03, 0.12, 0.18, 0.50, 1.3);
-    addClouds(4);
+// ---- Fábrica de partículas ----
+function addStars(sky, count, maxTop, loLow, loHigh, hiLow, hiHigh, maxSz) {
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'sky-star';
+    const sz = (Math.random()*(maxSz||1.8)+0.4).toFixed(1);
+    const lo = (Math.random()*(loHigh-loLow)+loLow).toFixed(2);
+    const hi = (Math.random()*(hiHigh-hiLow)+hiLow).toFixed(2);
+    s.style.cssText = `left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*(maxTop||72)).toFixed(1)}%;width:${sz}px;height:${sz}px;--lo:${lo};--hi:${hi};--dur:${(Math.random()*3+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s`;
+    sky.appendChild(s);
   }
 }
 
+function addClouds(sky, count, opacityBase, opacityRange, big) {
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'sky-cloud';
+    const w = big ? (120+Math.random()*160) : (70+Math.random()*90);
+    const op = (opacityBase + Math.random()*opacityRange).toFixed(2);
+    c.style.cssText = `left:${(Math.random()*80+2).toFixed(1)}%;top:${(Math.random()*35+5).toFixed(1)}%;opacity:${op};width:${w.toFixed(0)}px;animation-duration:${(50+Math.random()*50).toFixed(0)}s;animation-delay:${(Math.random()*30).toFixed(1)}s`;
+    sky.appendChild(c);
+  }
+}
+
+function addRain(sky, count, heavy) {
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('div');
+    d.className = heavy ? 'sky-rain heavy' : 'sky-rain';
+    const h = (heavy ? 22+Math.random()*18 : 12+Math.random()*14).toFixed(0);
+    const dur = (heavy ? 0.35+Math.random()*0.3 : 0.6+Math.random()*0.5).toFixed(2);
+    d.style.cssText = `left:${(Math.random()*110-5).toFixed(1)}%;top:${(Math.random()*-40-5).toFixed(0)}px;height:${h}px;animation-duration:${dur}s;animation-delay:-${(Math.random()*parseFloat(dur)).toFixed(2)}s`;
+    sky.appendChild(d);
+  }
+}
+
+function addSnow(sky, count) {
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'sky-snow';
+    const sz = (2+Math.random()*4).toFixed(1);
+    const dur = (5+Math.random()*7).toFixed(1);
+    s.style.cssText = `left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*-20-5).toFixed(0)}px;width:${sz}px;height:${sz}px;animation-duration:${dur}s;animation-delay:-${(Math.random()*parseFloat(dur)).toFixed(1)}s`;
+    sky.appendChild(s);
+  }
+}
+
+function addFog(sky, count) {
+  for (let i = 0; i < count; i++) {
+    const f = document.createElement('div');
+    f.className = 'sky-fog';
+    const w = 350+Math.random()*450, h = 120+Math.random()*160;
+    const dur = (10+Math.random()*14).toFixed(0);
+    f.style.cssText = `left:${(Math.random()*75).toFixed(0)}%;top:${(15+Math.random()*55).toFixed(0)}%;width:${w.toFixed(0)}px;height:${h.toFixed(0)}px;animation-duration:${dur}s;animation-delay:-${(Math.random()*parseFloat(dur)).toFixed(1)}s`;
+    sky.appendChild(f);
+  }
+}
+
+function startLightning(intensity) {
+  stopLightning();
+  const el = document.getElementById('sky-lightning');
+  if (!el) return;
+  function flash() {
+    const n = 1 + Math.floor(Math.random()*3);
+    let t = 0;
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => {
+        el.style.background = `rgba(215,230,255,${(0.45+Math.random()*0.45).toFixed(2)})`;
+        setTimeout(() => { el.style.background = 'transparent'; }, 55+Math.random()*70);
+      }, t);
+      t += 110+Math.random()*130;
+    }
+    _lightningTimer = setTimeout(flash, (2500+Math.random()*7000)/intensity);
+  }
+  flash();
+}
+
+function stopLightning() {
+  if (_lightningTimer) { clearTimeout(_lightningTimer); _lightningTimer = null; }
+  const el = document.getElementById('sky-lightning');
+  if (el) el.style.background = 'transparent';
+}
+
+// ---- Renderizador de cenário ----
+function renderScenario(scenario, h) {
+  const sky  = document.getElementById('sky-bg');
+  if (!sky) return;
+  const sun  = document.getElementById('sky-sun');
+  const moon = document.getElementById('sky-moon');
+  const moonEmoji = getMoonEmoji();
+  stopLightning();
+
+  // Limpa partículas antigas
+  sky.querySelectorAll('.sky-star,.sky-cloud,.sky-rain,.sky-snow,.sky-fog').forEach(e => e.remove());
+  sun.style.cssText  = 'display:none';
+  moon.style.cssText = 'display:none';
+
+  // Posição do sol (período diurno)
+  function sunPos(period, start, span, arcH) {
+    const pct = Math.max(0, Math.min(1, (h - start) / span));
+    const left = (4 + pct * 84).toFixed(1);
+    const top  = (arcH - Math.sin(Math.PI * pct) * (arcH * 0.7)).toFixed(1);
+    sun.style.cssText = `display:block;left:${left}%;top:${top}%`;
+  }
+
+  switch (scenario) {
+
+    case 'manha-limpa': {
+      const pct = (h-6)/6;
+      const horizon = pct < 0.35 ? '#c9843a' : '#7098c0';
+      const mid     = pct < 0.35 ? '#7faec8' : '#5c82bc';
+      sky.style.background = `linear-gradient(to bottom, #1c3470 0%, ${mid} 52%, ${horizon} 100%)`;
+      sunPos('manha',6,6,44);
+      addClouds(sky, pct < 0.35 ? 3 : 5, 0.06, 0.14);
+      break;
+    }
+    case 'manha-nuvem': {
+      sky.style.background = 'linear-gradient(to bottom, #1c3470 0%, #4a6888 48%, #7a98b0 100%)';
+      sunPos('manha',6,6,44);
+      addClouds(sky, 9, 0.22, 0.28, true);
+      break;
+    }
+    case 'tarde-limpa': {
+      const pct = (h-12)/6;
+      sky.style.background = 'linear-gradient(to bottom, #1a2e62 0%, #234080 42%, #3a6aaa 100%)';
+      sunPos('tarde',12,6,20);
+      addClouds(sky, 4, 0.07, 0.12);
+      break;
+    }
+    case 'tarde-nuvem': {
+      sky.style.background = 'linear-gradient(to bottom, #1a2e62 0%, #2c4470 45%, #4a6080 100%)';
+      sunPos('tarde',12,6,20);
+      addClouds(sky, 10, 0.28, 0.32, true);
+      break;
+    }
+    case 'noite-limpa': {
+      sky.style.background = 'linear-gradient(to bottom, #010108 0%, #05050f 55%, #0a0a18 100%)';
+      moon.style.cssText = 'display:block;top:7%;right:12%;background:none;box-shadow:none;width:auto;height:auto;border-radius:0;font-size:36px;line-height:1';
+      moon.textContent = moonEmoji;
+      addStars(sky, 180, 72, 0.08, 0.28, 0.38, 0.95);
+      break;
+    }
+    case 'noite-nuvem': {
+      sky.style.background = 'linear-gradient(to bottom, #08080f 0%, #0d0d1a 55%, #141422 100%)';
+      moon.style.cssText = 'display:block;top:8%;right:14%;background:none;box-shadow:none;width:auto;height:auto;border-radius:0;font-size:32px;line-height:1;opacity:0.55';
+      moon.textContent = moonEmoji;
+      addStars(sky, 40, 60, 0.02, 0.10, 0.12, 0.40, 1.2);
+      addClouds(sky, 8, 0.30, 0.25, true);
+      break;
+    }
+    case 'madrugada': {
+      sky.style.background = 'linear-gradient(to bottom, #010108 0%, #06060d 55%, #0c0c1a 100%)';
+      moon.style.cssText = 'display:block;top:10%;right:18%;background:none;box-shadow:none;width:auto;height:auto;border-radius:0;font-size:30px;line-height:1';
+      moon.textContent = moonEmoji;
+      addStars(sky, 55, 72, 0.03, 0.12, 0.18, 0.50, 1.3);
+      addClouds(sky, 4, 0.08, 0.10);
+      break;
+    }
+    case 'nublado-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #1a2030 0%, #282e3e 45%, #3e4858 100%)';
+      addClouds(sky, 14, 0.45, 0.30, true);
+      break;
+    }
+    case 'nublado-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #080810 0%, #0e0e1c 55%, #141420 100%)';
+      addClouds(sky, 10, 0.35, 0.25, true);
+      break;
+    }
+    case 'garoa-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #1a2232 0%, #252e3e 45%, #323e50 100%)';
+      addClouds(sky, 12, 0.38, 0.28, true);
+      addRain(sky, 55, false);
+      break;
+    }
+    case 'garoa-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #080810 0%, #0c0c18 50%, #101018 100%)';
+      addClouds(sky, 8, 0.30, 0.20, true);
+      addRain(sky, 45, false);
+      break;
+    }
+    case 'chuva-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #131820 0%, #1c2230 45%, #252e3e 100%)';
+      addClouds(sky, 14, 0.50, 0.28, true);
+      addRain(sky, 90, false);
+      break;
+    }
+    case 'chuva-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #050508 0%, #08080e 50%, #0c0c14 100%)';
+      addClouds(sky, 9, 0.40, 0.22, true);
+      addRain(sky, 75, false);
+      break;
+    }
+    case 'tempestade-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #0a0c14 0%, #111520 45%, #181c28 100%)';
+      addClouds(sky, 16, 0.60, 0.28, true);
+      addRain(sky, 130, true);
+      startLightning(2.0);
+      break;
+    }
+    case 'tempestade-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #03030a 0%, #06060f 50%, #0a0a16 100%)';
+      addClouds(sky, 12, 0.55, 0.25, true);
+      addRain(sky, 110, true);
+      startLightning(2.5);
+      break;
+    }
+    case 'neve-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #1e2a38 0%, #2a3848 45%, #4a5e72 100%)';
+      addClouds(sky, 12, 0.42, 0.28, true);
+      addSnow(sky, 60);
+      break;
+    }
+    case 'neve-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #0c1018 0%, #121820 50%, #1a2228 100%)';
+      addClouds(sky, 8, 0.35, 0.22, true);
+      addSnow(sky, 45);
+      addStars(sky, 20, 50, 0.02, 0.08, 0.10, 0.30, 1.1);
+      break;
+    }
+    case 'neblina-dia': {
+      sky.style.background = 'linear-gradient(to bottom, #202838 0%, #2e3a4a 45%, #5a6a78 100%)';
+      addFog(sky, 7);
+      addClouds(sky, 6, 0.18, 0.15);
+      break;
+    }
+    case 'neblina-noite': {
+      sky.style.background = 'linear-gradient(to bottom, #0a0c12 0%, #0e1018 50%, #141820 100%)';
+      addFog(sky, 5);
+      break;
+    }
+    default: {
+      sky.style.background = 'linear-gradient(to bottom, #010108 0%, #060612 55%, #0b0b1a 100%)';
+      addStars(sky, 100, 72, 0.06, 0.25, 0.30, 0.85);
+    }
+  }
+}
+
+// ---- Mostra indicador de clima no topo ----
+function showWeatherBadge(w, scenario) {
+  let badge = document.getElementById('weather-badge');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.id = 'weather-badge';
+    badge.style.cssText = 'position:fixed;top:12px;right:20px;z-index:200;display:flex;align-items:center;gap:6px;background:rgba(8,8,20,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.10);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,0.85);pointer-events:none';
+    document.body.appendChild(badge);
+  }
+  const icons = {
+    'manha-limpa':'☀️','manha-nuvem':'⛅','tarde-limpa':'🌤️','tarde-nuvem':'🌥️',
+    'noite-limpa':'🌙','noite-nuvem':'☁️','madrugada':'🌑',
+    'nublado-dia':'☁️','nublado-noite':'☁️',
+    'garoa-dia':'🌦️','garoa-noite':'🌧️',
+    'chuva-dia':'🌧️','chuva-noite':'🌧️',
+    'tempestade-dia':'⛈️','tempestade-noite':'⛈️',
+    'neve-dia':'❄️','neve-noite':'❄️',
+    'neblina-dia':'🌫️','neblina-noite':'🌫️',
+  };
+  const icon = icons[scenario] || '🌐';
+  badge.innerHTML = `${icon} <span>${w.temp}°C</span>`;
+}
+
+// ---- Init principal ----
+async function initSky() {
+  const h = getSPHour();
+
+  // 1ª carga: busca clima real
+  if (!window._weather && window._weatherFetched !== true) {
+    window._weatherFetched = true;
+    window._weather = await fetchWeather();
+  }
+
+  const code     = window._weather ? window._weather.code : null;
+  const scenario = getScenario(code, h);
+  renderScenario(scenario, h);
+
+  if (window._weather) showWeatherBadge(window._weather, scenario);
+}
+
 initSky();
-setInterval(initSky, 900000); // re-check every 15 min
+setInterval(initSky, 900000);
+// Revalida clima a cada 30 min
+setInterval(async () => { window._weather = await fetchWeather(); initSky(); }, 1800000);
 
 // ============================================================
 // CALENDAR
