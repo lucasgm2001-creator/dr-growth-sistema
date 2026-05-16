@@ -920,11 +920,13 @@ function closeModal() { document.getElementById('lead-modal').classList.remove('
 async function saveLead() {
   const id = document.getElementById('lead-id').value;
   const name = document.getElementById('lead-name').value.trim();
-  const nicho = document.getElementById('lead-nicho').value;
+  const nichoSel = document.getElementById('lead-nicho').value;
+  const nichoCustom = document.getElementById('lead-nicho-custom').value.trim();
+  const nicho = nichoSel === 'outros' ? nichoCustom : nichoSel;
   const stage = document.getElementById('lead-stage').value;
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
-  if (!nicho) { showToast('Selecione o nicho do lead.', 'error'); return; }
-  const data = { name, nicho, company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value, country: document.getElementById('lead-country').value };
+  if (!nicho) { showToast(nichoSel === 'outros' ? 'Descreva o nicho em "Outros".' : 'Selecione o nicho do lead.', 'error'); return; }
+  const data = { name, nicho, region: document.getElementById('lead-region').value.trim(), company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value, country: document.getElementById('lead-country').value };
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = leads.findIndex(l => l.id == id);
