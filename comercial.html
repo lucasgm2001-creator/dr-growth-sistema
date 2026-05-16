@@ -408,6 +408,7 @@ function switchTab(name, btn) {
   btn2.textContent = actions[name] || '+ Novo Lead';
   btn2.style.display = (name === 'pipeline' || name === 'metricas') ? 'none' : '';
   if (name === 'metricas') renderMetrics();
+  if (name === 'pipeline') { renderPipeline(); renderSellersAdmin(); }
 }
 
 // ---- Métricas personalizadas ----
