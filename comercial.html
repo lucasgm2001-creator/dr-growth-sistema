@@ -494,8 +494,8 @@ function renderMetrics() {
     return `<div style="margin-bottom:14px">
       <div class="flex items-center justify-between mb-1">
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="avatar avatar-sm avatar-${fmt.avatarClass(name)}">${fmt.initials(name)}</div>
-          <span style="font-size:12px;font-weight:600">${name}</span>
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(name)}">${fmt.initials(s.name)}</div>
+          <span style="font-size:12px;font-weight:600">${s.name}</span>
           <span style="font-size:10px;color:var(--text-muted)">${mine.length} leads</span>
         </div>
         <span style="font-size:13px;font-weight:700;color:var(--green)">${rate}%</span>
