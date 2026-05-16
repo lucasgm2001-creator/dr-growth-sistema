@@ -374,6 +374,18 @@ async function addInteraction() {
   showToast('Interação registrada!', 'success');
 }
 
+function registerCallInteraction(e) {
+  if (!selectedLeadId) return;
+  const lead = allLeads.find(l => l.id === selectedLeadId);
+  if (!lead) return;
+  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: `Ligação iniciada para ${lead.phone}`, created_at: new Date().toISOString() };
+  if (!history[selectedLeadId]) history[selectedLeadId] = [];
+  history[selectedLeadId].push(entry);
+  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
+  renderHistory(selectedLeadId);
+  showToast('Ligação registrada no histórico!', 'success');
+}
+
 function closeDetail() {
   document.getElementById('lead-detail-panel').style.display = 'none';
   selectedLeadId = null;
