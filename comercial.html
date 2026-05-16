@@ -651,39 +651,59 @@ function toggleIASection() {
 }
 
 function parseLeadIA() {
-  const text = document.getElementById('ia-text').value;
+  let text = document.getElementById('ia-text').value;
   if (!text.trim()) { showToast('Cole o formulário primeiro.', 'error'); return; }
 
+  // Remover a frase de saudação padrão
+  text = text.replace(/Hello!\s*I filled out your form and would like to know more about your business\.?\s*/gi, '');
+
   const lower = text.toLowerCase();
+  const usedPatterns = [];
 
   // Nome
   const nameMatch = text.match(/nome[:\s]+([^\n\r]+)/i) || text.match(/^([A-Z][a-záéíóúãõâêô]+ [A-Z][a-záéíóúãõâêô]+)/m);
-  if (nameMatch) document.getElementById('lead-name').value = nameMatch[1].trim();
+  if (nameMatch) { document.getElementById('lead-name').value = nameMatch[1].trim(); usedPatterns.push(nameMatch[0]); }
 
   // Empresa
-  const compMatch = text.match(/empresa[:\s]+([^\n\r]+)/i) || text.match(/company[:\s]+([^\n\r]+)/i) || text.match(/negócio[:\s]+([^\n\r]+)/i);
-  if (compMatch) document.getElementById('lead-company').value = compMatch[1].trim();
+  const compMatch = text.match(/empresa[:\s]+([^\n\r]+)/i) || text.match(/company[:\s]+([^\n\r]+)/i) || text.match(/negócio[:\s]+([^\n\r]+)/i) || text.match(/business[:\s]+([^\n\r]+)/i);
+  if (compMatch) { document.getElementById('lead-company').value = compMatch[1].trim(); usedPatterns.push(compMatch[0]); }
 
   // E-mail
   const emailMatch = text.match(/[\w.-]+@[\w.-]+\.\w+/);
-  if (emailMatch) document.getElementById('lead-email').value = emailMatch[0];
+  if (emailMatch) { document.getElementById('lead-email').value = emailMatch[0]; usedPatterns.push(emailMatch[0]); }
 
-  // Telefone
+  // Telefone + detecção de país
   const phoneMatch = text.match(/(\+?[\d\s\(\)\-]{9,20})/);
-  if (phoneMatch) document.getElementById('lead-phone').value = phoneMatch[1].trim();
+  if (phoneMatch) {
+    const phone = phoneMatch[1].trim();
+    document.getElementById('lead-phone').value = phone;
+    usedPatterns.push(phoneMatch[0]);
+    const digits = phone.replace(/\D/g,'');
+    if (phone.startsWith('+1') || digits.startsWith('1') && digits.length === 11) {
+      document.getElementById('lead-country').value = 'us';
+    } else if (phone.startsWith('+55') || digits.startsWith('55')) {
+      document.getElementById('lead-country').value = 'br';
+    }
+  }
 
   // Nicho
   const nichos = { saúde:'Saúde', saude:'Saúde', health:'Saúde', educação:'Educação', educacao:'Educação', 'e-commerce':'E-commerce', ecommerce:'E-commerce', tecnologia:'Tecnologia', tech:'Tecnologia', imobiliário:'Imobiliário', imobiliario:'Imobiliário', fitness:'Fitness', academia:'Fitness', alimentação:'Alimentação', alimentacao:'Alimentação', restaurante:'Alimentação', beleza:'Beleza', salão:'Beleza', jurídico:'Jurídico', juridico:'Jurídico', financeiro:'Financeiro' };
   for (const [key, val] of Object.entries(nichos)) {
-    if (lower.includes(key)) { document.getElementById('lead-nicho').value = val; break; }
+    if (lower.includes(key)) { document.getElementById('lead-nicho').value = val; usedPatterns.push(key); break; }
   }
 
   // Valor
-  const valueMatch = text.match(/(?:valor|orçamento|budget)[:\s]*R?\$?\s*([\d.,]+)/i);
-  if (valueMatch) document.getElementById('lead-value').value = valueMatch[1].replace(/\./g,'').replace(',','.');
+  const valueMatch = text.match(/(?:valor|orçamento|budget|investment|invest)[:\s]*R?\$?\s*([\d.,]+)/i);
+  if (valueMatch) { document.getElementById('lead-value').value = valueMatch[1].replace(/\./g,'').replace(',','.'); usedPatterns.push(valueMatch[0]); }
 
-  // Notas: colar o texto original nas observações
-  document.getElementById('lead-notes').value = text.trim();
+  // Montar observações com o que sobrou (linhas que não foram usadas para preencher campos)
+  const leftover = text.split(/\n/)
+    .map(l => l.trim())
+    .filter(l => l && !usedPatterns.some(p => l.toLowerCase().includes(p.toLowerCase().trim())))
+    .filter(l => !l.match(/^(nome|empresa|email|e-mail|phone|telefone|company|business|whatsapp|negócio|valor|budget|orçamento)[:\s]/i))
+    .join('\n').trim();
+
+  document.getElementById('lead-notes').value = leftover;
 
   document.getElementById('ia-section').style.display = 'none';
   document.getElementById('ia-text').value = '';
