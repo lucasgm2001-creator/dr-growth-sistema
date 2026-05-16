@@ -3393,3 +3393,145 @@ body.hall-page { background: transparent; }
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* ============================================
+   HALL QUADRANT GRID (2×2 full-screen layout)
+   ============================================ */
+.hall-quad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.hall-accordion.hall-quad {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+  background: #fff;
+  border: 1px solid #e5e5ea;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.hall-accordion.hall-quad .hall-acc-header {
+  background: #f7f7fa;
+  border-bottom: 1px solid #e5e5ea;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.hall-accordion.hall-quad .hall-acc-title {
+  color: #1d1d1f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hall-accordion.hall-quad .hall-acc-chevron {
+  display: none;
+}
+
+.hall-quad-body {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #fefefe;
+  border-top: none;
+  padding: 0 !important;
+}
+
+.quad-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 8px 12px;
+}
+
+.quad-footer {
+  flex-shrink: 0;
+  border-top: 1px solid #e5e5ea;
+  padding: 8px 12px;
+  background: #f7f7fa;
+}
+
+/* Calendar quadrant — light-mode overrides (same palette as hall-right-col) */
+.hall-quad .cal-cell {
+  background: #fff;
+  border-color: #e5e5ea;
+  color: #1d1d1f;
+}
+.hall-quad .cal-cell:hover { border-color: var(--accent); }
+.hall-quad .cal-cell.today { background: var(--accent-dim); border-color: var(--accent); }
+.hall-quad .cal-cell.other-month { background: #f0f0f5; }
+.hall-quad .cal-cell-num { color: #3a3a3c; }
+.hall-quad .cal-day-name { color: #8e8e93; }
+.hall-quad .cal-holiday { color: #6e6e73; }
+.hall-quad .cal-period-label { color: #1d1d1f; }
+.hall-quad .cal-vbtn { color: #6e6e73; background: #ebebf0; border-color: #d1d1d6; }
+.hall-quad .cal-vbtn.active { background: var(--accent); color: #fff; }
+.hall-quad .cal-nav-btn { background: #ebebf0; border-color: #d1d1d6; color: #3a3a3c; }
+.hall-quad .cal-nav-btn:hover { background: #e0e0e8; }
+.hall-quad .cal-view-btns { background: #ebebf0; border-color: #d1d1d6; }
+.hall-quad .cal-legend { border-top-color: #e5e5ea; }
+.hall-quad .cal-holiday-legend { color: #6e6e73; }
+.hall-quad .cal-toolbar { background: #f7f7fa; border-bottom: 1px solid #e5e5ea; padding: 6px 8px; }
+.hall-quad .cal-wrap { padding: 6px 8px 8px; }
+.hall-quad .cal-week-col { background: #fff; border-color: #e5e5ea; }
+.hall-quad .cal-week-col.today { background: var(--accent-dim); }
+.hall-quad .cal-week-col.weekend { background: #f7f7fa; }
+.hall-quad .cal-week-dayname { color: #8e8e93; }
+.hall-quad .cal-week-daynum { color: #3a3a3c; }
+.hall-quad .cal-day-slot { border-bottom-color: #ebebf0; }
+.hall-quad .cal-day-slot:hover { background: #f0f0f5; }
+.hall-quad .cal-day-slot.now { background: var(--accent-dim); }
+.hall-quad .cal-day-slot-time { color: #8e8e93; }
+.hall-quad .cal-day-allday { border-bottom-color: #e5e5ea; }
+.hall-quad .cal-day-allday-label { color: #8e8e93; }
+
+/* Mural in quadrant light mode */
+.hall-quad .aviso-item { border-bottom-color: #ebebf0; }
+.hall-quad .aviso-text { color: #3a3a3c; }
+.hall-quad .aviso-author { color: #8e8e93; }
+.hall-quad .aviso-pinned { color: #b45309; }
+.hall-quad .aviso-form { border-top: none; background: transparent; padding: 0; }
+.hall-quad .aviso-form input { background: #fff; border-color: #d1d1d6; color: #1d1d1f; }
+.hall-quad .aviso-form input::placeholder { color: #aeaeb2; }
+
+/* Team in quadrant light mode */
+.hall-quad .team-member { border-bottom-color: #ebebf0; }
+.hall-quad .team-member:hover { background: #f0f0f5; }
+.hall-quad .tm-name { color: #1d1d1f; }
+.hall-quad .tm-role { color: #8e8e93; }
+.hall-quad .empty-state h3 { color: #3a3a3c; }
+.hall-quad .empty-state p  { color: #8e8e93; }
+
+/* Feed in quadrant light mode */
+.hall-quad .feed-item { border-bottom-color: #ebebf0; }
+.hall-quad .feed-author { color: #3a3a3c; }
+.hall-quad .feed-time { color: #8e8e93; }
+.hall-quad .feed-text { color: #3a3a3c; }
+.hall-quad .aviso-form .btn-sm { flex-shrink: 0; }
+
+@media (max-width: 768px) {
+  .hall-quad-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    height: auto;
+    gap: 10px;
+  }
+  .hall-accordion.hall-quad {
+    height: auto;
+    min-height: 240px;
+    max-height: 360px;
+  }
+  .hall-body {
+    height: auto;
+    min-height: auto;
+    padding-bottom: 24px;
+  }
+}
