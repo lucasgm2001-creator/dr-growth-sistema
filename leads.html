@@ -377,6 +377,17 @@ async function addInteraction() {
   showToast('Interação registrada!', 'success');
 }
 
+function quickCallLog(id) {
+  const lead = allLeads.find(l => l.id === id);
+  if (!lead) return;
+  const entry = { lead_id: id, user_name: session.name.split(' ')[0], action: `Ligação iniciada para ${lead.phone}`, created_at: new Date().toISOString() };
+  if (!history[id]) history[id] = [];
+  history[id].push(entry);
+  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
+  if (selectedLeadId === id) renderHistory(id);
+  showToast(`Ligação para ${lead.name} registrada!`, 'success');
+}
+
 function registerCallInteraction(e) {
   if (!selectedLeadId) return;
   const lead = allLeads.find(l => l.id === selectedLeadId);
