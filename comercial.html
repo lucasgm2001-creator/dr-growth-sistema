@@ -806,8 +806,9 @@ function openNewLeadModal(stage = 'novo') {
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-nicho').value = '';
   document.getElementById('lead-stage').value = stage;
-  document.getElementById('lead-responsible').value = 'Lucas';
-  document.getElementById('lead-country').value = 'br';
+  populateSellersSelect();
+  document.getElementById('lead-responsible').value = '';
+  document.getElementById('lead-country').value = 'us';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('ia-section').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
