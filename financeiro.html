@@ -773,6 +773,7 @@ function deleteDespesa() {
   const id = document.getElementById('desp-id').value;
   if (!id||!confirm('Excluir despesa?')) return;
   allDespesas = allDespesas.filter(d=>d.id!=id);
+  saveDespesasLocal();
   closeDespesaModal(); renderDespesasUI();
   showToast('Despesa excluída.','info');
 }
