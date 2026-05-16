@@ -1622,7 +1622,7 @@ tbody td {
 }
 
 .greeting-text h1 span {
-  background: linear-gradient(135deg, #f59e0b, #f97316);
+  background: linear-gradient(135deg, #244c9c, #24448d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
