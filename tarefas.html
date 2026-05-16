@@ -325,6 +325,7 @@ async function toggleStatus(id, event) {
   if (window.drSupabase) {
     await window.drSupabase.from('tasks').update({ status: next }).eq('id', id);
   }
+  saveTasksLocal();
 
   updateKPIs();
   filterTasks();
