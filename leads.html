@@ -216,6 +216,9 @@ if (!session) throw new Error('Not authenticated');
 let allLeads = [], selectedLeadId = null;
 let history = {};
 
+function saveLeadsLocal() { try { localStorage.setItem('drg_leads', JSON.stringify(allLeads)); } catch {} }
+function loadLeadsLocal() { try { return JSON.parse(localStorage.getItem('drg_leads') || '[]'); } catch { return []; } }
+
 const DEMO_LEADS = [
   { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', email:'carlos@medtech.com', phone:'(11) 99234-5678', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', notes:'Interessado em gestão de tráfego pago.', created_at:'2026-05-10' },
   { id:2, name:'Sarah Johnson',   company:'US Digital LLC', email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao', value:8200, responsible:'Lucas', origin:'Indicação', notes:'Reunião agendada para 20/05.', created_at:'2026-05-08' },
