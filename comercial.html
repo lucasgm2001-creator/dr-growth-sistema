@@ -870,13 +870,22 @@ async function deleteLead() {
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
+
+// Auto-detecta país pelo telefone
+document.getElementById('lead-phone').addEventListener('input', function() {
+  const detected = detectCountryFromPhone(this.value);
+  if (detected) document.getElementById('lead-country').value = detected;
+});
+
 loadLeads().then(() => {
+  populateSellersSelect();
   initCountrySelector('comercial', () => {
     renderKanban();
     filterLeads();
     renderPipeline();
     renderMetrics();
   });
+  renderSellersAdmin();
 });
 </script>
 </body>
