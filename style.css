@@ -1630,12 +1630,15 @@ tbody td {
   margin-bottom: 6px;
 }
 
-/* Área de conteúdo principal do hall — fundo sólido para cobrir o céu */
+/* Área de conteúdo principal do hall */
 .hall-body {
-  background: var(--bg-primary);
+  background: linear-gradient(135deg, #0d0d1c 0%, #111120 60%, #0f0f1a 100%);
   border-radius: 16px 16px 0 0;
-  padding: 20px;
-  min-height: calc(100vh - 220px);
+  padding: 16px;
+  height: calc(100vh - var(--topbar-height) - 180px);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 .hall-greeting-inner {
