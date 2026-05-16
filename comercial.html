@@ -1265,6 +1265,7 @@ async function deleteLead() {
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
+document.getElementById('commission-modal').addEventListener('click', e => { if (e.target === document.getElementById('commission-modal')) closeCommissionModal(); });
 
 // Auto-detecta país pelo telefone
 document.getElementById('lead-phone').addEventListener('input', function() {
