@@ -73,100 +73,103 @@
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="hall-tabs">
-      <button class="hall-tab active" onclick="switchHallTab('recepcao', this)">🏠 Recepção</button>
-      <button class="hall-tab" onclick="switchHallTab('calendario', this)">📅 Calendário</button>
-    </div>
+    <!-- Conteúdo principal -->
+    <div class="hall-body">
+      <div class="hall-grid">
 
-    <!-- TAB: Recepção -->
-    <div class="hall-tab-panel active" id="htab-recepcao">
-    <!-- Grid principal -->
-    <div class="hall-grid">
+        <!-- Coluna esquerda: Feed + Calendário -->
+        <div class="hall-left-col">
 
-      <!-- Coluna esquerda: Feed -->
-      <div>
-        <div class="hall-accordion animate-in" id="acc-feed" style="animation-delay:0.1s">
-          <div class="hall-acc-header" onclick="toggleAcc('acc-feed')">
-            <div class="feed-live-dot"></div>
-            <span class="hall-acc-title">O que aconteceu</span>
-            <span class="text-muted text-sm" id="feed-time-range">Últimas 24h</span>
-            <span class="hall-acc-chevron">›</span>
-          </div>
-          <div class="hall-acc-body">
-            <div class="feed-list" id="feed-list"></div>
-            <div class="aviso-form" style="border-top:1px solid var(--border)">
-              <input type="text" id="feed-input" placeholder="Compartilhe o que aconteceu…" maxlength="200">
-              <button class="btn btn-primary btn-sm" onclick="postFeedItem()">Postar</button>
+          <!-- Feed -->
+          <div class="hall-accordion animate-in open" id="acc-feed" style="animation-delay:0.1s">
+            <div class="hall-acc-header" onclick="toggleAcc('acc-feed')">
+              <div class="feed-live-dot"></div>
+              <span class="hall-acc-title">O que aconteceu</span>
+              <span class="text-muted text-sm" id="feed-time-range">Últimas 24h</span>
+              <span class="hall-acc-chevron">›</span>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Coluna direita: Mural + Time -->
-      <div>
-
-        <!-- Mural de Avisos -->
-        <div class="hall-accordion animate-in" id="acc-mural" style="animation-delay:0.15s">
-          <div class="hall-acc-header" onclick="toggleAcc('acc-mural')">
-            <span style="font-size:15px;flex-shrink:0">&#128204;</span>
-            <span class="hall-acc-title">Mural de Avisos</span>
-            <span class="hall-acc-chevron">›</span>
-          </div>
-          <div class="hall-acc-body">
-            <div id="mural-list">
-              <div class="empty-state" style="padding:24px">
-                <p>Sem avisos no momento.</p>
+            <div class="hall-acc-body">
+              <div class="feed-list" id="feed-list"></div>
+              <div class="aviso-form" style="border-top:1px solid var(--border)">
+                <input type="text" id="feed-input" placeholder="Compartilhe o que aconteceu…" maxlength="200">
+                <button class="btn btn-primary btn-sm" onclick="postFeedItem()">Postar</button>
               </div>
             </div>
-            <div class="aviso-form" id="aviso-form" style="border-top:1px solid var(--border)">
-              <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
-              <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
+          </div>
+
+          <!-- Calendário (abaixo do feed) -->
+          <div class="hall-accordion animate-in open" id="acc-cal" style="animation-delay:0.18s">
+            <div class="hall-acc-header" onclick="toggleAcc('acc-cal')">
+              <span style="font-size:15px;flex-shrink:0">📅</span>
+              <span class="hall-acc-title">Calendário</span>
+              <span class="hall-acc-chevron">›</span>
+            </div>
+            <div class="hall-acc-body">
+              <div class="cal-wrap animate-in">
+                <div class="cal-nav">
+                  <button class="btn btn-secondary btn-sm" onclick="calPrevMonth()">← Anterior</button>
+                  <span class="cal-month-label" id="cal-month-label">—</span>
+                  <button class="btn btn-secondary btn-sm" onclick="calNextMonth()">Próximo →</button>
+                </div>
+                <div class="cal-grid">
+                  <div class="cal-day-name">Dom</div>
+                  <div class="cal-day-name">Seg</div>
+                  <div class="cal-day-name">Ter</div>
+                  <div class="cal-day-name">Qua</div>
+                  <div class="cal-day-name">Qui</div>
+                  <div class="cal-day-name">Sex</div>
+                  <div class="cal-day-name">Sáb</div>
+                  <div id="cal-cells" style="display:contents"></div>
+                </div>
+                <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+                  <span style="font-size:11px;color:var(--text-muted)">Legenda:</span>
+                  <span class="cal-chip type-event" style="position:static;font-size:10px">Compromisso</span>
+                  <span class="cal-chip type-meeting" style="position:static;font-size:10px">Reunião</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Time hoje -->
-        <div class="hall-accordion animate-in" id="acc-team" style="animation-delay:0.2s">
-          <div class="hall-acc-header" onclick="toggleAcc('acc-team')">
-            <span style="font-size:15px;flex-shrink:0">&#128101;</span>
-            <span class="hall-acc-title">Time hoje</span>
-            <span class="hall-acc-chevron">›</span>
+        </div><!-- /hall-left-col -->
+
+        <!-- Coluna direita: Mural + Time -->
+        <div>
+
+          <!-- Mural de Avisos -->
+          <div class="hall-accordion animate-in open" id="acc-mural" style="animation-delay:0.15s">
+            <div class="hall-acc-header" onclick="toggleAcc('acc-mural')">
+              <span style="font-size:15px;flex-shrink:0">&#128204;</span>
+              <span class="hall-acc-title">Mural de Avisos</span>
+              <span class="hall-acc-chevron">›</span>
+            </div>
+            <div class="hall-acc-body">
+              <div id="mural-list">
+                <div class="empty-state" style="padding:24px">
+                  <p>Sem avisos no momento.</p>
+                </div>
+              </div>
+              <div class="aviso-form" id="aviso-form" style="border-top:1px solid var(--border)">
+                <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
+                <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
+              </div>
+            </div>
           </div>
-          <div class="hall-acc-body">
-            <div id="team-list"></div>
+
+          <!-- Time hoje -->
+          <div class="hall-accordion animate-in open" id="acc-team" style="animation-delay:0.2s">
+            <div class="hall-acc-header" onclick="toggleAcc('acc-team')">
+              <span style="font-size:15px;flex-shrink:0">&#128101;</span>
+              <span class="hall-acc-title">Time hoje</span>
+              <span class="hall-acc-chevron">›</span>
+            </div>
+            <div class="hall-acc-body">
+              <div id="team-list"></div>
+            </div>
           </div>
-        </div>
 
-      </div>
-    </div>
-    </div><!-- /htab-recepcao -->
-
-    <!-- TAB: Calendário -->
-    <div class="hall-tab-panel" id="htab-calendario">
-      <div class="cal-wrap animate-in">
-        <div class="cal-nav">
-          <button class="btn btn-secondary btn-sm" onclick="calPrevMonth()">← Anterior</button>
-          <span class="cal-month-label" id="cal-month-label">—</span>
-          <button class="btn btn-secondary btn-sm" onclick="calNextMonth()">Próximo →</button>
-        </div>
-        <div class="cal-grid">
-          <div class="cal-day-name">Dom</div>
-          <div class="cal-day-name">Seg</div>
-          <div class="cal-day-name">Ter</div>
-          <div class="cal-day-name">Qua</div>
-          <div class="cal-day-name">Qui</div>
-          <div class="cal-day-name">Sex</div>
-          <div class="cal-day-name">Sáb</div>
-          <div id="cal-cells" style="display:contents"></div>
-        </div>
-        <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
-          <span style="font-size:11px;color:var(--text-muted)">Legenda:</span>
-          <span class="cal-chip type-event" style="position:static;font-size:10px">Compromisso</span>
-          <span class="cal-chip type-meeting" style="position:static;font-size:10px">Reunião</span>
         </div>
       </div>
-    </div><!-- /htab-calendario -->
+    </div><!-- /hall-body -->
 
   </main>
 </div>
