@@ -328,7 +328,7 @@ img { display: block; max-width: 100%; }
 .sidebar-logo {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background: linear-gradient(135deg, #1e3a6f, #244c9c);
   border-radius: 8px;
   display: flex;
   align-items: center;
