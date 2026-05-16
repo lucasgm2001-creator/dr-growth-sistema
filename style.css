@@ -2364,6 +2364,40 @@ body.hall-page { background: transparent; }
   display: none;
 }
 
+.sky-cloud {
+  position: absolute;
+  background: rgba(200,210,230,0.55);
+  border-radius: 50px;
+  height: 16px;
+  animation: sky-cloud-drift linear infinite;
+  filter: blur(3px);
+}
+.sky-cloud::before,
+.sky-cloud::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+  filter: blur(0);
+}
+.sky-cloud::before {
+  width: 55%;
+  height: 180%;
+  top: -55%;
+  left: 18%;
+}
+.sky-cloud::after {
+  width: 35%;
+  height: 140%;
+  top: -40%;
+  left: 55%;
+}
+@keyframes sky-cloud-drift {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(25px); }
+  100% { transform: translateX(0); }
+}
+
 /* ============================================
    HALL TABS
    ============================================ */
