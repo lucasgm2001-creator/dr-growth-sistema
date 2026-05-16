@@ -507,8 +507,8 @@ function renderMetrics() {
   }).join('');
 
   // Funnel velocity
-  const stageOrder = ['novo','contato','reuniao','proposta','fechado'];
-  const avgDays = { novo:2, contato:5, reuniao:8, proposta:12, fechado:18 }; // demo estimates
+  const stageOrder = ['novo','contato','seminteracao','reuniao','proposta','fechado'];
+  const avgDays = { novo:2, contato:4, seminteracao:7, reuniao:10, proposta:14, fechado:20 };
   document.getElementById('met-velocity').innerHTML = `
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Tempo médio estimado por estágio até o fechamento:</div>
     ${stageOrder.map((s,i) => {
