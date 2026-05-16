@@ -894,7 +894,17 @@ function openEditModal(id) {
   document.getElementById('lead-phone').value = l.phone||'';
   document.getElementById('lead-value').value = l.value||'';
   document.getElementById('lead-origin').value = l.origin||'';
-  document.getElementById('lead-nicho').value = l.nicho||'';
+  document.getElementById('lead-region').value = l.region||'';
+  const knownNichos = ['House Cleaning','Flooring','Tile','Carpentry','Painting','Landscape','Electricist','Junk Removal'];
+  if (l.nicho && !knownNichos.includes(l.nicho)) {
+    document.getElementById('lead-nicho').value = 'outros';
+    document.getElementById('lead-nicho-custom').value = l.nicho;
+    document.getElementById('lead-nicho-custom').style.display = '';
+  } else {
+    document.getElementById('lead-nicho').value = l.nicho||'';
+    document.getElementById('lead-nicho-custom').value = '';
+    document.getElementById('lead-nicho-custom').style.display = 'none';
+  }
   document.getElementById('lead-notes').value = l.notes||'';
   document.getElementById('lead-stage').value = l.stage;
   populateSellersSelect();
