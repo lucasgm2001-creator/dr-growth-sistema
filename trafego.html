@@ -854,11 +854,12 @@ function clearMetaCreds() {
   showToast('Credenciais removidas.', 'info');
 }
 
-// Patch switchTab to init Meta when opened
-const _origSwitch = switchTab;
+// Init Meta e Por Cliente quando abertos
+const _origSwitchTraf = switchTab;
 switchTab = function(name, btn) {
-  _origSwitch(name, btn);
+  _origSwitchTraf(name, btn);
   if (name === 'meta') { renderMetaKPIs(); renderMetaCampaigns(); }
+  if (name === 'porcliente') renderPorCliente();
 };
 
 // Init
