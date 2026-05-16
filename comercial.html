@@ -311,8 +311,6 @@ function populateSellersSelect() {
 }
 
 function addSeller() {
-  if (session.role !== 'admin' && session.role !== 'comercial') return;
-  if (session.role !== 'admin') return;
   const name = prompt('Nome completo do vendedor:');
   if (!name || !name.trim()) return;
   const short = name.trim().split(' ')[0];
@@ -327,7 +325,6 @@ function addSeller() {
 }
 
 function removeSeller(short) {
-  if (session.role !== 'admin') return;
   const sellers = getSellers().filter(s => s.short !== short);
   saveSellers(sellers);
   populateSellersSelect();
