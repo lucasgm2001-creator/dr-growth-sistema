@@ -1676,10 +1676,20 @@ tbody td {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
+}
+
+.hall-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 340px;
+  flex-shrink: 0;
 }
 
 @media (max-width: 900px) {
   .hall-grid { grid-template-columns: 1fr; }
+  .hall-right-col { width: 100%; }
 }
 
 /* Feed de novidades */
