@@ -364,6 +364,7 @@ async function saveClient() {
     if (window.drSupabase) await window.drSupabase.from('clients').update(data).eq('id', id);
     const idx = allClients.findIndex(c => c.id == id);
     if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
+    saveClientsLocal();
     showToast('Cliente atualizado!', 'success');
     logActivity({ icon:'📋', color:'#f59e0b', msg:`Cliente ${name} atualizado`, sector:'administrativo' });
   } else {
@@ -371,7 +372,9 @@ async function saveClient() {
     if (window.drSupabase) {
       const { data: ins } = await window.drSupabase.from('clients').insert(data).select().single();
       if (ins) allClients.push(ins);
+      else allClients.push({ ...data, id: Date.now() });
     } else { allClients.push({ ...data, id: Date.now() }); }
+    saveClientsLocal();
     showToast('Cliente criado!', 'success');
     logActivity({ icon:'🤝', color:'#f59e0b', msg:`Novo cliente cadastrado — ${name}${data.service ? ' ('+data.service+')' : ''}`, sector:'administrativo' });
   }
