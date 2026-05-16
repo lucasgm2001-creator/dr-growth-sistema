@@ -443,7 +443,7 @@ function renderMetrics() {
   document.getElementById('met-velocity').innerHTML = `
     <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Tempo médio estimado por estágio até o fechamento:</div>
     ${stageOrder.map((s,i) => {
-      const stageLeads = leads.filter(l => l.stage === s);
+      const stageLeads = vis1.filter(l => l.stage === s);
       const info = STAGE_INFO[s];
       return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
         <div style="width:8px;height:8px;border-radius:50%;background:${info?.color};flex-shrink:0"></div>
