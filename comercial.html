@@ -776,14 +776,15 @@ function switchTab(name, btn) {
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
 
-  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'', vendedores:'', comissoes:'' };
+  const actions = { funil:'+ Novo Lead', leads:'+ Novo Lead', pipeline:'', metricas:'', vendedores:'', comissoes:'', agenda:'' };
   const btn2 = document.getElementById('main-action-btn');
   btn2.textContent = actions[name] || '+ Novo Lead';
-  btn2.style.display = (['pipeline','metricas','vendedores','comissoes'].includes(name)) ? 'none' : '';
+  btn2.style.display = (['pipeline','metricas','vendedores','comissoes','agenda'].includes(name)) ? 'none' : '';
   if (name === 'metricas') renderMetrics();
   if (name === 'pipeline') renderPipeline();
   if (name === 'vendedores') renderSellersAdmin();
   if (name === 'comissoes') renderCommissions();
+  if (name === 'agenda') renderAgenda();
 }
 
 // ---- Métricas personalizadas ----
