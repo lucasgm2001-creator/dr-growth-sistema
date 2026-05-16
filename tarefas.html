@@ -408,6 +408,7 @@ async function deleteTask() {
   const task = allTasks.find(t => t.id == id);
   if (window.drSupabase) await window.drSupabase.from('tasks').delete().eq('id', id);
   allTasks = allTasks.filter(t => t.id != id);
+  saveTasksLocal();
   closeModal();
   updateKPIs();
   filterTasks();
