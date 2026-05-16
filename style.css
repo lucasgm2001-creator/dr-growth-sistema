@@ -962,6 +962,22 @@ tbody td {
   margin-top: 2px;
 }
 
+.followup-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.followup-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 99px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
 .lead-card-value {
   font-size: 13px;
   font-weight: 700;
