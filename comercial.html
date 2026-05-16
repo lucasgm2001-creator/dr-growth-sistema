@@ -772,9 +772,21 @@ function parseLeadIA() {
   }
   if (detectedName) document.getElementById('lead-name').value = detectedName;
 
-  // Empresa
-  const compMatch = text.match(/empresa[:\s]+([^\n\r]+)/i) || text.match(/company[:\s]+([^\n\r]+)/i) || text.match(/negócio[:\s]+([^\n\r]+)/i) || text.match(/business[:\s]+([^\n\r]+)/i);
+  // Empresa — cobre "company_name:", "company:", "empresa:", "business:", "negócio:"
+  const compMatch = text.match(/company[_\s]*name[:\s]+([^\n\r]+)/i)
+    || text.match(/empresa[:\s]+([^\n\r]+)/i)
+    || text.match(/company[:\s]+([^\n\r]+)/i)
+    || text.match(/negócio[:\s]+([^\n\r]+)/i)
+    || text.match(/business[:\s]+([^\n\r]+)/i);
   if (compMatch) { document.getElementById('lead-company').value = compMatch[1].trim(); usedPatterns.push(compMatch[0]); }
+
+  // Região / State
+  const stateMatch = text.match(/\bstate[:\s]+([^\n\r]+)/i)
+    || text.match(/\bregion[:\s]+([^\n\r]+)/i)
+    || text.match(/\bestado[:\s]+([^\n\r]+)/i)
+    || text.match(/\bcity[,\s\/]+([A-Z]{2})\b/)  // "Miami, FL" → FL
+    || text.match(/\b([A-Z]{2})\s*$/m);           // sigla de estado no fim de linha
+  if (stateMatch) { document.getElementById('lead-region').value = stateMatch[1].trim(); usedPatterns.push(stateMatch[0]); }
 
   // E-mail
   const emailMatch = text.match(/[\w.-]+@[\w.-]+\.\w+/);
