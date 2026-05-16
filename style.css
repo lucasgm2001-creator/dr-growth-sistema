@@ -1643,12 +1643,13 @@ tbody td {
 }
 
 .hall-greeting-inner {
-  background: rgba(8, 8, 18, 0.52);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(10, 25, 70, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 6px;
+  border: 1px solid rgba(100, 150, 255, 0.15);
 }
 
 /* Área de conteúdo principal do hall */
