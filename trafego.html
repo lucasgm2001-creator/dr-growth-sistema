@@ -547,7 +547,7 @@ function renderMetrics() {
 
   // Por plataforma
   const platData = {};
-  campaigns.forEach(c => {
+  vis.forEach(c => {
     if (!platData[c.platform]) platData[c.platform] = { spend:0, leads:0 };
     platData[c.platform].spend += c.spend||0;
     platData[c.platform].leads += c.leads||0;
