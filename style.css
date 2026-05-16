@@ -1669,9 +1669,15 @@ tbody td {
 /* Hall grid */
 .hall-grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 340px;
   gap: 20px;
   align-items: start;
+}
+
+.hall-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 @media (max-width: 900px) {
