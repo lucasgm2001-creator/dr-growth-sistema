@@ -526,8 +526,9 @@ function renderCampaigns() {
 }
 
 function renderMetrics() {
+  const vis = (window.filterByCountry || (x=>x))(campaigns);
   // Tabela
-  document.getElementById('metrics-tbody').innerHTML = campaigns.map(c => {
+  document.getElementById('metrics-tbody').innerHTML = vis.map(c => {
     const pi = PLATFORM_INFO[c.platform] || { icon:'📊' };
     const cpl  = c.leads > 0 ? fmt.currency(c.spend/c.leads) : '—';
     const ctr  = c.impressions > 0 ? ((c.clicks/c.impressions)*100).toFixed(2)+'%' : '—';
