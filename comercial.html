@@ -279,6 +279,85 @@
 const session = initPage('comercial.html');
 if (!session) throw new Error('Not authenticated');
 
+// ---- Gestão de Vendedores ----
+function getSellers()           { try { return JSON.parse(localStorage.getItem('drg_sellers') || '[]'); } catch { return []; } }
+function saveSellers(arr)       { localStorage.setItem('drg_sellers', JSON.stringify(arr)); }
+
+function populateSellersSelect() {
+  const sel = document.getElementById('lead-responsible');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Selecione o vendedor —</option>';
+  getSellers().forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.short; o.textContent = s.name;
+    sel.appendChild(o);
+  });
+  if (current) sel.value = current;
+}
+
+function addSeller() {
+  if (session.role !== 'admin') return;
+  const name = prompt('Nome completo do vendedor:');
+  if (!name || !name.trim()) return;
+  const short = name.trim().split(' ')[0];
+  const sellers = getSellers();
+  if (sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
+  sellers.push({ name: name.trim(), short });
+  saveSellers(sellers);
+  populateSellersSelect();
+  renderSellersAdmin();
+  renderPipeline();
+  showToast(`${name.trim()} adicionado como vendedor.`, 'success');
+}
+
+function removeSeller(short) {
+  if (session.role !== 'admin') return;
+  const sellers = getSellers().filter(s => s.short !== short);
+  saveSellers(sellers);
+  populateSellersSelect();
+  renderSellersAdmin();
+  renderPipeline();
+  showToast('Vendedor removido.', 'info');
+}
+
+function renderSellersAdmin() {
+  const el = document.getElementById('sellers-admin');
+  if (!el) return;
+  if (session.role !== 'admin') { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const sellers = getSellers();
+  el.innerHTML = `
+    <div class="card mt-4 animate-in">
+      <div class="card-header" style="display:flex;align-items:center;justify-content:space-between">
+        <span class="card-title">Vendedores Cadastrados</span>
+        <button class="btn btn-primary btn-sm" onclick="addSeller()">+ Adicionar Vendedor</button>
+      </div>
+      <div class="card-body">
+        ${sellers.length === 0
+          ? '<div class="text-muted text-sm">Nenhum vendedor cadastrado. Clique em + Adicionar Vendedor.</div>'
+          : sellers.map(s => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="avatar avatar-sm avatar-${fmt.avatarClass(s.short)}">${fmt.initials(s.name)}</div>
+                <span style="font-size:13px;font-weight:600">${s.name}</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="removeSeller('${s.short}')">Remover</button>
+            </div>`).join('')
+        }
+      </div>
+    </div>`;
+}
+
+// Detecta país automaticamente pelo telefone
+function detectCountryFromPhone(phone) {
+  const p = phone.trim();
+  if (p.startsWith('+1'))  return 'us';
+  if (p.startsWith('+55')) return 'br';
+  return null;
+}
+
+function onCountrySelectChange() {} // placeholder for explicit manual select
+
 const STAGES = [
   { key:'novo',          label:'Novo Lead',            color:'#6366f1' },
   { key:'contato',       label:'Lead Engajado',         color:'#3b82f6' },
