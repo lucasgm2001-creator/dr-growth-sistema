@@ -55,7 +55,7 @@
         <button class="sector-tab" onclick="switchTab('leads', this)">◉ Lista de Leads</button>
         <button class="sector-tab" onclick="switchTab('pipeline', this)">💰 Pipeline</button>
         <button class="sector-tab" onclick="switchTab('metricas', this)">📊 Métricas</button>
-        <button class="sector-tab" onclick="switchTab('vendedores', this)">👤 Vendedores</button>
+        ${session && session.role === 'admin' ? '<button class="sector-tab" onclick="switchTab(\'vendedores\', this)">👤 Vendedores</button>' : ''}
       </div>
     </div>
 
