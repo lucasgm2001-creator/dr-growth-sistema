@@ -358,15 +358,12 @@ async function saveLead() {
   };
 
   if (id) {
-    // Update
-    if (window.drSupabase) {
-      await window.drSupabase.from('leads').update(data).eq('id', id);
-    }
+    if (window.drSupabase) await window.drSupabase.from('leads').update(data).eq('id', id);
     const idx = leads.findIndex(l => l.id == id);
     if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
     showToast('Lead atualizado!', 'success');
+    logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
   } else {
-    // Insert
     data.created_at = new Date().toISOString();
     const newId = Date.now();
     if (window.drSupabase) {
@@ -376,6 +373,7 @@ async function saveLead() {
       leads.unshift({ ...data, id: newId });
     }
     showToast('Lead criado!', 'success');
+    logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${data.company ? ' ('+data.company+')' : ''}`, sector:'comercial' });
   }
 
   closeModal();
