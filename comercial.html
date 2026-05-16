@@ -1012,6 +1012,7 @@ function saveLead() {
       saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
+      logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
       // Supabase em background (não bloqueia)
       if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
     } else {
@@ -1023,6 +1024,7 @@ function saveLead() {
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
+      logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
       // Supabase em background (não bloqueia)
       if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
     }
