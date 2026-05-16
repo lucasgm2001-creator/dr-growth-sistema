@@ -350,8 +350,8 @@ function renderMetrics() {
   const vis1    = (window.filterByCountry || (x=>x))(leads);
   const active  = vis1.filter(l => !['fechado','perdido'].includes(l.stage));
   const closed  = vis1.filter(l => l.stage === 'fechado');
-  const lost    = leads.filter(l => l.stage === 'perdido');
-  const total   = leads.length;
+  const lost    = vis1.filter(l => l.stage === 'perdido');
+  const total   = vis1.length;
   const pipeline = active.reduce((s,l) => s + (Number(l.value)||0), 0);
   const closedVal= closed.reduce((s,l) => s + (Number(l.value)||0), 0);
   const avgTicket= closed.length ? closedVal / closed.length : 0;
