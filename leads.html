@@ -482,6 +482,7 @@ async function saveLead() {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = allLeads.findIndex(l => l.id == id);
     if (idx >= 0) allLeads[idx] = { ...allLeads[idx], ...data };
+    saveLeadsLocal();
     showToast('Lead atualizado!', 'success');
     logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
   } else {
@@ -490,7 +491,9 @@ async function saveLead() {
     if (window.drSupabase) {
       const { data: ins } = await window.drSupabase.from('leads').insert(data).select().single();
       if (ins) allLeads.unshift(ins);
+      else allLeads.unshift({ ...data, id: newId });
     } else { allLeads.unshift({ ...data, id: newId }); }
+    saveLeadsLocal();
     showToast('Lead criado!', 'success');
     logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${data.company ? ' ('+data.company+')' : ''}`, sector:'comercial' });
   }
