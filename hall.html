@@ -1075,13 +1075,11 @@ function renderScenario(scenario, h) {
 
 // ---- Mostra indicador de clima no topo ----
 function showWeatherBadge(w, scenario) {
-  let badge = document.getElementById('weather-badge');
-  if (!badge) {
-    badge = document.createElement('div');
-    badge.id = 'weather-badge';
-    badge.style.cssText = 'position:fixed;top:12px;right:20px;z-index:200;display:flex;align-items:center;gap:6px;background:rgba(8,8,20,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.10);border-radius:20px;padding:5px 12px;font-size:12px;color:rgba(255,255,255,0.85);pointer-events:none';
-    document.body.appendChild(badge);
-  }
+  const el       = document.getElementById('weather-topbar');
+  const divider  = document.getElementById('weather-divider');
+  const iconEl   = document.getElementById('weather-icon-label');
+  const tempEl   = document.getElementById('weather-temp-label');
+  if (!el) return;
   const icons = {
     'manha-limpa':'☀️','manha-nuvem':'⛅','tarde-limpa':'🌤️','tarde-nuvem':'🌥️',
     'noite-limpa':'🌙','noite-nuvem':'☁️','madrugada':'🌑',
@@ -1093,7 +1091,10 @@ function showWeatherBadge(w, scenario) {
     'neblina-dia':'🌫️','neblina-noite':'🌫️',
   };
   const icon = icons[scenario] || '🌐';
-  badge.innerHTML = `${icon} <span>${w.temp}°C</span>`;
+  iconEl.textContent = icon + ' Clima';
+  tempEl.textContent = `${w.temp}°C`;
+  el.style.display = '';
+  if (divider) divider.style.display = '';
 }
 
 // ---- Init principal ----
