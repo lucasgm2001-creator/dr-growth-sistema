@@ -419,7 +419,7 @@ function renderMetrics() {
   // Win rate by closer
   const closers = ['Daniel','Lucas','Gabriel','Thamyris'];
   document.getElementById('met-closers').innerHTML = closers.map(name => {
-    const mine   = leads.filter(l => l.responsible === name);
+    const mine   = vis1.filter(l => l.responsible === name);
     const won    = mine.filter(l => l.stage === 'fechado');
     const rate   = mine.length ? Math.round((won.length / mine.length) * 100) : 0;
     const value  = won.reduce((s,l) => s+(Number(l.value)||0), 0);
