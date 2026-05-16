@@ -479,8 +479,9 @@ const statusColors = { online:'var(--green)', offline:'var(--text-muted)' };
 function renderTeam() {
   const currentSession = AUTH.getSession();
   const currentName = currentSession ? currentSession.name : null;
+  const onlineCount = currentName ? 1 : 0;
 
-  document.getElementById('team-list').innerHTML = TEAM_ALL.map(m => {
+  const html = TEAM_ALL.map(m => {
     const isMe = currentName && m.name === currentName;
     const status = isMe ? 'online' : 'offline';
     return `
@@ -495,7 +496,21 @@ function renderTeam() {
       </div>
     </div>`;
   }).join('');
+
+  const pillList = document.getElementById('team-pill-list');
+  if (pillList) pillList.innerHTML = html;
+
+  const pillCount = document.getElementById('team-pill-count');
+  if (pillCount) pillCount.textContent = `${onlineCount} online`;
 }
+
+function toggleTeamPanel(e) {
+  e && e.stopPropagation();
+  document.getElementById('team-pill-panel').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('team-pill-panel')?.classList.remove('open');
+});
 
 // ---- Feed input (todos podem postar) ----
 function getFeedItems() {
