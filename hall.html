@@ -279,13 +279,39 @@
 const session = initPage('hall.html');
 if (!session) throw new Error('Not authenticated');
 
+// ---- Horário São Paulo ----
+function getSPHour() {
+  return parseInt(new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false
+  }).format(new Date()), 10);
+}
+
+// ---- Fase da lua ----
+function getMoonEmoji() {
+  const knownNew = new Date('2000-01-06T18:14:00Z');
+  const days = (Date.now() - knownNew) / 86400000;
+  const phase = ((days % 29.530589) / 29.530589 + 1) % 1;
+  if (phase < 0.0625) return '🌑';
+  if (phase < 0.1875) return '🌒';
+  if (phase < 0.3125) return '🌓';
+  if (phase < 0.4375) return '🌔';
+  if (phase < 0.5625) return '🌕';
+  if (phase < 0.6875) return '🌖';
+  if (phase < 0.8125) return '🌗';
+  if (phase < 0.9375) return '🌘';
+  return '🌑';
+}
+
 // ---- Saudação dinâmica ----
 function setGreeting() {
-  const h = new Date().getHours();
-  const period = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-  const emoji  = h < 12 ? '☀️' : h < 18 ? '🌤️' : '🌙';
-  const firstName = session.name.split(' ')[0];
+  const h = getSPHour();
+  let period, emoji;
+  if      (h >= 6  && h < 12) { period = 'Bom dia';       emoji = '☀️'; }
+  else if (h >= 12 && h < 18) { period = 'Boa tarde';      emoji = '🌤️'; }
+  else if (h >= 18)            { period = 'Boa noite';      emoji = getMoonEmoji(); }
+  else                          { period = 'Boa madrugada'; emoji = getMoonEmoji(); }
 
+  const firstName = session.name.split(' ')[0];
   document.getElementById('greeting-msg').innerHTML =
     `${period}, <span>${firstName}</span> ${emoji}`;
 
