@@ -3416,21 +3416,22 @@ body.hall-page { background: transparent; }
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
-  background: #fff;
-  border: 1px solid #e5e5ea;
+  background: #2c2c38;
+  border: 1px solid #3a3a4e;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
 }
 
 .hall-accordion.hall-quad .hall-acc-header {
-  background: #f7f7fa;
-  border-bottom: 1px solid #e5e5ea;
+  background: #34344a;
+  border-bottom: 1px solid #3f3f56;
   flex-shrink: 0;
   cursor: default;
 }
 
 .hall-accordion.hall-quad .hall-acc-title {
-  color: #1d1d1f;
+  color: #e8e8f0;
   font-size: 13px;
   font-weight: 600;
 }
@@ -3445,7 +3446,7 @@ body.hall-page { background: transparent; }
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: #fefefe;
+  background: #252535;
   border-top: none;
   padding: 0 !important;
 }
