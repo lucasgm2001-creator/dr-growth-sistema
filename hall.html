@@ -279,6 +279,12 @@
 const session = initPage('hall.html');
 if (!session) throw new Error('Not authenticated');
 
+// Limpa dados demo do localStorage (executa uma única vez)
+if (!localStorage.getItem('drg_clean_v1')) {
+  ['drg_avisos','drg_feed','drg_cal'].forEach(k => localStorage.removeItem(k));
+  localStorage.setItem('drg_clean_v1', '1');
+}
+
 // ---- Horário São Paulo ----
 function getSPHour() {
   return parseInt(new Intl.DateTimeFormat('pt-BR', {
