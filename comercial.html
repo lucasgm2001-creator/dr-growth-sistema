@@ -942,7 +942,7 @@ function openEditModal(id) {
 
 function closeModal() { document.getElementById('lead-modal').classList.remove('show'); }
 
-async function saveLead() {
+function saveLead() {
   try {
     const id = document.getElementById('lead-id').value;
     const name = document.getElementById('lead-name').value.trim();
@@ -964,31 +964,28 @@ async function saveLead() {
       responsible: (document.getElementById('lead-responsible') || {}).value || '',
       country:     (document.getElementById('lead-country')     || {}).value || 'us',
     };
+
     if (id) {
-      try {
-        if (window.drSupabase) {
-          const { error } = await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
-          if (error) throw error;
-        }
-      } catch (e) { console.warn('Supabase update falhou:', e.message); }
+      // Editar — atualiza local imediatamente
       const idx = leads.findIndex(l => l.id == id);
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
+      saveLeadsLocal();
+      closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
+      // Supabase em background (não bloqueia)
+      if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
     } else {
+      // Novo lead — salva local imediatamente
       data.created_at = new Date().toISOString();
-      let savedRemotely = false;
-      try {
-        if (window.drSupabase) {
-          const { data: ins, error } = await window.drSupabase.from('leads').insert(data).select().single();
-          if (error) throw error;
-          if (ins) { leads.unshift(ins); savedRemotely = true; }
-        }
-      } catch (e) { console.warn('Supabase insert falhou:', e.message); }
-      if (!savedRemotely) leads.unshift({ ...data, id: Date.now() });
-      showToast('Lead criado!', 'success');
+      data.id = Date.now();
+      leads.unshift(data);
+      saveLeadsLocal();
+      closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+      SFX.newLead();
+      showToast('Novo lead adicionado!', 'success');
+      // Supabase em background (não bloqueia)
+      if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
     }
-    saveLeadsLocal();
-    closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
   } catch (err) {
     console.error('saveLead erro:', err);
     showToast('Erro ao salvar: ' + err.message, 'error');
