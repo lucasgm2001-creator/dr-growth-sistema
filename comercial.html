@@ -685,23 +685,28 @@ function renderPipeline() {
     </div>`;
   }).join('');
 
-  // Por responsável
-  const resps = ['Daniel','Lucas','Gabriel','Thamyris'];
-  document.getElementById('pipeline-resp').innerHTML = resps.map(r => {
-    const rl = active.filter(l => l.responsible === r);
-    const rv = rl.reduce((acc,l)=>acc+(Number(l.value)||0),0);
-    const pct = Math.round((rv/totalValue)*100);
-    return `<div style="margin-bottom:14px">
-      <div class="flex items-center justify-between mb-1">
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="avatar avatar-sm avatar-${fmt.avatarClass(r)}">${fmt.initials(r)}</div>
-          <span style="font-size:12px;font-weight:600">${r}</span>
+  // Por responsável (apenas vendedores cadastrados)
+  const sellers = getSellers();
+  const respEl = document.getElementById('pipeline-resp');
+  if (!sellers.length) {
+    respEl.innerHTML = '<div class="text-muted text-sm">Nenhum vendedor cadastrado ainda.</div>';
+  } else {
+    respEl.innerHTML = sellers.map(s => {
+      const rl = active.filter(l => l.responsible === s.short);
+      const rv = rl.reduce((acc,l)=>acc+(Number(l.value)||0),0);
+      const pct = Math.round((rv/totalValue)*100);
+      return `<div style="margin-bottom:14px">
+        <div class="flex items-center justify-between mb-1">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar avatar-sm avatar-${fmt.avatarClass(s.short)}">${fmt.initials(s.name)}</div>
+            <span style="font-size:12px;font-weight:600">${s.name}</span>
+          </div>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">${fmt.currency(rv)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${rl.length})</span></span>
         </div>
-        <span style="font-size:13px;font-weight:700;color:var(--green)">${fmt.currency(rv)} <span style="font-size:10px;color:var(--text-muted);font-weight:400">(${rl.length})</span></span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    </div>`;
-  }).join('');
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  }
 
   // Resumo
   const closed = vis.filter(l=>l.stage==='fechado');
