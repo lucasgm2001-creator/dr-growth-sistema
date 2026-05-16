@@ -1223,17 +1223,16 @@ function saveLead() {
     };
 
     if (id) {
-      // Editar — atualiza local imediatamente
       const idx = leads.findIndex(l => l.id == id);
+      const oldStage = idx >= 0 ? leads[idx].stage : null;
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
       saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
       logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
-      // Supabase em background (não bloqueia)
       if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
+      if (data.stage === 'fechado' && oldStage !== 'fechado') openCommissionModal(Number(id));
     } else {
-      // Novo lead — salva local imediatamente
       data.created_at = new Date().toISOString();
       data.id = Date.now();
       leads.unshift(data);
@@ -1242,8 +1241,8 @@ function saveLead() {
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
       logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
-      // Supabase em background (não bloqueia)
       if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
+      if (data.stage === 'fechado') openCommissionModal(data.id);
     }
   } catch (err) {
     console.error('saveLead erro:', err);
