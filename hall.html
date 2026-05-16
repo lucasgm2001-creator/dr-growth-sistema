@@ -6,31 +6,34 @@
   <title>Hall — DR Growth</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    .post-form { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); align-items: flex-start; }
-    .post-form textarea { flex: 1; min-height: 36px; max-height: 100px; resize: none; font-size: 13px; }
-    .feed-item-actions { display: flex; gap: 4px; margin-left: auto; opacity: 0; transition: opacity 0.15s; }
-    .feed-item:hover .feed-item-actions { opacity: 1; }
-    .edited-tag { font-size: 10px; color: var(--text-muted); font-style: italic; margin-top: 2px; }
-    .aviso-item:hover .feed-item-actions { opacity: 1; }
-    .aviso-item { position: relative; padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-    .aviso-item:last-child { border-bottom: none; }
-    .inline-edit { display: flex; gap: 8px; margin-top: 8px; }
-    .inline-edit textarea { flex: 1; font-size: 13px; min-height: 48px; resize: none; }
-  </style>
 </head>
 <body class="hall-page">
+<!-- Sky Background -->
+<div class="sky-bg" id="sky-bg">
+  <div id="sky-sun"></div>
+  <div id="sky-moon"></div>
+</div>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+<!-- SIDEBAR / ELEVADOR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand">
+      <h2>DR Growth</h2>
+      <span>Sistema de Gestão</span>
+    </div>
   </div>
+
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
-  <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
+
+  <div class="sidebar-footer">
+    <div class="user-profile" id="user-profile"></div>
+  </div>
 </aside>
 
+<!-- MAIN -->
 <div class="main-content">
   <header class="topbar">
     <button class="menu-toggle" id="menu-toggle">☰</button>
@@ -40,9 +43,15 @@
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 São Paulo</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item">
+          <span class="clock-tz">🇧🇷 São Paulo</span>
+          <span class="clock-time" id="clock-br">--:--:--</span>
+        </div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 New York</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item">
+          <span class="clock-tz">🇺🇸 New York</span>
+          <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
       </div>
     </div>
   </header>
@@ -53,7 +62,7 @@
     <div class="hall-greeting animate-in">
       <div class="hall-greeting-inner">
         <div class="greeting-text">
-          <h1 id="greeting-msg">Bom dia 👋</h1>
+          <h1 id="greeting-msg">Bom dia, <span id="greeting-name">—</span> 👋</h1>
           <p id="greeting-sub">Aqui estão as novidades de hoje na DR Growth.</p>
         </div>
         <div class="greeting-date">
@@ -63,26 +72,29 @@
       </div>
     </div>
 
+    <!-- Tabs -->
+    <div class="hall-tabs">
+      <button class="hall-tab active" onclick="switchHallTab('recepcao', this)">🏠 Recepção</button>
+      <button class="hall-tab" onclick="switchHallTab('calendario', this)">📅 Calendário</button>
+    </div>
+
+    <!-- TAB: Recepção -->
+    <div class="hall-tab-panel active" id="htab-recepcao">
     <!-- Grid principal -->
     <div class="hall-grid">
 
       <!-- Coluna esquerda: Feed -->
       <div>
-        <div class="hall-section animate-in" style="animation-delay:0.1s">
-          <div class="hall-section-header" onclick="toggleSection('feed')">
-            <div class="feed-live-dot" style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
-            <h3 style="margin:0;font-size:14px;font-weight:700">O que aconteceu</h3>
-            <span class="text-muted text-sm" id="feed-time-range" style="margin-left:4px">Últimas 24h</span>
-            <span class="hall-section-toggle" id="feed-toggle">▼</span>
+        <div class="feed-card animate-in" style="animation-delay:0.1s">
+          <div class="feed-header">
+            <div class="feed-live-dot"></div>
+            <h3>O que aconteceu</h3>
+            <span class="text-muted text-sm" id="feed-time-range">Últimas 24h</span>
           </div>
-          <div class="hall-section-body" id="feed-body">
-            <div class="post-form">
-              <div class="avatar avatar-sm avatar-${''}" id="feed-post-avatar" style="flex-shrink:0;margin-top:2px"></div>
-              <textarea class="form-control" id="feed-input" placeholder="Registrar uma atualização para o time…" rows="1"></textarea>
-              <button class="btn btn-primary btn-sm" onclick="postFeedItem()" style="align-self:flex-end">Postar</button>
-            </div>
-            <div id="feed-list">
-              <div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><p>Carregando…</p></div>
+          <div class="feed-list" id="feed-list">
+            <div class="empty-state" style="padding:32px">
+              <div class="empty-icon">📡</div>
+              <p>Carregando novidades…</p>
             </div>
           </div>
         </div>
@@ -92,119 +104,164 @@
       <div>
 
         <!-- Mural de Avisos -->
-        <div class="hall-section animate-in" style="animation-delay:0.15s">
-          <div class="hall-section-header" onclick="toggleSection('mural')">
-            <span style="font-size:16px">📌</span>
-            <h3 style="margin:0;font-size:14px;font-weight:700">Mural de Avisos</h3>
-            <span class="hall-section-toggle" id="mural-toggle">▼</span>
+        <div class="mural-card animate-in" style="animation-delay:0.15s">
+          <div class="mural-header">
+            <h3>📌 Mural de Avisos</h3>
+            <span id="aviso-admin-btn"></span>
           </div>
-          <div class="hall-section-body" id="mural-body">
-            <div class="post-form">
-              <div class="avatar avatar-sm" id="mural-post-avatar" style="flex-shrink:0;margin-top:2px"></div>
-              <textarea class="form-control" id="aviso-input" placeholder="Escreva um aviso para o time…" rows="1" maxlength="400"></textarea>
-              <button class="btn btn-primary btn-sm" onclick="postAviso()" style="align-self:flex-end">Postar</button>
+          <div id="mural-list">
+            <div class="empty-state" style="padding:24px">
+              <div class="empty-icon">📌</div>
+              <p>Sem avisos no momento.</p>
             </div>
-            <div id="mural-list">
-              <div class="empty-state" style="padding:20px"><div class="empty-icon">📌</div><p>Sem avisos.</p></div>
-            </div>
+          </div>
+          <div class="aviso-form" id="aviso-form" style="display:none">
+            <input type="text" id="aviso-input" placeholder="Escreva um aviso para o time…" maxlength="200">
+            <button class="btn btn-primary btn-sm" onclick="postAviso()">Postar</button>
           </div>
         </div>
 
         <!-- Time hoje -->
-        <div class="hall-section animate-in" style="animation-delay:0.2s">
-          <div class="hall-section-header" onclick="toggleSection('team')">
-            <span style="font-size:16px">👥</span>
-            <h3 style="margin:0;font-size:14px;font-weight:700">Time hoje</h3>
-            <span class="hall-section-toggle" id="team-toggle">▼</span>
+        <div class="team-card animate-in" style="animation-delay:0.2s">
+          <div class="team-header">
+            <h3>👥 Time hoje</h3>
           </div>
-          <div class="hall-section-body" id="team-body">
-            <div id="team-list"></div>
-          </div>
+          <div id="team-list"></div>
         </div>
 
       </div>
     </div>
+    </div><!-- /htab-recepcao -->
 
-    <!-- Calendário -->
-    <div class="hall-section animate-in" style="animation-delay:0.25s;margin-top:20px">
-      <div class="hall-section-header" onclick="toggleSection('calendario')">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:32px;height:32px;background:rgba(68,114,216,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">📅</div>
-          <div>
-            <div style="font-size:14px;font-weight:700">Calendário</div>
-            <div style="font-size:11px;color:var(--text-muted)">Compromissos da empresa e feriados BR/EUA</div>
-          </div>
+    <!-- TAB: Calendário -->
+    <div class="hall-tab-panel" id="htab-calendario">
+      <div class="cal-wrap animate-in">
+        <div class="cal-nav">
+          <button class="btn btn-secondary btn-sm" onclick="calPrevMonth()">← Anterior</button>
+          <span class="cal-month-label" id="cal-month-label">—</span>
+          <button class="btn btn-secondary btn-sm" onclick="calNextMonth()">Próximo →</button>
         </div>
-        <span class="hall-section-toggle" id="calendario-toggle">▶</span>
-      </div>
-      <div class="hall-section-body" id="calendario-body">
-        <div class="cal-layout" style="display:grid;grid-template-columns:1fr 250px;gap:16px;align-items:start">
-          <div id="cal-grid" class="cal-container"></div>
-          <div>
-            <div class="card" style="margin-bottom:12px">
-              <div class="card-header" style="padding:12px 14px">
-                <span class="card-title" style="font-size:13px">Próximos Compromissos</span>
-              </div>
-              <div id="cal-upcoming"></div>
-            </div>
-            <div class="card">
-              <div class="card-header" style="padding:12px 14px">
-                <span class="card-title" style="font-size:13px">Legenda</span>
-              </div>
-              <div id="cal-legend" style="padding:10px 14px"></div>
-            </div>
-          </div>
+        <div class="cal-grid">
+          <div class="cal-day-name">Dom</div>
+          <div class="cal-day-name">Seg</div>
+          <div class="cal-day-name">Ter</div>
+          <div class="cal-day-name">Qua</div>
+          <div class="cal-day-name">Qui</div>
+          <div class="cal-day-name">Sex</div>
+          <div class="cal-day-name">Sáb</div>
+          <div id="cal-cells" style="display:contents"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+          <span style="font-size:11px;color:var(--text-muted)">Legenda:</span>
+          <span class="cal-chip type-event" style="position:static;font-size:10px">Compromisso</span>
+          <span class="cal-chip type-meeting" style="position:static;font-size:10px">Reunião</span>
         </div>
       </div>
-    </div>
+    </div><!-- /htab-calendario -->
 
   </main>
 </div>
 
-<!-- MODAL Evento Calendário -->
-<div class="modal-overlay" id="cal-event-modal">
+<!-- MODAL Calendário -->
+<div class="modal-overlay" id="cal-modal">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
       <h3 id="cal-modal-title">Novo Compromisso</h3>
-      <button class="modal-close" onclick="closeCalEventModal()">✕</button>
+      <button class="modal-close" onclick="closeCalModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-group"><label>Título *</label><input type="text" class="form-control" id="cal-ev-title" placeholder="Ex: Reunião com cliente"></div>
-      <div class="grid-2">
-        <div class="form-group"><label>Data *</label><input type="date" class="form-control" id="cal-ev-date"></div>
-        <div class="form-group"><label>Horário</label><input type="time" class="form-control" id="cal-ev-time"></div>
+      <div class="form-group">
+        <label>Título *</label>
+        <input type="text" class="form-control" id="cal-event-title" placeholder="Ex: Reunião com Sarah Johnson">
       </div>
-      <div class="grid-2">
-        <div class="form-group"><label>Categoria</label>
-          <select class="form-control" id="cal-ev-category">
-            <option>Reunião</option><option>Financeiro</option><option>Comercial</option>
-            <option>Tráfego</option><option>Administrativo</option><option>Urgente</option>
-            <option>Cliente</option><option>Interno</option>
-          </select>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label>Data *</label>
+          <input type="date" class="form-control" id="cal-event-date">
         </div>
-        <div class="form-group"><label>País</label>
-          <select class="form-control" id="cal-ev-country">
-            <option value="both">Ambos</option>
-            <option value="br">Brasil</option>
-            <option value="us">EUA</option>
-          </select>
+        <div class="form-group">
+          <label>Horário</label>
+          <input type="time" class="form-control" id="cal-event-time" oninput="updateTimeConversion()">
         </div>
       </div>
-      <div class="form-group"><label>Responsável</label>
-        <select class="form-control" id="cal-ev-resp">
-          <option>Daniel Ramos</option><option>Lucas Moraes</option>
-          <option>Gabriel Ramos</option><option>Thamyris Lages</option>
-        </select>
+      <div class="form-group">
+        <label>Fuso horário do horário acima</label>
+        <div class="tz-grid">
+          <button class="tz-btn active" data-tz="America/Sao_Paulo" onclick="selectTz('America/Sao_Paulo')">
+            <span class="tz-btn-flag">🇧🇷</span>
+            <span class="tz-btn-name">Brasil</span>
+            <span class="tz-btn-code">BRT · UTC-3</span>
+          </button>
+          <button class="tz-btn" data-tz="America/New_York" onclick="selectTz('America/New_York')">
+            <span class="tz-btn-flag">🇺🇸</span>
+            <span class="tz-btn-name">Nova York / Florida</span>
+            <span class="tz-btn-code">ET · UTC-4/-5</span>
+          </button>
+          <button class="tz-btn" data-tz="America/Chicago" onclick="selectTz('America/Chicago')">
+            <span class="tz-btn-flag">🇺🇸</span>
+            <span class="tz-btn-name">Chicago / Texas</span>
+            <span class="tz-btn-code">CT · UTC-5/-6</span>
+          </button>
+          <button class="tz-btn" data-tz="America/Los_Angeles" onclick="selectTz('America/Los_Angeles')">
+            <span class="tz-btn-flag">🇺🇸</span>
+            <span class="tz-btn-name">Los Angeles / CA</span>
+            <span class="tz-btn-code">PT · UTC-7/-8</span>
+          </button>
+        </div>
+        <div class="time-convert-box" id="time-convert-box"></div>
       </div>
-      <div class="form-group"><label>Descrição</label>
-        <textarea class="form-control" id="cal-ev-desc" rows="2" style="resize:vertical" placeholder="Detalhes do compromisso…"></textarea>
+      <div class="form-group">
+        <div class="tog-row" onclick="toggleMeeting()">
+          <div class="tog" id="meeting-tog"></div>
+          <span>📹 Marcar como reunião</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notas (opcional)</label>
+        <textarea class="form-control" id="cal-event-notes" rows="2" placeholder="Link da reunião, pauta…" style="resize:vertical"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeCalEventModal()">Cancelar</button>
       <button class="btn btn-danger btn-sm" id="cal-delete-btn" onclick="deleteCalEvent()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-secondary" onclick="closeCalModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="saveCalEvent()">Salvar</button>
     </div>
+  </div>
+</div>
+
+<!-- PULSO DIÁRIO -->
+<div class="pulso-overlay" id="pulso-overlay">
+  <div class="pulso-modal" id="pulso-modal">
+
+    <div class="pulso-header">
+      <div class="pulso-logo">✦</div>
+      <div>
+        <div class="pulso-title" id="pulso-title">Bom dia —</div>
+        <div class="pulso-date" id="pulso-date">—</div>
+      </div>
+    </div>
+
+    <div class="pulso-body">
+      <div class="pulso-insight" id="pulso-insight">
+        <span class="pulso-insight-icon">↑</span>
+        <span id="pulso-insight-text">Carregando…</span>
+      </div>
+      <div class="pulso-alert" id="pulso-alert">
+        <span class="pulso-alert-icon">!</span>
+        <span id="pulso-alert-text">Carregando…</span>
+      </div>
+      <div class="pulso-priorities">
+        <div class="pulso-priorities-label">Minhas 3 prioridades de hoje</div>
+        <div id="pulso-list"></div>
+      </div>
+      <div class="pulso-bonus" id="pulso-bonus" style="display:none"></div>
+    </div>
+
+    <div class="pulso-footer">
+      <button class="btn-pulso" id="pulso-btn" onclick="closePulso()">Começar o dia ✦</button>
+      <div class="pulso-ai-tag">gerado por IA · DR Growth</div>
+    </div>
+
   </div>
 </div>
 
@@ -214,235 +271,160 @@
 const session = initPage('hall.html');
 if (!session) throw new Error('Not authenticated');
 
-// ---- Saudação ----
+// ---- Saudação dinâmica ----
 function setGreeting() {
   const h = new Date().getHours();
   const period = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
   const emoji  = h < 12 ? '☀️' : h < 18 ? '🌤️' : '🌙';
-  document.getElementById('greeting-msg').innerHTML = `${period}, <span>${session.name.split(' ')[0]}</span> ${emoji}`;
+  const firstName = session.name.split(' ')[0];
+
+  document.getElementById('greeting-msg').innerHTML =
+    `${period}, <span>${firstName}</span> ${emoji}`;
+
   const subs = {
-    admin:     'Você tem acesso total ao sistema.',
-    comercial: 'Confira os leads e oportunidades no Comercial.',
-    trafego:   'Suas campanhas estão no Tráfego.',
+    admin:     'Você tem acesso total ao sistema. Bom trabalho!',
+    comercial: 'Confira os leads e oportunidades no setor Comercial.',
+    trafego:   'Suas campanhas e métricas estão no setor Tráfego.',
     financeiro:'O financeiro e os contratos estão te esperando.',
   };
-  document.getElementById('greeting-sub').textContent = subs[session.role] || 'Aqui estão as novidades de hoje.';
+  document.getElementById('greeting-sub').textContent =
+    subs[session.role] || 'Aqui estão as novidades de hoje na DR Growth.';
 }
 
 function updateDates() {
   const now = new Date();
   const dayNames = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
   const monthNames = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  document.getElementById('greeting-date').textContent = `${now.getDate()} de ${monthNames[now.getMonth()]} de ${now.getFullYear()}`;
+
+  document.getElementById('greeting-date').textContent =
+    `${now.getDate()} de ${monthNames[now.getMonth()]} de ${now.getFullYear()}`;
   document.getElementById('greeting-weekday').textContent = dayNames[now.getDay()];
+
+  const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
+  const usTime = now.toLocaleTimeString('en-US', { timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', hour12:true });
+  document.getElementById('clock-hero-br').textContent = brTime;
+  document.getElementById('clock-hero-us').textContent = usTime;
 }
 
 setGreeting();
 updateDates();
-setInterval(updateDates, 60000);
+setInterval(updateDates, 30000);
 
-// ---- Avatar dos campos de post ----
-function initPostAvatars() {
-  const avatarCls = fmt.avatarClass(session.name);
-  ['feed-post-avatar','mural-post-avatar'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.className = `avatar avatar-sm avatar-${avatarCls}`;
-      el.textContent = fmt.initials(session.name);
-    }
-  });
-}
-
-// ---- Toggle sections ----
-function toggleSection(name) {
-  const body   = document.getElementById(name + '-body');
-  const toggle = document.getElementById(name + '-toggle');
-  const isOpen = body.classList.toggle('open');
-  toggle.classList.toggle('open', isOpen);
-}
-
-// ---- FEED ----
-const FEED_DEFAULT = [
-  { id:1, icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Marcos Souza</strong> adicionado ao funil', who:'Lucas Moraes', time: new Date(Date.now() - 15*60000).toISOString(), system:true },
-  { id:2, icon:'💰', color:'#22c55e', msg:'Pagamento de <strong>GrowthX Agency — R$12.000</strong> confirmado', who:'Thamyris Lages', time: new Date(Date.now() - 45*60000).toISOString(), system:true },
-  { id:3, icon:'✅', color:'#22c55e', msg:'Tarefa <strong>Follow-up Sarah Johnson</strong> concluída', who:'Lucas Moraes', time: new Date(Date.now() - 90*60000).toISOString(), system:true },
-  { id:4, icon:'📊', color:'#a855f7', msg:'Campanha <strong>Google Ads — MedTech</strong> otimizada', who:'Gabriel Ramos', time: new Date(Date.now() - 2*3600000).toISOString(), system:true },
-  { id:5, icon:'📈', color:'#3b82f6', msg:'Lead <strong>Sarah Johnson</strong> movido para Reunião Agendada', who:'Lucas Moraes', time: new Date(Date.now() - 3*3600000).toISOString(), system:true },
+// ---- Feed de novidades ----
+const FEED_DEMO = [
+  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Marcos Souza</strong> adicionado ao funil', who:'Lucas', time: new Date(Date.now() - 15*60000).toISOString() },
+  { type:'payment', icon:'💰', color:'#22c55e', msg:'Pagamento de <strong>GrowthX Agency — R$12.000</strong> confirmado', who:'Thamyris', time: new Date(Date.now() - 45*60000).toISOString() },
+  { type:'task',    icon:'✅', color:'#22c55e', msg:'Tarefa <strong>Follow-up Sarah Johnson</strong> concluída', who:'Lucas', time: new Date(Date.now() - 90*60000).toISOString() },
+  { type:'campaign',icon:'📊', color:'#a855f7', msg:'Campanha <strong>Google Ads — MedTech</strong> otimizada', who:'Gabriel', time: new Date(Date.now() - 2*3600000).toISOString() },
+  { type:'lead',    icon:'📈', color:'#3b82f6', msg:'Lead <strong>Sarah Johnson</strong> movido para Reunião Agendada', who:'Lucas', time: new Date(Date.now() - 3*3600000).toISOString() },
+  { type:'client',  icon:'⭐', color:'#f59e0b', msg:'Cliente <strong>US Digital LLC</strong> marcado como atenção', who:'Gabriel', time: new Date(Date.now() - 5*3600000).toISOString() },
+  { type:'task',    icon:'📋', color:'#6366f1', msg:'Tarefa <strong>Configurar campanhas Google Ads</strong> em andamento', who:'Gabriel', time: new Date(Date.now() - 7*3600000).toISOString() },
+  { type:'lead',    icon:'📥', color:'#3b82f6', msg:'Novo lead <strong>Paulo Andrade</strong> de E-commerce Plus entrou no funil', who:'Gabriel', time: new Date(Date.now() - 18*3600000).toISOString() },
+  { type:'payment', icon:'⚠️', color:'#ef4444', msg:'Pagamento de <strong>US Digital LLC — R$8.200</strong> está em atraso', who:'Sistema', time: new Date(Date.now() - 24*3600000).toISOString() },
 ];
 
-function getFeedItems() {
-  try { return JSON.parse(localStorage.getItem('drg_feed') || 'null') || FEED_DEFAULT; } catch { return FEED_DEFAULT; }
-}
-function saveFeedItems(items) { localStorage.setItem('drg_feed', JSON.stringify(items)); }
-
-function renderFeed() {
-  const items = getFeedItems();
+function renderFeed(items) {
   if (!items.length) {
-    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:24px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3></div>`;
+    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3><p>Nenhuma novidade nas últimas 24h.</p></div>`;
     return;
   }
-  document.getElementById('feed-list').innerHTML = items.map((item, i) => {
-    const isOwner = item.who === session.name && !item.system;
-    return `
-    <div class="feed-item animate-in" style="animation-delay:${i*0.03}s;position:relative" id="feed-item-${item.id}">
-      <div class="feed-icon" style="background:${item.color||'#6366f1'}18;font-size:18px">${item.icon||'💬'}</div>
-      <div class="feed-content" style="flex:1">
+
+  document.getElementById('feed-list').innerHTML = items.map((item, i) => `
+    <div class="feed-item animate-in" style="animation-delay:${i * 0.04}s">
+      <div class="feed-icon" style="background:${item.color}18;font-size:18px">${item.icon}</div>
+      <div class="feed-content">
         <div class="feed-msg">${item.msg}</div>
-        ${item.edited ? `<div class="edited-tag">editado</div>` : ''}
         <div class="feed-meta">
-          <div class="avatar avatar-sm avatar-${fmt.avatarClass(item.who.split(' ')[0])}">${fmt.initials(item.who)}</div>
+          <div class="avatar avatar-sm avatar-${fmt.avatarClass(item.who)}">${fmt.initials(item.who)}</div>
           ${item.who}
-          <span style="margin-left:4px;color:var(--text-muted)">· ${fmt.timeAgo(item.time)}</span>
-        </div>
-        <div id="feed-edit-${item.id}" style="display:none" class="inline-edit">
-          <textarea class="form-control" id="feed-edit-text-${item.id}" rows="2">${item.msg.replace(/<[^>]*>/g,'')}</textarea>
-          <div style="display:flex;flex-direction:column;gap:4px">
-            <button class="btn btn-primary btn-sm" onclick="saveFeedEdit(${item.id})">Salvar</button>
-            <button class="btn btn-ghost btn-sm" onclick="cancelFeedEdit(${item.id})">✕</button>
-          </div>
         </div>
       </div>
-      ${isOwner ? `
-      <div class="feed-item-actions" style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px" onclick="startFeedEdit(${item.id})">✏️</button>
-        <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;color:var(--red)" onclick="deleteFeedItem(${item.id})">✕</button>
-      </div>` : ''}
-    </div>`;
-  }).join('');
+      <div class="feed-time">${fmt.timeAgo(item.time)}</div>
+    </div>`).join('');
 }
 
-function postFeedItem() {
-  const input = document.getElementById('feed-input');
-  const text = input.value.trim();
-  if (!text) return;
-  const items = getFeedItems();
-  items.unshift({ id: Date.now(), icon:'💬', color:'#6366f1', msg: escapeHtml(text), who: session.name, time: new Date().toISOString(), system: false });
-  saveFeedItems(items);
-  input.value = '';
-  renderFeed();
-  showToast('Atualização postada!', 'success');
-}
-
-function startFeedEdit(id) {
-  document.getElementById('feed-edit-' + id).style.display = 'flex';
-}
-function cancelFeedEdit(id) {
-  document.getElementById('feed-edit-' + id).style.display = 'none';
-}
-function saveFeedEdit(id) {
-  const text = document.getElementById('feed-edit-text-' + id).value.trim();
-  if (!text) return;
-  const items = getFeedItems();
-  const idx = items.findIndex(x => x.id === id);
-  if (idx >= 0 && items[idx].who === session.name) {
-    items[idx].msg = escapeHtml(text);
-    items[idx].edited = true;
-    saveFeedItems(items);
-    renderFeed();
-    showToast('Atualização editada.', 'success');
-  }
-}
-function deleteFeedItem(id) {
-  const items = getFeedItems();
-  const item = items.find(x => x.id === id);
-  if (!item || item.who !== session.name) return;
-  saveFeedItems(items.filter(x => x.id !== id));
-  renderFeed();
-}
-
-document.getElementById('feed-input')?.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postFeedItem(); } });
-
-// ---- MURAL ----
+// ---- Mural de Avisos ----
 const AVISOS_DEFAULT = [
-  { id:1, text:'Reunião de alinhamento toda segunda às 9h (BR) / 8h (ET). Link no grupo do WhatsApp.', author:'Daniel Ramos', pinned:true,  time: new Date(Date.now() - 2*86400000).toISOString() },
-  { id:2, text:'Prazo para envio de NFs: todo dia 20 do mês. Thamyris coordena.',                      author:'Daniel Ramos', pinned:false, time: new Date(Date.now() - 5*86400000).toISOString() },
+  { id:1, text:'Reunião de alinhamento toda segunda às 9h (BR) / 8h (ET). Link no grupo do WhatsApp.', author:'Daniel', pinned:true, time: new Date(Date.now() - 2*86400000).toISOString() },
+  { id:2, text:'Prazo para envio de NFs: todo dia 20 do mês. Thamyris coordena.', author:'Daniel', pinned:false, time: new Date(Date.now() - 5*86400000).toISOString() },
 ];
 
 function getAvisos() {
-  try { return JSON.parse(localStorage.getItem('drg_avisos') || 'null') || AVISOS_DEFAULT; } catch { return AVISOS_DEFAULT; }
+  try {
+    const raw = localStorage.getItem('drg_avisos');
+    return raw ? JSON.parse(raw) : AVISOS_DEFAULT;
+  } catch { return AVISOS_DEFAULT; }
 }
-function saveAvisos(avisos) { localStorage.setItem('drg_avisos', JSON.stringify(avisos)); }
+
+function saveAvisos(avisos) {
+  localStorage.setItem('drg_avisos', JSON.stringify(avisos));
+}
 
 function renderMural() {
   const avisos = getAvisos();
   const isAdmin = session.role === 'admin';
+
+  // Botão de novo aviso (só admin)
+  const adminBtn = document.getElementById('aviso-admin-btn');
+  if (isAdmin) {
+    adminBtn.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="toggleAvisoForm()">+ Novo</button>`;
+    document.getElementById('aviso-form').style.display = 'flex';
+  }
+
   if (!avisos.length) {
     document.getElementById('mural-list').innerHTML = `<div class="empty-state" style="padding:20px"><div class="empty-icon">📌</div><p>Sem avisos.</p></div>`;
     return;
   }
-  const sorted = [...avisos].sort((a,b) => (b.pinned?1:0)-(a.pinned?1:0));
-  document.getElementById('mural-list').innerHTML = sorted.map(a => {
-    const isOwner = a.author === session.name;
-    return `
-    <div class="aviso-item" id="aviso-item-${a.id}">
+
+  const sorted = [...avisos].sort((a,b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+  document.getElementById('mural-list').innerHTML = sorted.map(a => `
+    <div class="aviso-item">
       ${a.pinned ? '<div class="aviso-pinned">📌 fixado</div>' : ''}
-      <div class="aviso-text" id="aviso-text-${a.id}">${escapeHtml(a.text)}</div>
-      ${a.edited ? `<div class="edited-tag">editado</div>` : ''}
+      <div class="aviso-text">${a.text}</div>
       <div class="aviso-author">
-        <div class="avatar avatar-sm avatar-${fmt.avatarClass(a.author.split(' ')[0])}">${fmt.initials(a.author)}</div>
+        <div class="avatar avatar-sm avatar-${fmt.avatarClass(a.author)}">${fmt.initials(a.author)}</div>
         ${a.author} · ${fmt.timeAgo(a.time)}
-        <div class="feed-item-actions" style="margin-left:auto">
-          ${isOwner ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px" onclick="startAvisoEdit(${a.id})">✏️</button>` : ''}
-          ${(isOwner || isAdmin) ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;color:var(--red)" onclick="removeAviso(${a.id})">✕</button>` : ''}
-        </div>
+        ${isAdmin ? `<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:10px;margin-left:auto;color:var(--text-muted)" onclick="removeAviso(${a.id})">✕</button>` : ''}
       </div>
-      <div id="aviso-edit-${a.id}" style="display:none" class="inline-edit" style="padding:0 16px 12px">
-        <textarea class="form-control" id="aviso-edit-text-${a.id}" rows="2">${a.text}</textarea>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <button class="btn btn-primary btn-sm" onclick="saveAvisoEdit(${a.id})">Salvar</button>
-          <button class="btn btn-ghost btn-sm" onclick="cancelAvisoEdit(${a.id})">✕</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
+}
+
+function toggleAvisoForm() {
+  const form = document.getElementById('aviso-form');
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
 }
 
 function postAviso() {
   const input = document.getElementById('aviso-input');
-  const text = input.value.trim();
+  const text  = input.value.trim();
   if (!text) return;
+
   const avisos = getAvisos();
-  avisos.unshift({ id: Date.now(), text, author: session.name, pinned: false, time: new Date().toISOString() });
+  avisos.unshift({ id: Date.now(), text, author: session.name.split(' ')[0], pinned: false, time: new Date().toISOString() });
   saveAvisos(avisos);
   input.value = '';
   renderMural();
   showToast('Aviso postado!', 'success');
 }
 
-function startAvisoEdit(id) { document.getElementById('aviso-edit-' + id).style.display = 'flex'; }
-function cancelAvisoEdit(id) { document.getElementById('aviso-edit-' + id).style.display = 'none'; }
-
-function saveAvisoEdit(id) {
-  const text = document.getElementById('aviso-edit-text-' + id).value.trim();
-  if (!text) return;
-  const avisos = getAvisos();
-  const idx = avisos.findIndex(a => a.id === id);
-  if (idx >= 0 && avisos[idx].author === session.name) {
-    avisos[idx].text = text;
-    avisos[idx].edited = true;
-    saveAvisos(avisos);
-    renderMural();
-    showToast('Aviso editado.', 'success');
-  }
-}
-
 function removeAviso(id) {
-  const avisos = getAvisos();
-  const item = avisos.find(a => a.id === id);
-  if (!item) return;
-  if (item.author !== session.name && session.role !== 'admin') return;
-  saveAvisos(avisos.filter(a => a.id !== id));
+  const avisos = getAvisos().filter(a => a.id !== id);
+  saveAvisos(avisos);
   renderMural();
 }
 
-document.getElementById('aviso-input')?.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); postAviso(); } });
+// Enter para postar aviso
+document.getElementById('aviso-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') postAviso();
+});
 
-// ---- TEAM ----
+// ---- Time hoje ----
 const TEAM = [
-  { name:'Daniel Ramos',   role:'Gestor / Admin',             color:'#6366f1', status:'online', activity:'Revisando métricas' },
-  { name:'Lucas Moraes',   role:'Comercial EUA',              color:'#3b82f6', status:'online', activity:'Follow-up de leads' },
-  { name:'Gabriel Ramos',  role:'Tráfego & Administrativo',   color:'#a855f7', status:'online', activity:'Otimizando campanhas' },
-  { name:'Thamyris Lages', role:'Administrativo & Financeiro',color:'#22c55e', status:'away',   activity:'Emitindo NFs' },
+  { name:'Daniel Rocha',   role:'Gestor / Dono',             color:'#6366f1', status:'online',  activity:'Revisando métricas' },
+  { name:'Lucas Moraes',   role:'Comercial EUA',              color:'#3b82f6', status:'online',  activity:'Follow-up de leads' },
+  { name:'Gabriel Silva',  role:'Tráfego & Marketing',        color:'#a855f7', status:'online',  activity:'Otimizando campanhas' },
+  { name:'Thamyris Costa', role:'Administrativo & Financeiro',color:'#22c55e', status:'away',    activity:'Emitindo NFs' },
 ];
 
 const statusLabels = { online:'● Online', away:'◌ Ocupado', offline:'○ Offline' };
@@ -457,237 +439,500 @@ function renderTeam() {
         <div class="tm-role">${m.role}</div>
         <div class="text-muted" style="font-size:11px;margin-top:2px">↳ ${m.activity}</div>
       </div>
-      <div class="team-status" style="color:${statusColors[m.status]}">${statusLabels[m.status]}</div>
+      <div class="team-status" style="color:${statusColors[m.status]}">
+        ${statusLabels[m.status]}
+      </div>
     </div>`).join('');
 }
 
-// ---- Utilitários ----
-function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 // ---- Init ----
-initPostAvatars();
-renderFeed();
+renderFeed(FEED_DEMO);
 renderMural();
 renderTeam();
+</script>
 
-// ============================================================
-//  CALENDÁRIO
-// ============================================================
-const CAL_CATEGORY_COLORS = {
-  'Reunião':        '#4472d8',
-  'Financeiro':     '#22c55e',
-  'Comercial':      '#3b82f6',
-  'Tráfego':        '#a855f7',
-  'Administrativo': '#f97316',
-  'Urgente':        '#ef4444',
-  'Cliente':        '#eab308',
-  'Interno':        '#6b7280',
+<!-- ============================================================
+     PULSO DIÁRIO — Script
+     ============================================================ -->
+<script>
+// ---- SFX via Web Audio API (sem arquivos externos) ----
+const SFX = (() => {
+  let ctx = null;
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+  function tone(freq, type, duration, vol, delay = 0) {
+    try {
+      const c   = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, c.currentTime + delay);
+      gain.gain.setValueAtTime(0, c.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(vol, c.currentTime + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + duration);
+      osc.start(c.currentTime + delay);
+      osc.stop(c.currentTime + delay + duration + 0.05);
+    } catch(_) {}
+  }
+  return {
+    open()    { tone(440,'sine',0.28,0.12,0); tone(554,'sine',0.28,0.10,0.16); },
+    confirm() { tone(880,'sine',0.12,0.18,0); tone(660,'sine',0.35,0.09,0.10); },
+    check()   { tone(660,'sine',0.18,0.14,0); },
+  };
+})();
+
+// ---- Dados demo para o Pulso (independentes do dashboard) ----
+const PULSO_DEMO = {
+  leads: [
+    { name:'Carlos Mendonça', company:'MedTech Brasil',    stage:'proposta', value:4500,  responsible:'Lucas',   lastContact: new Date(Date.now()-4*86400000).toISOString() },
+    { name:'Sarah Johnson',   company:'US Digital LLC',    stage:'reuniao',  value:8200,  responsible:'Lucas',   lastContact: new Date(Date.now()-6*86400000).toISOString() },
+    { name:'Paulo Andrade',   company:'E-commerce Plus',   stage:'novo',     value:3200,  responsible:'Gabriel', lastContact: new Date(Date.now()-1*86400000).toISOString() },
+    { name:'Robert Davis',    company:'GrowthX Agency',    stage:'fechado',  value:12000, responsible:'Lucas',   lastContact: new Date(Date.now()-1*86400000).toISOString() },
+    { name:'Fernanda Lima',   company:'Estudio Criativo',  stage:'contato',  value:2800,  responsible:'Gabriel', lastContact: new Date(Date.now()-2*86400000).toISOString() },
+  ],
+  tasks: [
+    { title:'Enviar proposta para MedTech Brasil',    responsible:'Lucas',    due_date: new Date(Date.now()+3*86400000).toISOString(), priority:'high',   status:'pending'     },
+    { title:'Configurar campanhas de Google Ads',     responsible:'Gabriel',  due_date: new Date(Date.now()+1*86400000).toISOString(), priority:'high',   status:'in_progress' },
+    { title:'Ajustar landing page US Digital',        responsible:'Gabriel',  due_date: new Date(Date.now()+2*86400000).toISOString(), priority:'high',   status:'in_progress' },
+    { title:'Emitir NFs de maio',                     responsible:'Thamyris', due_date: new Date(Date.now()+5*86400000).toISOString(), priority:'medium', status:'pending'     },
+    { title:'Revisar contratos Q2',                   responsible:'Thamyris', due_date: new Date(Date.now()+4*86400000).toISOString(), priority:'medium', status:'pending'     },
+    { title:'Reunião de onboarding — GrowthX',        responsible:'Daniel',   due_date: new Date(Date.now()+2*86400000).toISOString(), priority:'medium', status:'pending'     },
+  ],
+  payments: [
+    { client_name:'GrowthX Agency',    amount:12000, due_date: new Date(Date.now()-5*86400000).toISOString(),  status:'paid'    },
+    { client_name:'MedTech Brasil',    amount:4500,  due_date: new Date(Date.now()+5*86400000).toISOString(),  status:'pending' },
+    { client_name:'US Digital LLC',    amount:8200,  due_date: new Date(Date.now()-3*86400000).toISOString(),  status:'overdue' },
+    { client_name:'Restaurante Sabor', amount:1800,  due_date: new Date(Date.now()-10*86400000).toISOString(), status:'overdue' },
+    { client_name:'Academia Fit',      amount:2400,  due_date: new Date(Date.now()+5*86400000).toISOString(),  status:'pending' },
+  ],
+  clients: [
+    { name:'GrowthX Agency',    monthly_value:12000, health:'green'  },
+    { name:'MedTech Brasil',    monthly_value:4500,  health:'green'  },
+    { name:'US Digital LLC',    monthly_value:8200,  health:'yellow' },
+    { name:'Restaurante Sabor', monthly_value:1800,  health:'red'    },
+    { name:'Academia Fit',      monthly_value:2400,  health:'green'  },
+  ],
 };
 
-const HOLIDAYS = [
-  // Brasil
-  {date:'2025-01-01',name:'Confraternização Universal',country:'br'},
-  {date:'2025-04-18',name:'Sexta-Feira Santa',country:'br'},
-  {date:'2025-04-21',name:'Tiradentes',country:'br'},
-  {date:'2025-05-01',name:'Dia do Trabalho',country:'br'},
-  {date:'2025-06-19',name:'Corpus Christi',country:'br'},
-  {date:'2025-09-07',name:'Independência do Brasil',country:'br'},
-  {date:'2025-10-12',name:'N.Sra. Aparecida',country:'br'},
-  {date:'2025-11-02',name:'Finados',country:'br'},
-  {date:'2025-11-15',name:'Proclamação da República',country:'br'},
-  {date:'2025-12-25',name:'Natal',country:'br'},
-  {date:'2026-01-01',name:'Confraternização Universal',country:'br'},
-  {date:'2026-04-03',name:'Sexta-Feira Santa',country:'br'},
-  {date:'2026-04-21',name:'Tiradentes',country:'br'},
-  {date:'2026-05-01',name:'Dia do Trabalho',country:'br'},
-  {date:'2026-06-04',name:'Corpus Christi',country:'br'},
-  {date:'2026-09-07',name:'Independência do Brasil',country:'br'},
-  {date:'2026-10-12',name:'N.Sra. Aparecida',country:'br'},
-  {date:'2026-11-02',name:'Finados',country:'br'},
-  {date:'2026-11-15',name:'Proclamação da República',country:'br'},
-  {date:'2026-12-25',name:'Natal',country:'br'},
-  // EUA
-  {date:'2025-01-01',name:"New Year's Day",country:'us'},
-  {date:'2025-01-20',name:'MLK Day',country:'us'},
-  {date:'2025-02-17',name:"Presidents' Day",country:'us'},
-  {date:'2025-05-26',name:'Memorial Day',country:'us'},
-  {date:'2025-07-04',name:'Independence Day',country:'us'},
-  {date:'2025-09-01',name:'Labor Day',country:'us'},
-  {date:'2025-11-27',name:'Thanksgiving',country:'us'},
-  {date:'2025-12-25',name:'Christmas Day',country:'us'},
-  {date:'2026-01-01',name:"New Year's Day",country:'us'},
-  {date:'2026-01-19',name:'MLK Day',country:'us'},
-  {date:'2026-02-16',name:"Presidents' Day",country:'us'},
-  {date:'2026-05-25',name:'Memorial Day',country:'us'},
-  {date:'2026-07-04',name:'Independence Day',country:'us'},
-  {date:'2026-09-07',name:'Labor Day',country:'us'},
-  {date:'2026-11-26',name:'Thanksgiving',country:'us'},
-  {date:'2026-12-25',name:'Christmas Day',country:'us'},
-];
+// ---- Gerar conteúdo do Pulso por role ----
+function buildPulsoContent(role) {
+  const { leads, tasks, payments, clients } = PULSO_DEMO;
 
-let calYear  = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let editingCalId = null;
-
-function getCalEvents() {
-  try { return JSON.parse(localStorage.getItem('drg_calendar') || '[]'); } catch { return []; }
-}
-function saveCalEvents(ev) { localStorage.setItem('drg_calendar', JSON.stringify(ev)); }
-
-function renderCalendar() {
-  const today    = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  const firstDay = new Date(calYear, calMonth, 1);
-  const lastDay  = new Date(calYear, calMonth + 1, 0);
-  const startDow = firstDay.getDay();
-  const totalDays = lastDay.getDate();
-  const events    = getCalEvents();
-  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-  let cells = '';
-  for (let i = 0; i < startDow; i++) cells += `<div class="cal-day cal-day-empty"></div>`;
-  for (let d = 1; d <= totalDays; d++) {
-    const mm  = String(calMonth + 1).padStart(2,'0');
-    const dd  = String(d).padStart(2,'0');
-    const ds  = `${calYear}-${mm}-${dd}`;
-    const isToday = ds === todayStr;
-    const hols    = HOLIDAYS.filter(h => h.date === ds);
-    const evs     = events.filter(e => e.date === ds);
-    const hasBR   = hols.some(h => h.country === 'br');
-    const hasUS   = hols.some(h => h.country === 'us');
-    let cls = 'cal-day';
-    if (isToday) cls += ' cal-today';
-    if (hasBR && hasUS) cls += ' cal-holiday-both';
-    else if (hasBR) cls += ' cal-holiday-br';
-    else if (hasUS)  cls += ' cal-holiday-us';
-    const holTip = hols.map(h=>`${h.country==='br'?'🇧🇷':'🇺🇸'} ${h.name}`).join('&#10;');
-    const dots   = evs.slice(0,3).map(e=>{const c=CAL_CATEGORY_COLORS[e.category]||'#4472d8';return `<div class="cal-event-dot" style="background:${c}" title="${e.title}"></div>`;}).join('');
-    const more   = evs.length>3 ? `<div class="cal-event-more">+${evs.length-3}</div>`:'';
-    const flags  = (hasBR||hasUS) ? `<div class="cal-holiday-flags">${hasBR?'🇧🇷':''}${hasUS?'🇺🇸':''}</div>`:'';
-    cells += `<div class="${cls}"${holTip?` title="${holTip}"`:''}  onclick="openCalDay('${ds}')">
-      <div class="cal-day-num">${d}</div>${flags}
-      <div class="cal-day-events">${dots}${more}</div>
-    </div>`;
+  if (role === 'comercial') {
+    const active  = leads.filter(l => !['fechado','perdido'].includes(l.stage));
+    const stale   = active
+      .filter(l => (Date.now() - new Date(l.lastContact)) / 86400000 >= 3)
+      .sort((a, b) => new Date(a.lastContact) - new Date(b.lastContact));
+    const closed  = leads.filter(l => l.stage === 'fechado').length;
+    const convRate = Math.round((closed / leads.length) * 100);
+    const top     = stale[0];
+    const staleDays = top ? Math.floor((Date.now() - new Date(top.lastContact)) / 86400000) : 0;
+    return {
+      insight:  convRate >= 20
+        ? `Taxa de conversão em ${convRate}% — acima da média histórica (18%). Bom ritmo esta semana!`
+        : `Você tem ${active.length} leads ativos no funil. Foco em quem está há mais tempo sem contato.`,
+      alert:    top
+        ? `${top.name} (${top.company}) está há ${staleDays} dias sem contato — risco de perder R$ ${top.value.toLocaleString('pt-BR')}.`
+        : `${active.length} leads ativos aguardam follow-up no funil.`,
+      priorities: [
+        top ? `Ligar para ${top.name} — ${staleDays} dias sem contato` : 'Revisar funil de leads',
+        'Enviar proposta para MedTech Brasil — prazo se aproximando',
+        `Follow-up com ${active.find(l => l !== top)?.name || 'Paulo Andrade'} — lead recente`,
+      ],
+      bonus: top ? `Se fechar ${top.name} hoje → +R$ ${top.value.toLocaleString('pt-BR')} no MRR` : null,
+    };
   }
 
-  document.getElementById('cal-grid').innerHTML = `
-    <div class="cal-header">
-      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
-      <h3 class="cal-month-title">${MONTHS[calMonth]} ${calYear}</h3>
-      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
-      <button class="btn btn-primary btn-sm" style="margin-left:8px" onclick="openCalEventModal(null,null)">+ Evento</button>
-    </div>
-    <div class="cal-weekdays">${['Dom','Seg','Ter','Qua','Qui','Sex','Sab'].map(d=>`<div class="cal-weekday">${d}</div>`).join('')}</div>
-    <div class="cal-days">${cells}</div>`;
+  if (role === 'trafego') {
+    const mine    = tasks.filter(t => t.responsible === 'Gabriel' && t.status !== 'done');
+    const high    = mine.filter(t => t.priority === 'high');
+    const overdue = mine.filter(t => new Date(t.due_date) < new Date());
+    return {
+      insight:  `${mine.length} tarefas ativas — ${high.length} de alta prioridade. Planeje o dia com foco nelas.`,
+      alert:    overdue.length
+        ? `${overdue.length} tarefa(s) vencida(s). Ação imediata para não impactar os clientes.`
+        : 'US Digital LLC marcado como atenção — campanha pode precisar de ajuste de budget.',
+      priorities: [
+        'Configurar campanhas de Google Ads — prazo amanhã',
+        'Ajustar landing page US Digital — alta prioridade',
+        'Verificar ROAS das campanhas ativas desta semana',
+      ],
+      bonus: null,
+    };
+  }
 
-  renderUpcomingEvents();
-  renderCalLegend();
+  if (role === 'financeiro') {
+    const overdue      = payments.filter(p => p.status === 'overdue');
+    const overdueTotal = overdue.reduce((s, p) => s + p.amount, 0);
+    const mrr          = clients.reduce((s, c) => s + c.monthly_value, 0);
+    return {
+      insight:  `MRR atual: R$ ${mrr.toLocaleString('pt-BR')}. ${payments.filter(p => p.status === 'paid').length} pagamentos confirmados este mês.`,
+      alert:    overdue.length
+        ? `R$ ${overdueTotal.toLocaleString('pt-BR')} em atraso — ${overdue.length} cliente(s) com pagamento vencido.`
+        : 'Nenhum pagamento crítico em atraso hoje.',
+      priorities: [
+        'Cobrar US Digital LLC — R$ 8.200 atrasado há 3 dias',
+        'Cobrar Restaurante Sabor — R$ 1.800 atrasado há 10 dias',
+        'Verificar NFs de maio — prazo no dia 20',
+      ],
+      bonus: null,
+    };
+  }
+
+  // admin
+  const overdue      = payments.filter(p => p.status === 'overdue');
+  const overdueTotal = overdue.reduce((s, p) => s + p.amount, 0);
+  const mrr          = clients.reduce((s, c) => s + c.monthly_value, 0);
+  const openTasks    = tasks.filter(t => t.status !== 'done').length;
+  const atRisk       = clients.filter(c => c.health === 'red').length;
+  const activeLeads  = leads.filter(l => !['fechado','perdido'].includes(l.stage)).length;
+  return {
+    insight:  `MRR R$ ${mrr.toLocaleString('pt-BR')} · ${clients.length} clientes ativos · ${activeLeads} leads no funil.`,
+    alert:    atRisk
+      ? `${atRisk} cliente(s) em risco de churn. R$ ${overdueTotal.toLocaleString('pt-BR')} em pagamentos atrasados.`
+      : `${overdue.length} pagamento(s) em atraso — total R$ ${overdueTotal.toLocaleString('pt-BR')}.`,
+    priorities: [
+      `Revisar saúde de ${atRisk || overdue.length} cliente(s) em risco ou inadimplência`,
+      `Acompanhar ${openTasks} tarefas abertas do time`,
+      `Cobrança: R$ ${overdueTotal.toLocaleString('pt-BR')} aguardam ação de Thamyris`,
+    ],
+    bonus: null,
+  };
 }
 
-function calNav(dir) { calMonth += dir; if(calMonth<0){calMonth=11;calYear--;}else if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
-
-function openCalDay(dateStr) { openCalEventModal(null, dateStr); }
-
-function openCalEventModal(id, defaultDate) {
-  editingCalId = id;
-  const ev = id ? getCalEvents().find(e => e.id === id) : null;
-  document.getElementById('cal-modal-title').textContent = ev ? 'Editar Compromisso' : 'Novo Compromisso';
-  document.getElementById('cal-ev-title').value    = ev?.title || '';
-  document.getElementById('cal-ev-date').value     = ev?.date || defaultDate || new Date().toISOString().split('T')[0];
-  document.getElementById('cal-ev-time').value     = ev?.time || '';
-  document.getElementById('cal-ev-category').value = ev?.category || 'Reunião';
-  document.getElementById('cal-ev-country').value  = ev?.country || 'both';
-  document.getElementById('cal-ev-resp').value     = ev?.responsible || session.name;
-  document.getElementById('cal-ev-desc').value     = ev?.description || '';
-  document.getElementById('cal-delete-btn').style.display = ev ? 'inline-flex' : 'none';
-  document.getElementById('cal-event-modal').classList.add('show');
+// ---- Controle de exibição (1x por dia por usuário) ----
+function pulsoKey() {
+  const today = new Date().toISOString().slice(0, 10);
+  const who   = (session && session.name) ? session.name.replace(/\s/g,'') : 'user';
+  return `drg_pulso_${today}_${who}`;
 }
 
-function closeCalEventModal() {
-  document.getElementById('cal-event-modal').classList.remove('show');
-  editingCalId = null;
+function pulsoSeen()     { return !!localStorage.getItem(pulsoKey()); }
+function markPulsoSeen() { localStorage.setItem(pulsoKey(), '1'); }
+
+// ---- Abrir Pulso ----
+function showPulso() {
+  if (pulsoSeen()) return;
+  if (!session) return;
+
+  const content = buildPulsoContent(session.role);
+
+  // Saudação
+  const h       = new Date().getHours();
+  const period  = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  const firstName = session.name.split(' ')[0];
+  const now     = new Date();
+  const days    = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  const months  = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+  document.getElementById('pulso-title').textContent =
+    `${period}, ${firstName} ✦`;
+  document.getElementById('pulso-date').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
+
+  document.getElementById('pulso-insight-text').textContent = content.insight;
+  document.getElementById('pulso-alert-text').textContent   = content.alert;
+
+  // Prioridades
+  document.getElementById('pulso-list').innerHTML = content.priorities.map((p, i) => `
+    <div class="pulso-item" id="pulso-item-${i}">
+      <div class="pulso-item-num">${i + 1}</div>
+      <div class="pulso-item-text">${p}</div>
+    </div>`).join('');
+
+  // Bonus
+  const bonusEl = document.getElementById('pulso-bonus');
+  if (content.bonus) {
+    bonusEl.textContent = '💰 ' + content.bonus;
+    bonusEl.style.display = 'block';
+  } else {
+    bonusEl.style.display = 'none';
+  }
+
+  // Mostrar overlay
+  const overlay = document.getElementById('pulso-overlay');
+  overlay.classList.add('show');
+  SFX.open();
+
+  // Stagger dos itens de prioridade
+  content.priorities.forEach((_, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`pulso-item-${i}`);
+      if (el) el.classList.add('visible');
+    }, 400 + i * 100);
+  });
+}
+
+// ---- Fechar Pulso ----
+function closePulso() {
+  SFX.confirm();
+  markPulsoSeen();
+  const overlay = document.getElementById('pulso-overlay');
+  const modal   = document.getElementById('pulso-modal');
+  modal.style.cssText  = 'transform:translateY(-14px);opacity:0;transition:transform 0.22s ease,opacity 0.22s ease;';
+  overlay.style.cssText = 'opacity:0;transition:opacity 0.25s ease;pointer-events:none;';
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    modal.style.cssText  = '';
+    overlay.style.cssText = '';
+  }, 260);
+}
+
+// Fechar clicando fora do modal
+document.getElementById('pulso-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closePulso();
+});
+
+// Fechar com ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('pulso-overlay').classList.contains('show')) {
+    closePulso();
+  }
+});
+
+// ---- Auto-disparar após a página carregar ----
+setTimeout(showPulso, 700);
+</script>
+
+<!-- SKY + CALENDAR + HALL TABS -->
+<script>
+// ============================================================
+// HALL TABS
+// ============================================================
+function switchHallTab(name, btn) {
+  document.querySelectorAll('.hall-tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.hall-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('htab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'calendario') renderCalendar();
+}
+
+// ============================================================
+// SKY BACKGROUND
+// ============================================================
+function initSky() {
+  const sky = document.getElementById('sky-bg');
+  if (!sky) return;
+  const h = new Date().getHours();
+
+  // Remove old stars
+  sky.querySelectorAll('.sky-star').forEach(s => s.remove());
+
+  const sun  = document.getElementById('sky-sun');
+  const moon = document.getElementById('sky-moon');
+
+  if (h >= 20 || h < 5) {
+    // Night — dark navy + stars + moon
+    sky.style.background = 'linear-gradient(to bottom, #010108 0%, #060612 55%, #0b0b1a 100%)';
+    moon.style.cssText = 'display:block;top:8%;right:14%';
+    sun.style.display = 'none';
+    for (let i = 0; i < 160; i++) {
+      const s = document.createElement('div');
+      s.className = 'sky-star';
+      const sz = (Math.random() * 1.8 + 0.4).toFixed(1);
+      const lo = (Math.random() * 0.25 + 0.08).toFixed(2);
+      const hi = (Math.random() * 0.55 + 0.35).toFixed(2);
+      s.style.cssText = `left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*72).toFixed(1)}%;width:${sz}px;height:${sz}px;--lo:${lo};--hi:${hi};--dur:${(Math.random()*3+2).toFixed(1)}s;--delay:${(Math.random()*5).toFixed(1)}s`;
+      sky.appendChild(s);
+    }
+  } else if (h >= 5 && h < 7) {
+    // Dawn — indigo fading to orange
+    sky.style.background = 'linear-gradient(to bottom, #0f0c29 0%, #2d1654 40%, #c2410c 78%, #fb923c 100%)';
+    sun.style.display = 'none'; moon.style.display = 'none';
+    // Few fading stars
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('div');
+      s.className = 'sky-star';
+      const sz = (Math.random() * 1.2 + 0.3).toFixed(1);
+      s.style.cssText = `left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*40).toFixed(1)}%;width:${sz}px;height:${sz}px;--lo:0.04;--hi:0.2;--dur:${(Math.random()*2+2).toFixed(1)}s;--delay:${(Math.random()*3).toFixed(1)}s`;
+      sky.appendChild(s);
+    }
+  } else if (h >= 7 && h < 17) {
+    // Day — deep blue sky + sun arc
+    sky.style.background = 'linear-gradient(to bottom, #0c1445 0%, #1e3a8a 45%, #1d4ed8 100%)';
+    moon.style.display = 'none';
+    const pct = (h - 7) / 10;
+    const leftPct = (5 + pct * 90).toFixed(1);
+    const topPct  = (20 - Math.sin(Math.PI * pct) * 14).toFixed(1);
+    sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
+  } else {
+    // Sunset 17–20 — indigo to deep orange
+    sky.style.background = 'linear-gradient(to bottom, #1e1b4b 0%, #7c2d12 45%, #c2410c 72%, #fb923c 100%)';
+    sun.style.display = 'none'; moon.style.display = 'none';
+  }
+}
+
+initSky();
+setInterval(initSky, 1800000); // re-check every 30 min
+
+// ============================================================
+// CALENDAR
+// ============================================================
+const CAL_TZS = [
+  { id:'America/Sao_Paulo',   flag:'🇧🇷', name:'Brasil',          code:'BRT · UTC-3'   },
+  { id:'America/New_York',    flag:'🇺🇸', name:'NY / Florida',    code:'ET · UTC-4/-5' },
+  { id:'America/Chicago',     flag:'🇺🇸', name:'Chicago / Texas', code:'CT · UTC-5/-6' },
+  { id:'America/Los_Angeles', flag:'🇺🇸', name:'Los Angeles / CA',code:'PT · UTC-7/-8' },
+];
+
+let calDate     = new Date();
+let calSelTz    = 'America/Sao_Paulo';
+let calMeeting  = false;
+let calEditId   = null;
+
+function getCalEvents()       { try { return JSON.parse(localStorage.getItem('drg_cal') || '[]'); } catch { return []; } }
+function saveCalEvents(evs)   { localStorage.setItem('drg_cal', JSON.stringify(evs)); }
+
+// Convert wall-clock time in a timezone to UTC ISO string
+function wallToUTC(dateStr, timeStr, tz) {
+  if (!dateStr || !timeStr) return null;
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const [h, m]     = timeStr.split(':').map(Number);
+  let guess = new Date(Date.UTC(y, mo - 1, d, h, m));
+  for (let i = 0; i < 3; i++) {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', hour12: false
+    }).format(guess).split(', ');
+    const [fh, fm] = parts[1].split(':').map(Number);
+    guess = new Date(guess.getTime() + ((h - (fh === 24 ? 0 : fh)) * 60 + (m - fm)) * 60000);
+  }
+  return guess.toISOString();
+}
+
+// Format UTC ISO string in a given timezone → "HH:MM"
+function utcToTzTime(utcStr, tz) {
+  if (!utcStr) return '';
+  return new Intl.DateTimeFormat('pt-BR', { timeZone: tz, hour:'2-digit', minute:'2-digit', hour12: false }).format(new Date(utcStr));
+}
+
+function renderCalendar() {
+  const events = getCalEvents();
+  const y = calDate.getFullYear();
+  const m = calDate.getMonth();
+  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-month-label').textContent = `${MONTHS[m]} ${y}`;
+
+  const firstDay    = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const daysInPrev  = new Date(y, m, 0).getDate();
+  const today       = new Date();
+
+  let html = '';
+
+  // Prev-month filler
+  for (let i = firstDay - 1; i >= 0; i--)
+    html += `<div class="cal-cell other-month"><div class="cal-cell-num">${daysInPrev - i}</div></div>`;
+
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday  = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
+    const dateStr  = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayEvs   = events.filter(e => e.date === dateStr);
+    const chips    = dayEvs.slice(0, 3).map(ev => {
+      const label = ev.utc ? utcToTzTime(ev.utc, 'America/Sao_Paulo') : (ev.time || '');
+      return `<div class="cal-chip ${ev.isMeeting ? 'type-meeting' : 'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label ? label + ' ' : ''}${ev.title}</div>`;
+    }).join('');
+    const more = dayEvs.length > 3 ? `<div class="cal-chip type-event">+${dayEvs.length - 3} mais</div>` : '';
+    html += `<div class="cal-cell${isToday ? ' today' : ''}" onclick="openCalAdd('${dateStr}')">
+      <div class="cal-cell-num">${d}</div>${chips}${more}</div>`;
+  }
+
+  // Next-month filler
+  const filled = firstDay + daysInMonth;
+  const remainder = (7 - (filled % 7)) % 7;
+  for (let d = 1; d <= remainder; d++)
+    html += `<div class="cal-cell other-month"><div class="cal-cell-num">${d}</div></div>`;
+
+  document.getElementById('cal-cells').innerHTML = html;
+}
+
+function calPrevMonth() { calDate = new Date(calDate.getFullYear(), calDate.getMonth() - 1, 1); renderCalendar(); }
+function calNextMonth() { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1); renderCalendar(); }
+
+function openCalAdd(dateStr) {
+  calEditId = null; calMeeting = false; calSelTz = 'America/Sao_Paulo';
+  document.getElementById('cal-modal-title').textContent = 'Novo Compromisso';
+  document.getElementById('cal-event-title').value = '';
+  document.getElementById('cal-event-date').value  = dateStr;
+  document.getElementById('cal-event-time').value  = '';
+  document.getElementById('cal-event-notes').value = '';
+  document.getElementById('cal-delete-btn').style.display = 'none';
+  refreshTzBtns(); refreshMeetingTog(); updateTimeConversion();
+  document.getElementById('cal-modal').classList.add('show');
+}
+
+function openCalView(id) {
+  const ev = getCalEvents().find(e => e.id === id);
+  if (!ev) return;
+  calEditId = id; calMeeting = ev.isMeeting || false; calSelTz = ev.timezone || 'America/Sao_Paulo';
+  document.getElementById('cal-modal-title').textContent = 'Editar Compromisso';
+  document.getElementById('cal-event-title').value = ev.title;
+  document.getElementById('cal-event-date').value  = ev.date;
+  document.getElementById('cal-event-time').value  = ev.time || '';
+  document.getElementById('cal-event-notes').value = ev.notes || '';
+  document.getElementById('cal-delete-btn').style.display = 'inline-flex';
+  refreshTzBtns(); refreshMeetingTog(); updateTimeConversion();
+  document.getElementById('cal-modal').classList.add('show');
+}
+
+function selectTz(tz) { calSelTz = tz; refreshTzBtns(); updateTimeConversion(); }
+
+function refreshTzBtns() {
+  document.querySelectorAll('.tz-btn').forEach(b => b.classList.toggle('active', b.dataset.tz === calSelTz));
+}
+
+function toggleMeeting() { calMeeting = !calMeeting; refreshMeetingTog(); }
+function refreshMeetingTog() { document.getElementById('meeting-tog').classList.toggle('on', calMeeting); }
+
+function updateTimeConversion() {
+  const time = document.getElementById('cal-event-time').value;
+  const date = document.getElementById('cal-event-date').value;
+  const box  = document.getElementById('time-convert-box');
+  if (!time || !date || calSelTz === 'America/Sao_Paulo') { box.classList.remove('show'); return; }
+  try {
+    const utc    = wallToUTC(date, time, calSelTz);
+    const brTime = utcToTzTime(utc, 'America/Sao_Paulo');
+    const tzInfo = CAL_TZS.find(t => t.id === calSelTz);
+    box.classList.add('show');
+    box.innerHTML = `${tzInfo?.flag || ''} ${time} (${tzInfo?.code || calSelTz}) &nbsp;=&nbsp; 🇧🇷 <strong>${brTime}</strong> no Brasil`;
+  } catch { box.classList.remove('show'); }
 }
 
 function saveCalEvent() {
-  const title = document.getElementById('cal-ev-title').value.trim();
-  if (!title) { showToast('Título é obrigatório.','error'); return; }
-  const entry = {
-    id: editingCalId || Date.now(),
-    title,
-    date:        document.getElementById('cal-ev-date').value,
-    time:        document.getElementById('cal-ev-time').value,
-    category:    document.getElementById('cal-ev-category').value,
-    country:     document.getElementById('cal-ev-country').value,
-    responsible: document.getElementById('cal-ev-resp').value,
-    description: document.getElementById('cal-ev-desc').value.trim(),
-    createdBy:   session.name,
-  };
-  let evs = getCalEvents();
-  if (editingCalId) { const i = evs.findIndex(e=>e.id===editingCalId); if(i>=0) evs[i]=entry; }
-  else evs.push(entry);
-  saveCalEvents(evs);
-  closeCalEventModal();
+  const title = document.getElementById('cal-event-title').value.trim();
+  const date  = document.getElementById('cal-event-date').value;
+  const time  = document.getElementById('cal-event-time').value;
+  const notes = document.getElementById('cal-event-notes').value.trim();
+  if (!title || !date) { showToast('Título e data são obrigatórios.', 'error'); return; }
+  const utc    = time ? wallToUTC(date, time, calSelTz) : null;
+  const events = getCalEvents();
+  if (calEditId) {
+    const idx = events.findIndex(e => e.id === calEditId);
+    if (idx >= 0) events[idx] = { ...events[idx], title, date, time, notes, timezone: calSelTz, isMeeting: calMeeting, utc };
+  } else {
+    events.push({ id: String(Date.now()), title, date, time, notes, timezone: calSelTz, isMeeting: calMeeting, utc, createdBy: session?.name?.split(' ')[0] || '' });
+  }
+  saveCalEvents(events);
+  closeCalModal();
   renderCalendar();
-  showToast(editingCalId?'Compromisso atualizado!':'Compromisso criado!','success');
+  showToast(calEditId ? 'Compromisso atualizado!' : 'Compromisso adicionado!', 'success');
 }
 
 function deleteCalEvent() {
-  if (!editingCalId || !confirm('Excluir este compromisso?')) return;
-  saveCalEvents(getCalEvents().filter(e=>e.id!==editingCalId));
-  closeCalEventModal();
-  renderCalendar();
-  showToast('Compromisso excluído.','info');
+  if (!calEditId || !confirm('Remover este compromisso?')) return;
+  saveCalEvents(getCalEvents().filter(e => e.id !== calEditId));
+  closeCalModal(); renderCalendar();
+  showToast('Compromisso removido.', 'info');
 }
 
-function renderUpcomingEvents() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const evs   = getCalEvents()
-    .filter(e => new Date(e.date+'T00:00:00') >= today)
-    .sort((a,b) => a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||''))
-    .slice(0,6);
-  const el = document.getElementById('cal-upcoming');
-  if (!evs.length) { el.innerHTML=`<div class="text-muted" style="padding:14px;font-size:12px;text-align:center">Sem compromissos futuros</div>`; return; }
-  el.innerHTML = evs.map(e=>{
-    const c   = CAL_CATEGORY_COLORS[e.category]||'#4472d8';
-    const flag= e.country==='br'?'🇧🇷':e.country==='us'?'🇺🇸':'';
-    return `<div class="cal-upcoming-item" onclick="openCalEventModal(${e.id},null)">
-      <div class="cal-upcoming-bar" style="background:${c}"></div>
-      <div class="cal-upcoming-content">
-        <div style="font-size:12px;font-weight:600">${e.title} ${flag}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${fmt.date(e.date)}${e.time?' · '+e.time:''}</div>
-        <div style="font-size:11px;color:var(--text-muted)">${e.category} · ${e.responsible.split(' ')[0]}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
+function closeCalModal() { document.getElementById('cal-modal').classList.remove('show'); }
 
-function renderCalLegend() {
-  const el = document.getElementById('cal-legend');
-  let html = `
-    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(68,114,216,0.3);border:1px solid #4472d8"></div> Hoje</div>
-    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4)"></div> 🇧🇷 Feriado Brasil</div>
-    <div class="cal-legend-row"><div class="cal-legend-dot" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4)"></div> 🇺🇸 Feriado EUA</div>
-    <div style="border-top:1px solid var(--border);margin:8px 0"></div>`;
-  Object.entries(CAL_CATEGORY_COLORS).forEach(([cat,col])=>{
-    html += `<div class="cal-legend-row"><div class="cal-event-dot" style="background:${col};width:10px;height:10px;border-radius:2px;flex-shrink:0"></div> ${cat}</div>`;
-  });
-  el.innerHTML = html;
-}
-
-document.getElementById('cal-event-modal')?.addEventListener('click', e => { if(e.target===document.getElementById('cal-event-modal')) closeCalEventModal(); });
-
-// Render calendar when section opens (lazy init)
-const _origToggle = toggleSection;
-window.toggleSection = function(name) {
-  _origToggle(name);
-  if (name === 'calendario') {
-    const isNowOpen = document.getElementById('calendario-body').classList.contains('open');
-    if (isNowOpen && !document.getElementById('cal-grid').innerHTML) renderCalendar();
-    else if (isNowOpen) renderCalendar();
-  }
-};
+document.getElementById('cal-modal').addEventListener('click', e => { if (e.target === document.getElementById('cal-modal')) closeCalModal(); });
 </script>
 </body>
 </html>
