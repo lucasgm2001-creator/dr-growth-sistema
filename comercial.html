@@ -600,12 +600,13 @@ function closeDetail() { document.getElementById('lead-detail').style.display = 
 
 // ---- Pipeline ----
 function renderPipeline() {
-  const active = leads.filter(l => l.stage !== 'perdido');
+  const vis    = (window.filterByCountry || (x=>x))(leads);
+  const active = vis.filter(l => l.stage !== 'perdido');
   const totalValue = active.reduce((s,l) => s+(Number(l.value)||0), 0) || 1;
 
   // Por estágio
   document.getElementById('pipeline-stages').innerHTML = STAGES.filter(s=>s.key!=='perdido').map(s => {
-    const sl = leads.filter(l => l.stage === s.key);
+    const sl = vis.filter(l => l.stage === s.key);
     const sv = sl.reduce((acc,l)=>acc+(Number(l.value)||0),0);
     const pct = Math.round((sv/totalValue)*100);
     return `<div style="margin-bottom:14px">
