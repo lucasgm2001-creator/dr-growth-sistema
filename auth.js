@@ -457,6 +457,88 @@ function showToast(message, type = 'info') {
   else if (type === 'error') SFX.error();
 }
 
+// ============================================================
+//  Personal To-Do Widget (all sectors)
+// ============================================================
+function initTodo() {
+  const s = AUTH.getSession();
+  const userName = s ? s.name.split(' ')[0].toLowerCase() : 'user';
+  const key = `drg_todo_${userName}`;
+
+  function getTodos() { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
+  function saveTodos(arr) { localStorage.setItem(key, JSON.stringify(arr)); }
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="todo-fab" class="todo-fab" onclick="window._todoToggle()">
+      <span style="font-size:18px">📝</span>
+      <span class="todo-badge" id="todo-badge" style="display:none">0</span>
+    </div>
+    <div id="todo-panel" class="todo-panel">
+      <div class="todo-panel-header">
+        <span>📝 Minhas Tarefas</span>
+        <button class="todo-close-btn" onclick="window._todoToggle()">✕</button>
+      </div>
+      <div class="todo-input-row">
+        <input type="text" id="todo-input" class="todo-input" placeholder="Nova tarefa…" maxlength="200"
+          onkeydown="if(event.key==='Enter')window._todoAdd()">
+        <button class="todo-add-btn" onclick="window._todoAdd()">+</button>
+      </div>
+      <div class="todo-list" id="todo-list"></div>
+    </div>
+  `);
+
+  window._todoToggle = function() {
+    document.getElementById('todo-panel').classList.toggle('open');
+  };
+
+  window._todoAdd = function() {
+    const input = document.getElementById('todo-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const todos = getTodos();
+    todos.unshift({ id: Date.now(), text, done: false });
+    saveTodos(todos);
+    input.value = '';
+    _renderTodos();
+  };
+
+  window._todoCheck = function(id) {
+    const todos = getTodos();
+    const item = todos.find(t => t.id === id);
+    if (item) item.done = !item.done;
+    saveTodos(todos);
+    _renderTodos();
+  };
+
+  window._todoDel = function(id) {
+    saveTodos(getTodos().filter(t => t.id !== id));
+    _renderTodos();
+  };
+
+  function _renderTodos() {
+    const todos = getTodos();
+    const pending = todos.filter(t => !t.done).length;
+    const badge = document.getElementById('todo-badge');
+    if (pending > 0) { badge.textContent = pending > 9 ? '9+' : pending; badge.style.display = 'flex'; }
+    else { badge.style.display = 'none'; }
+    const list = document.getElementById('todo-list');
+    if (!todos.length) {
+      list.innerHTML = `<div class="todo-empty">Sem tarefas. Adicione uma acima.</div>`;
+      return;
+    }
+    list.innerHTML = todos.map(t => `
+      <div class="todo-item${t.done ? ' done' : ''}">
+        <div class="todo-check" onclick="window._todoCheck(${t.id})">${t.done ? '✓' : ''}</div>
+        <div class="todo-text" onclick="window._todoCheck(${t.id})">${t.text}</div>
+        <button class="todo-del" onclick="window._todoDel(${t.id})">✕</button>
+      </div>`).join('');
+  }
+
+  _renderTodos();
+}
+
+document.addEventListener('DOMContentLoaded', initTodo);
+
 // Expõe globalmente
 window.AUTH       = AUTH;
 window.SECTIONS   = SECTIONS;
