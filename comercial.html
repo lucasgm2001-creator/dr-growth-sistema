@@ -625,7 +625,8 @@ async function onDrop(e, stage) {
   const lead = leads.find(l => l.id === draggedId);
   if (!lead || lead.stage === stage) return;
   lead.stage = stage;
-  if (window.drSupabase) await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId);
+  if (window.drSupabase) { try { await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId); } catch {} }
+  saveLeadsLocal();
   renderKanban(); renderLeadsTable(leads); renderPipeline(); updateSubtitle();
   showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
   draggedId = null;
