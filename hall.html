@@ -111,26 +111,53 @@
             </div>
             <div class="hall-acc-body">
               <div class="cal-wrap animate-in">
-                <div class="cal-nav">
-                  <button class="btn btn-secondary btn-sm" onclick="calPrevMonth()">← Anterior</button>
-                  <span class="cal-month-label" id="cal-month-label">—</span>
-                  <button class="btn btn-secondary btn-sm" onclick="calNextMonth()">Próximo →</button>
+
+                <!-- Toolbar: view switcher + navigation -->
+                <div class="cal-toolbar">
+                  <div class="cal-view-btns">
+                    <button class="cal-vbtn active" id="cal-vbtn-month" onclick="setCalView('month')">Mês</button>
+                    <button class="cal-vbtn" id="cal-vbtn-week" onclick="setCalView('week')">Semana</button>
+                    <button class="cal-vbtn" id="cal-vbtn-day" onclick="setCalView('day')">Dia</button>
+                  </div>
+                  <div class="cal-nav-row">
+                    <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+                    <span class="cal-period-label" id="cal-period-label">—</span>
+                    <button class="cal-nav-btn" onclick="calNext()">›</button>
+                    <button class="cal-nav-btn cal-today-btn" onclick="calToday()">Hoje</button>
+                  </div>
                 </div>
-                <div class="cal-grid">
-                  <div class="cal-day-name">Dom</div>
-                  <div class="cal-day-name">Seg</div>
-                  <div class="cal-day-name">Ter</div>
-                  <div class="cal-day-name">Qua</div>
-                  <div class="cal-day-name">Qui</div>
-                  <div class="cal-day-name">Sex</div>
-                  <div class="cal-day-name">Sáb</div>
-                  <div id="cal-cells" style="display:contents"></div>
+
+                <!-- Month view -->
+                <div id="cal-month-view">
+                  <div class="cal-grid">
+                    <div class="cal-day-name">Dom</div>
+                    <div class="cal-day-name">Seg</div>
+                    <div class="cal-day-name">Ter</div>
+                    <div class="cal-day-name">Qua</div>
+                    <div class="cal-day-name">Qui</div>
+                    <div class="cal-day-name">Sex</div>
+                    <div class="cal-day-name">Sáb</div>
+                    <div id="cal-cells" style="display:contents"></div>
+                  </div>
                 </div>
-                <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
-                  <span style="font-size:11px;color:var(--text-muted)">Legenda:</span>
-                  <span class="cal-chip type-event" style="position:static;font-size:10px">Compromisso</span>
-                  <span class="cal-chip type-meeting" style="position:static;font-size:10px">Reunião</span>
+
+                <!-- Week view -->
+                <div id="cal-week-view" style="display:none">
+                  <div id="cal-week-grid"></div>
                 </div>
+
+                <!-- Day view -->
+                <div id="cal-day-view" style="display:none">
+                  <div id="cal-day-content"></div>
+                </div>
+
+                <!-- Legend -->
+                <div class="cal-legend">
+                  <span class="cal-chip type-event" style="position:static;font-size:10px;display:inline">Compromisso</span>
+                  <span class="cal-chip type-meeting" style="position:static;font-size:10px;display:inline">Reunião</span>
+                  <span class="cal-holiday-legend">🇧🇷🇺🇸 <em>feriado</em></span>
+                </div>
+
               </div>
             </div>
           </div>
