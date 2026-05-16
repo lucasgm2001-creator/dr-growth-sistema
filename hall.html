@@ -1311,9 +1311,9 @@ function renderCalMonth() {
       const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
       return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
     }).join('');
-    const more=dayEvs.length>2?`<div class="cal-chip type-event">+${dayEvs.length-2}</div>`:'';
+    const extra=dayEvs.length>2?`<div class="cal-chip cal-chip-more" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+${dayEvs.length-2} mais</div>`:'';
     html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalAdd('${dateStr}')">
-      <div class="cal-cell-num">${d}</div>${_holHtml(dateStr)}${chips}${more}</div>`;
+      <div class="cal-cell-num">${d}<span class="cal-add-btn" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+</span></div>${_holHtml(dateStr)}${chips}${extra}</div>`;
   }
   const filled=firstDay+daysInMonth, remainder=(7-(filled%7))%7;
   for (let d=1;d<=remainder;d++)
