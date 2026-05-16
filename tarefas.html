@@ -376,6 +376,7 @@ async function saveTask() {
     const idx = allTasks.findIndex(t => t.id == id);
     if (idx >= 0) allTasks[idx] = { ...allTasks[idx], ...data };
     showToast('Tarefa atualizada!', 'success');
+    logActivity({ icon:'✏️', color:'#6366f1', msg:`Tarefa "${title}" atualizada`, sector:'tarefas' });
   } else {
     data.created_at = new Date().toISOString();
     const newId = Date.now();
@@ -384,6 +385,7 @@ async function saveTask() {
       if (ins) allTasks.unshift(ins);
     } else { allTasks.unshift({ ...data, id: newId }); }
     showToast('Tarefa criada!', 'success');
+    logActivity({ icon:'📋', color:'#6366f1', msg:`Nova tarefa criada — "${title}" (resp: ${data.responsible})`, sector:'tarefas' });
   }
 
   closeModal();
@@ -394,12 +396,14 @@ async function saveTask() {
 async function deleteTask() {
   const id = document.getElementById('task-id').value;
   if (!id || !confirm('Excluir esta tarefa?')) return;
+  const task = allTasks.find(t => t.id == id);
   if (window.drSupabase) await window.drSupabase.from('tasks').delete().eq('id', id);
   allTasks = allTasks.filter(t => t.id != id);
   closeModal();
   updateKPIs();
   filterTasks();
   showToast('Tarefa excluída.', 'info');
+  if (task) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Tarefa "${task.title}" excluída`, sector:'tarefas' });
 }
 
 document.getElementById('task-modal').addEventListener('click', e => { if (e.target === document.getElementById('task-modal')) closeModal(); });
