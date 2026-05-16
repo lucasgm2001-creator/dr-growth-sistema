@@ -2711,7 +2711,7 @@ body.hall-page { background: transparent; }
   display: block;
 }
 
-.cal-chip.type-event   { background: var(--accent-dim); color: var(--accent); border-left: 2px solid var(--accent); }
+.cal-chip.type-event   { background: var(--orange-dim); color: var(--orange); border-left: 2px solid var(--orange); }
 .cal-chip.type-meeting { background: var(--purple-dim); color: var(--purple); border-left: 2px solid var(--purple); }
 
 /* ---- Holidays ---- */
