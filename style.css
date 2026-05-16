@@ -17,7 +17,7 @@
   --border-light:  #333348;
 
   --accent:        #244c9c;
-  --accent-hover:  #3060c8;
+  --accent-hover:  #24448d;
   --accent-dim:    rgba(36,76,156,0.15);
   --accent-glow:   rgba(36,76,156,0.3);
 
@@ -27,8 +27,8 @@
   --yellow-dim:    rgba(234,179,8,0.12);
   --red:           #ef4444;
   --red-dim:       rgba(239,68,68,0.12);
-  --blue:          #3b82f6;
-  --blue-dim:      rgba(59,130,246,0.12);
+  --blue:          #244c94;
+  --blue-dim:      rgba(36,76,148,0.15);
   --purple:        #a855f7;
   --purple-dim:    rgba(168,85,247,0.12);
   --orange:        #f97316;
