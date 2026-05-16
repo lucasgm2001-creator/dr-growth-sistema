@@ -978,9 +978,11 @@ function saveLead() {
       phone:       (document.getElementById('lead-phone')       || {}).value?.trim() || '',
       value:       Number((document.getElementById('lead-value') || {}).value) || null,
       origin:      (document.getElementById('lead-origin')      || {}).value || '',
-      notes:       (document.getElementById('lead-notes')       || {}).value?.trim() || '',
-      responsible: (document.getElementById('lead-responsible') || {}).value || '',
-      country:     (document.getElementById('lead-country')     || {}).value || 'us',
+      notes:        (document.getElementById('lead-notes')       || {}).value?.trim() || '',
+      responsible:  (document.getElementById('lead-responsible') || {}).value || '',
+      country:      (document.getElementById('lead-country')     || {}).value || 'us',
+      followup_date:(document.getElementById('lead-followup')    || {}).value || '',
+      priority:     (document.getElementById('lead-priority')    || {}).value || '',
     };
 
     if (id) {
