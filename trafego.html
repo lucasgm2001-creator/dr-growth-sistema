@@ -12,7 +12,8 @@
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div class="sidebar-logo">DR</div>
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
   </div>
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
@@ -43,19 +44,16 @@
         <div class="sector-icon" style="background:rgba(168,85,247,0.15)">📊</div>
         <div>
           <div class="sector-name" style="color:#a855f7">Tráfego & Marketing</div>
-          <div class="text-muted">Andar 01 · Campanhas, Métricas & Conteúdo</div>
+          <div class="text-muted">1º Andar · Campanhas, Métricas & Conteúdo</div>
         </div>
       </div>
       <div class="sector-tabs" style="--tab-color:#a855f7">
         <button class="sector-tab active" onclick="switchTab('campanhas', this)">🚀 Campanhas</button>
-        <button class="sector-tab" onclick="switchTab('clientes', this)">👤 Por Cliente</button>
         <button class="sector-tab" onclick="switchTab('metricas', this)">📈 Métricas</button>
         <button class="sector-tab" onclick="switchTab('conteudo', this)">📅 Conteúdo</button>
+        <button class="sector-tab" onclick="switchTab('meta', this)">📣 Meta Ads</button>
       </div>
     </div>
-
-    <!-- Seletor de País -->
-    <div id="country-selector"></div>
 
     <!-- TAB: Campanhas -->
     <div class="tab-panel active" id="tab-campanhas">
@@ -86,112 +84,6 @@
 
       <!-- Grid de campanhas -->
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" id="campaigns-grid" class="animate-in"></div>
-    </div>
-
-    <!-- TAB: Por Cliente -->
-    <div class="tab-panel" id="tab-clientes">
-      <div class="animate-in mt-2">
-
-        <!-- Filtros -->
-        <div class="filter-bar mb-4">
-          <select class="filter-select" id="cliente-select" onchange="renderClienteView()">
-            <option value="">Selecione um cliente…</option>
-            <option>GrowthX Agency</option>
-            <option>MedTech Brasil</option>
-            <option>US Digital LLC</option>
-            <option>Academia Fit</option>
-            <option>Restaurante Sabor</option>
-          </select>
-          <select class="filter-select" id="cliente-periodo" onchange="renderClienteView()">
-            <option value="semana">Última semana</option>
-            <option value="mes" selected>Último mês</option>
-            <option value="trimestre">Último trimestre</option>
-            <option value="semestre">Último semestre</option>
-            <option value="personalizado">Personalizado</option>
-          </select>
-          <input type="date" id="periodo-inicio" style="display:none" class="filter-select" oninput="renderClienteView()">
-          <input type="date" id="periodo-fim"    style="display:none" class="filter-select" oninput="renderClienteView()">
-        </div>
-
-        <div id="cliente-view-empty" class="empty-state animate-in">
-          <div class="empty-icon">👤</div>
-          <h3>Selecione um cliente</h3>
-          <p>Escolha um cliente acima para ver os resultados consolidados.</p>
-        </div>
-
-        <div id="cliente-view-content" style="display:none">
-
-          <!-- Header cliente -->
-          <div class="card mb-4" style="padding:20px">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="avatar avatar-lg" id="cli-avatar" style="background:linear-gradient(135deg,#a855f7,#6366f1)"></div>
-              <div>
-                <div style="font-size:18px;font-weight:800" id="cli-nome">—</div>
-                <div style="font-size:13px;color:var(--text-muted)" id="cli-periodo-label">—</div>
-              </div>
-              <div style="margin-left:auto;text-align:right">
-                <div style="font-size:11px;color:var(--text-muted)">SALDO ORÇAMENTO</div>
-                <div style="font-size:22px;font-weight:800" id="cli-saldo">—</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- KPIs consolidados -->
-          <div class="kpi-grid mb-4">
-            <div class="kpi-card" style="border-color:rgba(234,67,53,0.3)">
-              <div class="kpi-top"><span class="kpi-label">Google Ads — Invest.</span><div class="kpi-icon" style="background:rgba(234,67,53,0.1)">🔍</div></div>
-              <div class="kpi-value" id="cli-g-invest" style="color:#ea4335">—</div>
-              <div class="kpi-change neutral" id="cli-g-leads">— leads</div>
-            </div>
-            <div class="kpi-card" style="border-color:rgba(24,119,242,0.3)">
-              <div class="kpi-top"><span class="kpi-label">Meta Ads — Invest.</span><div class="kpi-icon" style="background:rgba(24,119,242,0.1)">📘</div></div>
-              <div class="kpi-value" id="cli-m-invest" style="color:#1877f2">—</div>
-              <div class="kpi-change neutral" id="cli-m-leads">— leads</div>
-            </div>
-            <div class="kpi-card" style="border-color:rgba(168,85,247,0.3)">
-              <div class="kpi-top"><span class="kpi-label">Total de Leads</span><div class="kpi-icon" style="background:rgba(168,85,247,0.1)">🎯</div></div>
-              <div class="kpi-value" id="cli-total-leads" style="color:#a855f7">—</div>
-              <div class="kpi-change neutral" id="cli-cpl">CPL: —</div>
-            </div>
-            <div class="kpi-card" style="border-color:rgba(34,197,94,0.3)">
-              <div class="kpi-top"><span class="kpi-label">ROAS Médio</span><div class="kpi-icon" style="background:rgba(34,197,94,0.1)">📉</div></div>
-              <div class="kpi-value" id="cli-roas" style="color:var(--green)">—</div>
-              <div class="kpi-change neutral">retorno sobre ad spend</div>
-            </div>
-          </div>
-
-          <!-- Comparativo Google vs Meta -->
-          <div class="grid-2 mb-4">
-            <div class="card" style="border-color:rgba(234,67,53,0.25)">
-              <div class="card-header" style="background:rgba(234,67,53,0.05)">
-                <span class="card-title">🔍 Google Ads</span>
-              </div>
-              <div class="card-body" id="cli-google-detail"></div>
-            </div>
-            <div class="card" style="border-color:rgba(24,119,242,0.25)">
-              <div class="card-header" style="background:rgba(24,119,242,0.05)">
-                <span class="card-title">📘 Meta Ads</span>
-              </div>
-              <div class="card-body" id="cli-meta-detail"></div>
-            </div>
-          </div>
-
-          <!-- Campanhas do cliente -->
-          <div class="card">
-            <div class="card-header">
-              <span class="card-title">Campanhas Ativas</span>
-            </div>
-            <div class="table-container" style="border:none;border-radius:0">
-              <table>
-                <thead>
-                  <tr><th>Campanha</th><th>Plataforma</th><th>Investimento</th><th>Leads</th><th>CPL</th><th>ROAS</th><th>Status</th></tr>
-                </thead>
-                <tbody id="cli-campanhas-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- TAB: Métricas -->
@@ -255,91 +147,56 @@
       </div>
     </div>
 
+    <!-- TAB: Meta Ads -->
+    <div class="tab-panel" id="tab-meta">
+      <div class="meta-config-banner animate-in">
+        <div class="meta-logo">f</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Integração Meta Ads</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="meta-status-text">Exibindo dados de demonstração · Configure suas credenciais para dados reais</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="openMetaConfig()">⚙️ Configurar API</button>
+        <button class="btn btn-primary btn-sm" onclick="fetchMetaData()">↻ Atualizar</button>
+      </div>
+      <div class="metrics-kpi-row animate-in" id="meta-kpis"></div>
+      <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:13px;font-weight:700">Campanhas</div>
+        <select class="filter-select" id="meta-filter-status" onchange="renderMetaCampaigns()" style="min-width:140px">
+          <option value="">Todos os status</option>
+          <option value="ACTIVE">Ativas</option>
+          <option value="PAUSED">Pausadas</option>
+        </select>
+      </div>
+      <div class="meta-campaign-grid animate-in" id="meta-campaigns"></div>
+    </div>
+
   </main>
 </div>
 
-<!-- MODAL Detalhe Campanha -->
-<div class="modal-overlay" id="campaign-detail-modal">
-  <div class="modal" style="max-width:680px">
-    <div class="modal-header" id="detail-modal-header" style="border-bottom:2px solid var(--border)">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div id="detail-platform-icon" style="font-size:24px"></div>
-        <div>
-          <h3 id="detail-camp-name" style="margin:0;font-size:16px"></h3>
-          <div style="font-size:12px;color:var(--text-muted)" id="detail-camp-client"></div>
-        </div>
-        <span id="detail-camp-status" class="badge" style="margin-left:8px"></span>
-      </div>
-      <button class="modal-close" onclick="closeCampaignDetail()">✕</button>
+<!-- MODAL Meta Config -->
+<div class="modal-overlay" id="meta-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3>⚙️ Configurar Meta Ads API</h3>
+      <button class="modal-close" onclick="closeMetaModal()">✕</button>
     </div>
-    <div class="modal-body" style="padding:20px">
-
-      <!-- Budget bar -->
-      <div style="margin-bottom:20px">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-muted text-sm">Orçamento utilizado</span>
-          <span id="detail-budget-pct" style="font-size:12px;font-weight:700"></span>
-        </div>
-        <div class="progress-bar" style="height:8px">
-          <div id="detail-budget-bar" class="progress-fill" style="height:8px"></div>
-        </div>
-        <div class="flex items-center justify-between mt-1">
-          <span style="font-size:11px;color:var(--text-muted)" id="detail-budget-spent">—</span>
-          <span style="font-size:11px;color:var(--text-muted)" id="detail-budget-total">—</span>
-        </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-secondary);line-height:1.6">
+        Crie um app em <strong>developers.facebook.com</strong>, gere um Access Token com permissão <code style="background:var(--bg-active);padding:1px 5px;border-radius:3px">ads_read</code> e copie o ID da sua conta de anúncios (formato: <code style="background:var(--bg-active);padding:1px 5px;border-radius:3px">act_XXXXXXXXX</code>).
       </div>
-
-      <!-- Métricas -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-        <div class="fin-card" style="padding:14px;text-align:center">
-          <div class="fin-card-label">Leads</div>
-          <div id="detail-leads" style="font-size:24px;font-weight:800;color:var(--blue)">—</div>
-        </div>
-        <div class="fin-card" style="padding:14px;text-align:center">
-          <div class="fin-card-label">CPL</div>
-          <div id="detail-cpl" style="font-size:20px;font-weight:800;color:var(--green)">—</div>
-        </div>
-        <div class="fin-card" style="padding:14px;text-align:center">
-          <div class="fin-card-label">Cliques</div>
-          <div id="detail-clicks" style="font-size:20px;font-weight:800">—</div>
-        </div>
-        <div class="fin-card" style="padding:14px;text-align:center">
-          <div class="fin-card-label">ROAS</div>
-          <div id="detail-roas" style="font-size:20px;font-weight:800;color:var(--accent)">—</div>
-        </div>
+      <div class="form-group">
+        <label>Access Token</label>
+        <input type="password" class="form-control" id="meta-token" placeholder="EAABsbCS4abc..." autocomplete="off">
       </div>
-
-      <!-- Impressões + CTR -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-        <div class="fin-card" style="padding:14px">
-          <div class="fin-card-label">Impressões</div>
-          <div id="detail-impressions" style="font-size:18px;font-weight:800">—</div>
-        </div>
-        <div class="fin-card" style="padding:14px">
-          <div class="fin-card-label">CTR</div>
-          <div id="detail-ctr" style="font-size:18px;font-weight:800;color:var(--yellow)">—</div>
-        </div>
-      </div>
-
-      <!-- Objetivo + Notas -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px">
-        <div>
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">OBJETIVO</div>
-          <div id="detail-objective" style="font-size:13px;font-weight:600">—</div>
-        </div>
-        <div>
-          <div class="text-muted" style="font-size:11px;margin-bottom:4px">PLATAFORMA</div>
-          <div id="detail-platform-name" style="font-size:13px;font-weight:600">—</div>
-        </div>
-      </div>
-      <div id="detail-notes-wrap" style="display:none;margin-top:14px;padding:12px;background:var(--surface);border-radius:8px;font-size:13px;color:var(--text-secondary);border:1px solid var(--border)">
-        <span style="font-size:10px;font-weight:700;color:var(--text-muted);display:block;margin-bottom:4px">OBSERVAÇÕES</span>
-        <span id="detail-notes-text"></span>
+      <div class="form-group">
+        <label>Ad Account ID</label>
+        <input type="text" class="form-control" id="meta-account-id" placeholder="act_123456789">
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeCampaignDetail()">Fechar</button>
-      <button class="btn btn-primary" id="detail-edit-btn" onclick="openEditFromDetail()">✏️ Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="clearMetaCreds()" style="margin-right:auto">Desconectar</button>
+      <button class="btn btn-secondary" onclick="closeMetaModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMetaCreds()">Salvar e Conectar</button>
     </div>
   </div>
 </div>
@@ -448,13 +305,11 @@ if (!session) throw new Error('Not authenticated');
 
 // ---- Demo Data ----
 let campaigns = [
-  { id:1, name:'Google Ads — MedTech',      client:'MedTech Brasil',   platform:'google',   status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200,  clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.',         country:'br' },
-  { id:2, name:'Meta Ads — GrowthX',         client:'GrowthX Agency',  platform:'meta',     status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em conversão.',         country:'br' },
-  { id:3, name:'Google Ads — US Digital',    client:'US Digital LLC',  platform:'google',   status:'active', budget:4000, objective:'Conversão',         spend:3890, impressions:67000,  clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.',country:'us' },
-  { id:4, name:'Instagram — Academia Fit',   client:'Academia Fit',    platform:'meta',     status:'paused', budget:800,  objective:'Engajamento',        spend:620,  impressions:28000,  clicks:940,  leads:12, notes:'Pausado para revisão de criativos.',  country:'br' },
-  { id:5, name:'LinkedIn — US Digital',      client:'US Digital LLC',  platform:'linkedin', status:'active', budget:1500, objective:'Tráfego',            spend:1200, impressions:15000,  clicks:480,  leads:22, notes:'B2B, CPL alto mas qualificado.',      country:'us' },
-  { id:6, name:'Meta Ads — Miami Health',    client:'Miami Health Co.', platform:'meta',    status:'active', budget:2500, objective:'Geração de Leads',   spend:2100, impressions:89000,  clicks:2600, leads:45, notes:'Leads qualificados. ROAS 3.2x.',      country:'us' },
-  { id:7, name:'Google Ads — Restaurante',   client:'Restaurante Sabor',platform:'google',  status:'active', budget:600,  objective:'Tráfego Local',      spend:540,  impressions:18000,  clicks:720,  leads:8,  notes:'Foco em raio de 5km.',               country:'br' },
+  { id:1, name:'Google Ads — MedTech', client:'MedTech Brasil', platform:'google', status:'active', budget:2000, objective:'Geração de Leads', spend:1840, impressions:48200, clicks:1240, leads:38, notes:'CTR bom, CPL dentro da meta.' },
+  { id:2, name:'Meta Ads — GrowthX', client:'GrowthX Agency', platform:'meta', status:'active', budget:3500, objective:'Geração de Leads', spend:3320, impressions:124000, clicks:3800, leads:87, notes:'ROAS excelente em campanha de conversão.' },
+  { id:3, name:'Google Ads — US Digital', client:'US Digital LLC', platform:'google', status:'active', budget:4000, objective:'Conversão', spend:3890, impressions:67000, clicks:2100, leads:54, notes:'Campanhas em USD. CPA dentro da meta.' },
+  { id:4, name:'Instagram — Academia Fit', client:'Academia Fit', platform:'meta', status:'paused', budget:800, objective:'Engajamento', spend:620, impressions:28000, clicks:940, leads:12, notes:'Pausado para revisão de criativos.' },
+  { id:5, name:'LinkedIn — US Digital', client:'US Digital LLC', platform:'linkedin', status:'active', budget:1500, objective:'Tráfego', spend:1200, impressions:15000, clicks:480, leads:22, notes:'B2B, CPL alto mas qualificado.' },
 ];
 
 let contents = [
@@ -495,15 +350,10 @@ function switchTab(name, btn) {
   if (name === 'campanhas') { mb.textContent = '+ Campanha'; mb.onclick = openCampaignModal; mb.style.display = ''; }
   else if (name === 'conteudo') { mb.textContent = '+ Conteúdo'; mb.onclick = openContentModal; mb.style.display = ''; }
   else mb.style.display = 'none';
-  if (name === 'clientes') renderClienteView();
-}
-
-function getFilteredCampaigns() {
-  return window.filterByCountry ? window.filterByCountry(campaigns) : campaigns;
 }
 
 function updateKPIs() {
-  const active = getFilteredCampaigns().filter(c => c.status === 'active');
+  const active = campaigns.filter(c => c.status === 'active');
   const totalSpend = active.reduce((s,c) => s+(c.spend||0), 0);
   const totalLeads = active.reduce((s,c) => s+(c.leads||0), 0);
   const cpl = totalLeads > 0 ? totalSpend / totalLeads : 0;
@@ -516,13 +366,12 @@ function updateKPIs() {
 }
 
 function renderCampaigns() {
-  const grid     = document.getElementById('campaigns-grid');
-  const filtered = getFilteredCampaigns();
-  if (!filtered.length) {
+  const grid = document.getElementById('campaigns-grid');
+  if (!campaigns.length) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🚀</div><h3>Sem campanhas</h3><p>Adicione a primeira campanha.</p></div>`;
     return;
   }
-  grid.innerHTML = filtered.map(c => {
+  grid.innerHTML = campaigns.map(c => {
     const pi = PLATFORM_INFO[c.platform] || { name:c.platform, icon:'📊', color:'#6366f1' };
     const si = STATUS_CAMP[c.status] || { label:c.status, cls:'badge-muted' };
     const roas = c.spend > 0 ? ((c.leads * 500) / c.spend).toFixed(1) : '—'; // estimated
@@ -530,7 +379,7 @@ function renderCampaigns() {
     const pctBudget = c.budget > 0 ? Math.min(Math.round((c.spend/c.budget)*100), 100) : 0;
 
     return `
-      <div class="campaign-card" onclick="openCampaignDetail(${c.id})" style="cursor:pointer">
+      <div class="campaign-card" onclick="openEditCampaign(${c.id})">
         <div class="campaign-platform">
           <div class="platform-icon" style="background:${pi.color}18;font-size:20px">${pi.icon}</div>
           <div>
@@ -684,62 +533,6 @@ function renderContent(items) {
   }).join('');
 }
 
-// ---- Detalhe Campanha ----
-let _detailCampaignId = null;
-
-function openCampaignDetail(id) {
-  const c = campaigns.find(x => x.id === id);
-  if (!c) return;
-  _detailCampaignId = id;
-
-  const pi = PLATFORM_INFO[c.platform] || { icon:'📊', name:c.platform, color:'#6366f1' };
-  const si = STATUS_CAMP[c.status]     || { label:c.status, cls:'badge-muted' };
-  const cpl  = c.leads > 0  ? fmt.currency(c.spend / c.leads) : '—';
-  const roas = c.spend > 0  ? ((c.leads * 500) / c.spend).toFixed(1) + 'x' : '—';
-  const ctr  = c.impressions > 0 ? ((c.clicks / c.impressions) * 100).toFixed(2) + '%' : '—';
-  const pctB = c.budget > 0 ? Math.min(Math.round((c.spend / c.budget) * 100), 100) : 0;
-  const barColor = pctB >= 90 ? 'var(--red)' : pctB >= 70 ? 'var(--yellow)' : 'var(--accent)';
-
-  document.getElementById('detail-platform-icon').textContent = pi.icon;
-  document.getElementById('detail-camp-name').textContent     = c.name;
-  document.getElementById('detail-camp-client').textContent   = c.client + ' · ' + pi.name;
-  document.getElementById('detail-camp-status').textContent   = si.label;
-  document.getElementById('detail-camp-status').className     = 'badge ' + si.cls;
-
-  document.getElementById('detail-budget-pct').textContent    = pctB + '%';
-  document.getElementById('detail-budget-pct').style.color    = barColor;
-  document.getElementById('detail-budget-bar').style.width    = pctB + '%';
-  document.getElementById('detail-budget-bar').style.background = barColor;
-  document.getElementById('detail-budget-spent').textContent  = fmt.currency(c.spend) + ' gasto';
-  document.getElementById('detail-budget-total').textContent  = fmt.currency(c.budget) + ' orçamento';
-
-  document.getElementById('detail-leads').textContent       = c.leads || 0;
-  document.getElementById('detail-cpl').textContent         = cpl;
-  document.getElementById('detail-clicks').textContent      = (c.clicks || 0).toLocaleString('pt-BR');
-  document.getElementById('detail-roas').textContent        = roas;
-  document.getElementById('detail-impressions').textContent = c.impressions > 999 ? (c.impressions/1000).toFixed(1) + 'k' : (c.impressions || 0);
-  document.getElementById('detail-ctr').textContent         = ctr;
-  document.getElementById('detail-objective').textContent   = c.objective || '—';
-  document.getElementById('detail-platform-name').textContent = pi.name;
-
-  const notesWrap = document.getElementById('detail-notes-wrap');
-  if (c.notes) {
-    notesWrap.style.display = '';
-    document.getElementById('detail-notes-text').textContent = c.notes;
-  } else {
-    notesWrap.style.display = 'none';
-  }
-
-  document.getElementById('campaign-detail-modal').classList.add('show');
-}
-
-function closeCampaignDetail() { document.getElementById('campaign-detail-modal').classList.remove('show'); }
-
-function openEditFromDetail() {
-  closeCampaignDetail();
-  if (_detailCampaignId) openEditCampaign(_detailCampaignId);
-}
-
 // ---- Modais Campanha ----
 function openCampaignModal() {
   document.getElementById('camp-modal-title').textContent = 'Nova Campanha';
@@ -808,118 +601,187 @@ function saveContent() {
   showToast('Conteúdo adicionado!', 'success');
 }
 
-document.getElementById('campaign-detail-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-detail-modal')) closeCampaignDetail(); });
 document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
 document.getElementById('content-modal').addEventListener('click', e => { if (e.target===document.getElementById('content-modal')) closeContentModal(); });
+document.getElementById('meta-modal').addEventListener('click', e => { if (e.target===document.getElementById('meta-modal')) closeMetaModal(); });
 
-// ---- PERÍODO PERSONALIZADO ----
-document.getElementById('cliente-periodo').addEventListener('change', function() {
-  const custom = this.value === 'personalizado';
-  document.getElementById('periodo-inicio').style.display = custom ? '' : 'none';
-  document.getElementById('periodo-fim').style.display    = custom ? '' : 'none';
-});
+// ============================================================
+// META ADS
+// ============================================================
+const META_DEMO = [
+  { id:'1', name:'DR Growth — Lead Gen BR', status:'ACTIVE', objective:'LEAD_GENERATION', market:'🇧🇷',
+    insights:{ spend:'R$ 1.840', reach:'62.400', clicks:'1.240', impressions:'187.300', cpl:'R$ 22,50', cpm:'R$ 9,82', cpc:'R$ 1,48', leads:82 } },
+  { id:'2', name:'US Digital LLC — Conversão', status:'ACTIVE', objective:'CONVERSIONS', market:'🇺🇸',
+    insights:{ spend:'R$ 3.120', reach:'38.900', clicks:'980',  impressions:'124.500', cpl:'R$ 41,07', cpm:'R$ 25,06', cpc:'R$ 3,18', leads:76 } },
+  { id:'3', name:'MedTech Brasil — Awareness', status:'ACTIVE', objective:'BRAND_AWARENESS', market:'🇧🇷',
+    insights:{ spend:'R$ 890',   reach:'94.200', clicks:'620',  impressions:'210.000', cpl:'—',        cpm:'R$ 4,24', cpc:'R$ 1,44', leads:0  } },
+  { id:'4', name:'Academia Fit — Tráfego', status:'PAUSED', objective:'TRAFFIC', market:'🇧🇷',
+    insights:{ spend:'R$ 540',   reach:'18.700', clicks:'430',  impressions:'62.400',  cpl:'R$ 18,00', cpm:'R$ 8,65', cpc:'R$ 1,26', leads:30 } },
+  { id:'5', name:'GrowthX Agency — Retargeting', status:'ACTIVE', objective:'CONVERSIONS', market:'🇺🇸',
+    insights:{ spend:'R$ 2.200', reach:'12.400', clicks:'890',  impressions:'48.300',  cpl:'R$ 28,57', cpm:'R$ 45,55', cpc:'R$ 2,47', leads:77 } },
+  { id:'6', name:'E-commerce Plus — Catálogo', status:'PAUSED', objective:'CATALOG_SALES', market:'🇧🇷',
+    insights:{ spend:'R$ 720',   reach:'29.100', clicks:'1.040', impressions:'88.600', cpl:'—',        cpm:'R$ 8,12', cpc:'R$ 0,69', leads:0  } },
+];
 
-// ---- VISÃO POR CLIENTE ----
-function renderClienteView() {
-  const clienteNome = document.getElementById('cliente-select').value;
-  const periodo     = document.getElementById('cliente-periodo').value;
+const OBJ_LABELS = {
+  LEAD_GENERATION:'Captação de Leads', CONVERSIONS:'Conversões', BRAND_AWARENESS:'Reconhecimento',
+  TRAFFIC:'Tráfego', CATALOG_SALES:'Vendas de Catálogo', REACH:'Alcance',
+};
 
-  if (!clienteNome) {
-    document.getElementById('cliente-view-empty').style.display  = '';
-    document.getElementById('cliente-view-content').style.display = 'none';
+let metaData = [...META_DEMO];
+let metaLoading = false;
+
+function getMetaCreds() {
+  return { token: localStorage.getItem('drg_meta_token'), accountId: localStorage.getItem('drg_meta_account') };
+}
+
+function renderMetaKPIs() {
+  const active  = metaData.filter(c => c.status === 'ACTIVE');
+  const totalSpend = metaData.reduce((s,c) => {
+    const val = parseFloat((c.insights.spend||'0').replace(/[^0-9,.]/g,'').replace(',','.'));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+  const totalLeads  = metaData.reduce((s,c) => s + (c.insights.leads||0), 0);
+  const totalReach  = metaData.reduce((s,c) => {
+    const val = parseInt((c.insights.reach||'0').replace(/\D/g,''));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+  const totalClicks = metaData.reduce((s,c) => {
+    const val = parseInt((c.insights.clicks||'0').replace(/\D/g,''));
+    return s + (isNaN(val) ? 0 : val);
+  }, 0);
+
+  document.getElementById('meta-kpis').innerHTML = [
+    { label:'Campanhas Ativas',  value: active.length,                     color:'var(--green)',  sub:`de ${metaData.length} total` },
+    { label:'Investimento Total',value: 'R$ ' + totalSpend.toLocaleString('pt-BR',{minimumFractionDigits:0}), color:'var(--red)', sub:'período atual' },
+    { label:'Leads Gerados',     value: totalLeads,                        color:'var(--accent)', sub:'todas campanhas' },
+    { label:'Alcance Total',     value: totalReach >= 1000 ? (totalReach/1000).toFixed(1)+'K' : totalReach, color:'var(--blue)', sub:'pessoas únicas' },
+    { label:'Cliques Totais',    value: totalClicks.toLocaleString('pt-BR'),color:'var(--purple)',sub:'no período' },
+    { label:'CPL Médio',         value: totalLeads ? 'R$ '+(totalSpend/totalLeads).toFixed(2).replace('.',',') : '—', color:'var(--yellow)', sub:'custo por lead' },
+  ].map(k => `
+    <div class="metric-kpi">
+      <div class="metric-kpi-label">${k.label}</div>
+      <div class="metric-kpi-value" style="color:${k.color}">${k.value}</div>
+      <div class="metric-kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+function renderMetaCampaigns() {
+  const filter = document.getElementById('meta-filter-status')?.value || '';
+  const filtered = filter ? metaData.filter(c => c.status === filter) : metaData;
+
+  if (!filtered.length) {
+    document.getElementById('meta-campaigns').innerHTML = `<div class="empty-state"><div class="empty-icon">📣</div><h3>Nenhuma campanha</h3></div>`;
     return;
   }
 
-  document.getElementById('cliente-view-empty').style.display  = 'none';
-  document.getElementById('cliente-view-content').style.display = '';
-
-  const periodoLabels = { semana:'Última semana', mes:'Último mês', trimestre:'Último trimestre', semestre:'Último semestre', personalizado:'Período personalizado' };
-
-  document.getElementById('cli-avatar').textContent = fmt.initials(clienteNome);
-  document.getElementById('cli-nome').textContent = clienteNome;
-  document.getElementById('cli-periodo-label').textContent = periodoLabels[periodo] || periodo;
-
-  const campCliente = campaigns.filter(c => c.client === clienteNome);
-  const mult = { semana:0.25, mes:1, trimestre:3, semestre:6, personalizado:1 }[periodo] || 1;
-
-  const google = campCliente.filter(c => c.platform === 'google');
-  const meta   = campCliente.filter(c => c.platform === 'meta');
-
-  const sum  = (arr, k) => arr.reduce((s,c)=>(s+(c[k]||0))*mult/mult,0) * mult;
-  const gInvest = google.reduce((s,c)=>s+(c.spend||0),0) * mult;
-  const mInvest = meta.reduce((s,c)=>s+(c.spend||0),0) * mult;
-  const gLeads  = Math.round(google.reduce((s,c)=>s+(c.leads||0),0) * mult);
-  const mLeads  = Math.round(meta.reduce((s,c)=>s+(c.leads||0),0) * mult);
-  const totalLeads  = gLeads + mLeads;
-  const totalInvest = gInvest + mInvest;
-  const totalBudget = campCliente.reduce((s,c)=>s+(c.budget||0),0) * mult;
-  const saldo = totalBudget - totalInvest;
-  const cpl   = totalLeads > 0 ? totalInvest / totalLeads : 0;
-  const roas  = totalInvest > 0 ? ((totalLeads * 500) / totalInvest).toFixed(2) : '—';
-
-  document.getElementById('cli-g-invest').textContent  = fmt.currency(gInvest);
-  document.getElementById('cli-g-leads').textContent   = `${gLeads} leads`;
-  document.getElementById('cli-m-invest').textContent  = fmt.currency(mInvest);
-  document.getElementById('cli-m-leads').textContent   = `${mLeads} leads`;
-  document.getElementById('cli-total-leads').textContent = totalLeads;
-  document.getElementById('cli-cpl').textContent       = `CPL: ${cpl > 0 ? fmt.currency(cpl) : '—'}`;
-  document.getElementById('cli-roas').textContent      = typeof roas === 'number' ? roas + 'x' : roas;
-  document.getElementById('cli-saldo').textContent     = fmt.currency(saldo);
-  document.getElementById('cli-saldo').style.color     = saldo >= 0 ? 'var(--green)' : 'var(--red)';
-
-  const detailHTML = (arr, color) => {
-    if (!arr.length) return `<div class="text-muted text-sm">Nenhuma campanha ativa.</div>`;
-    const invest = arr.reduce((s,c)=>s+(c.spend||0),0)*mult;
-    const leads  = Math.round(arr.reduce((s,c)=>s+(c.leads||0),0)*mult);
-    const clicks = Math.round(arr.reduce((s,c)=>s+(c.clicks||0),0)*mult);
-    const impr   = Math.round(arr.reduce((s,c)=>s+(c.impressions||0),0)*mult);
-    const cplL   = leads > 0 ? invest/leads : 0;
-    return [
-      ['Investimento', fmt.currency(invest), color],
-      ['Leads Gerados', leads, 'var(--blue)'],
-      ['Cliques', clicks.toLocaleString('pt-BR'), 'inherit'],
-      ['Impressões', impr > 999 ? (impr/1000).toFixed(1)+'k' : impr, 'inherit'],
-      ['CPL', cplL > 0 ? fmt.currency(cplL) : '—', 'var(--green)'],
-    ].map(([k,v,c])=>`
-      <div class="flex items-center justify-between" style="padding:8px 0;border-bottom:1px solid var(--border)">
-        <span style="font-size:12px;color:var(--text-secondary)">${k}</span>
-        <span style="font-weight:700;color:${c}">${v}</span>
-      </div>`).join('');
-  };
-
-  document.getElementById('cli-google-detail').innerHTML = detailHTML(google, '#ea4335');
-  document.getElementById('cli-meta-detail').innerHTML   = detailHTML(meta, '#1877f2');
-
-  const rows = campCliente.map(c => {
-    const pi = PLATFORM_INFO[c.platform]||{icon:'📊',name:c.platform};
-    const si = STATUS_CAMP[c.status]||{label:c.status,cls:'badge-muted'};
-    const spend  = (c.spend||0)*mult;
-    const leads  = Math.round((c.leads||0)*mult);
-    const cplC   = leads > 0 ? fmt.currency(spend/leads) : '—';
-    const roasC  = spend > 0 ? ((leads*500)/spend).toFixed(1)+'x' : '—';
-    return `<tr>
-      <td><div class="td-main">${c.name}</div></td>
-      <td>${pi.icon} ${pi.name}</td>
-      <td style="color:var(--red);font-weight:700">${fmt.currency(spend)}</td>
-      <td style="color:var(--blue);font-weight:700">${leads}</td>
-      <td style="color:var(--green);font-weight:700">${cplC}</td>
-      <td style="color:var(--accent);font-weight:700">${roasC}</td>
-      <td><span class="badge ${si.cls}">${si.label}</span></td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🚀</div><h3>Sem campanhas para este cliente</h3></div></td></tr>`;
-  document.getElementById('cli-campanhas-tbody').innerHTML = rows;
+  document.getElementById('meta-campaigns').innerHTML = filtered.map(c => {
+    const isActive = c.status === 'ACTIVE';
+    const ins = c.insights;
+    return `
+    <div class="meta-card">
+      <div class="meta-card-top">
+        <div>
+          <div class="meta-card-name">${c.market} ${c.name}</div>
+          <div class="meta-card-obj">${OBJ_LABELS[c.objective] || c.objective}</div>
+        </div>
+        <span class="badge ${isActive ? 'badge-green' : 'badge-muted'}">${isActive ? 'Ativa' : 'Pausada'}</span>
+      </div>
+      <div class="meta-metrics">
+        <div><div class="meta-metric-label">Investimento</div><div class="meta-metric-value" style="color:var(--red)">${ins.spend}</div></div>
+        <div><div class="meta-metric-label">Leads</div><div class="meta-metric-value" style="color:var(--accent)">${ins.leads || '—'}</div></div>
+        <div><div class="meta-metric-label">Alcance</div><div class="meta-metric-value">${ins.reach}</div></div>
+        <div><div class="meta-metric-label">Cliques</div><div class="meta-metric-value">${ins.clicks}</div></div>
+        <div><div class="meta-metric-label">CPL</div><div class="meta-metric-value" style="color:var(--yellow)">${ins.cpl}</div></div>
+        <div><div class="meta-metric-label">CPM</div><div class="meta-metric-value">${ins.cpm}</div></div>
+        <div><div class="meta-metric-label">CPC</div><div class="meta-metric-value">${ins.cpc}</div></div>
+        <div><div class="meta-metric-label">Impressões</div><div class="meta-metric-value">${ins.impressions}</div></div>
+      </div>
+    </div>`;
+  }).join('');
 }
+
+async function fetchMetaData() {
+  const { token, accountId } = getMetaCreds();
+  if (!token || !accountId) {
+    showToast('Configure as credenciais da API primeiro.', 'error');
+    openMetaConfig();
+    return;
+  }
+  document.getElementById('meta-status-text').textContent = 'Buscando dados reais…';
+  try {
+    const fields = 'name,status,objective,insights{spend,reach,clicks,impressions,cost_per_result,cpm,cpc,actions}';
+    const url = `https://graph.facebook.com/v18.0/${accountId}/campaigns?fields=${encodeURIComponent(fields)}&access_token=${token}`;
+    const res  = await fetch(url);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error.message);
+    metaData = json.data.map(c => ({
+      id: c.id, name: c.name, status: c.status, objective: c.objective, market: '',
+      insights: {
+        spend:       'R$ ' + parseFloat(c.insights?.data?.[0]?.spend||0).toLocaleString('pt-BR',{minimumFractionDigits:2}),
+        reach:       parseInt(c.insights?.data?.[0]?.reach||0).toLocaleString('pt-BR'),
+        clicks:      parseInt(c.insights?.data?.[0]?.clicks||0).toLocaleString('pt-BR'),
+        impressions: parseInt(c.insights?.data?.[0]?.impressions||0).toLocaleString('pt-BR'),
+        cpl:         c.insights?.data?.[0]?.cost_per_result ? 'R$ '+parseFloat(c.insights.data[0].cost_per_result).toFixed(2).replace('.',',') : '—',
+        cpm:         'R$ '+parseFloat(c.insights?.data?.[0]?.cpm||0).toFixed(2).replace('.',','),
+        cpc:         'R$ '+parseFloat(c.insights?.data?.[0]?.cpc||0).toFixed(2).replace('.',','),
+        leads:       c.insights?.data?.[0]?.actions?.find(a=>a.action_type==='lead')?.value || 0,
+      }
+    }));
+    document.getElementById('meta-status-text').textContent = `✓ Dados reais · ${accountId} · atualizado agora`;
+    showToast('Meta Ads atualizado!', 'success');
+  } catch(err) {
+    document.getElementById('meta-status-text').textContent = 'Erro na API — exibindo dados demo';
+    showToast('Erro: ' + err.message, 'error');
+    metaData = [...META_DEMO];
+  }
+  renderMetaKPIs();
+  renderMetaCampaigns();
+}
+
+function openMetaConfig() {
+  const { token, accountId } = getMetaCreds();
+  document.getElementById('meta-token').value      = token || '';
+  document.getElementById('meta-account-id').value = accountId || '';
+  document.getElementById('meta-modal').classList.add('show');
+}
+
+function closeMetaModal() { document.getElementById('meta-modal').classList.remove('show'); }
+
+function saveMetaCreds() {
+  const token     = document.getElementById('meta-token').value.trim();
+  const accountId = document.getElementById('meta-account-id').value.trim();
+  if (!token || !accountId) { showToast('Preencha token e account ID.', 'error'); return; }
+  localStorage.setItem('drg_meta_token',   token);
+  localStorage.setItem('drg_meta_account', accountId);
+  closeMetaModal();
+  showToast('Credenciais salvas! Clique em Atualizar.', 'success');
+  document.getElementById('meta-status-text').textContent = `Conectado · ${accountId} · clique em Atualizar para carregar`;
+}
+
+function clearMetaCreds() {
+  localStorage.removeItem('drg_meta_token');
+  localStorage.removeItem('drg_meta_account');
+  metaData = [...META_DEMO];
+  document.getElementById('meta-status-text').textContent = 'Exibindo dados de demonstração · Configure suas credenciais para dados reais';
+  closeMetaModal();
+  renderMetaKPIs();
+  renderMetaCampaigns();
+  showToast('Credenciais removidas.', 'info');
+}
+
+// Patch switchTab to init Meta when opened
+const _origSwitch = switchTab;
+switchTab = function(name, btn) {
+  _origSwitch(name, btn);
+  if (name === 'meta') { renderMetaKPIs(); renderMetaCampaigns(); }
+};
 
 // Init
 updateKPIs();
 renderCampaigns();
 renderMetrics();
 renderContent(contents);
-initCountrySelector('trafego', () => {
-  updateKPIs();
-  renderCampaigns();
-  renderMetrics();
-});
 </script>
 </body>
 </html>
