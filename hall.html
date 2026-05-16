@@ -1156,160 +1156,327 @@ const CAL_TZS = [
   { id:'America/Los_Angeles', flag:'🇺🇸', name:'Los Angeles / CA',code:'PT · UTC-7/-8' },
 ];
 
-let calDate     = new Date();
-let calSelTz    = 'America/Sao_Paulo';
-let calMeeting  = false;
-let calEditId   = null;
+let calDate    = new Date();
+let calView    = 'month';
+let calSelTz   = 'America/Sao_Paulo';
+let calMeeting = false;
+let calEditId  = null;
 
-function getCalEvents()       { try { return JSON.parse(localStorage.getItem('drg_cal') || '[]'); } catch { return []; } }
-function saveCalEvents(evs)   { localStorage.setItem('drg_cal', JSON.stringify(evs)); }
+function getCalEvents()     { try { return JSON.parse(localStorage.getItem('drg_cal') || '[]'); } catch { return []; } }
+function saveCalEvents(evs) { localStorage.setItem('drg_cal', JSON.stringify(evs)); }
 
-// Convert wall-clock time in a timezone to UTC ISO string
+// ---- Holiday helpers ----
+function _fmtDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function _addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+
+function _getEaster(year) {
+  const a=year%19, b=Math.floor(year/100), c=year%100, d=Math.floor(b/4), e=b%4;
+  const f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const l=(32+2*e+2*i-h-k)%7, mm=Math.floor((a+11*h+22*l)/451);
+  const mo=Math.floor((h+l-7*mm+114)/31), dy=((h+l-7*mm+114)%31)+1;
+  return new Date(year, mo-1, dy);
+}
+
+function _nthWeekday(year, month, weekday, nth) {
+  let count=0;
+  for (let d=1;d<=31;d++) {
+    const dt=new Date(year,month-1,d);
+    if (dt.getMonth()!==month-1) break;
+    if (dt.getDay()===weekday && ++count===nth) return _fmtDate(dt);
+  }
+  return null;
+}
+
+function _lastWeekday(year, month, weekday) {
+  for (let d=new Date(year,month,0).getDate(); d>=1; d--) {
+    const dt=new Date(year,month-1,d);
+    if (dt.getDay()===weekday) return _fmtDate(dt);
+  }
+  return null;
+}
+
+const _holCache = {};
+function _getHolidays(year) {
+  if (_holCache[year]) return _holCache[year];
+  const h = [];
+  [['01-01','Ano Novo'],['04-21','Tiradentes'],['05-01','Dia do Trabalho'],
+   ['09-07','Independência'],['10-12','N. Sra. Aparecida'],['11-02','Finados'],
+   ['11-15','República'],['12-25','Natal']
+  ].forEach(([md,n]) => h.push({date:`${year}-${md}`,name:n,flag:'🇧🇷'}));
+  const easter = _getEaster(year);
+  h.push({date:_fmtDate(_addDays(easter,-48)),name:'Carnaval',flag:'🇧🇷'});
+  h.push({date:_fmtDate(_addDays(easter,-47)),name:'Carnaval',flag:'🇧🇷'});
+  h.push({date:_fmtDate(_addDays(easter,-2)),name:'Sexta-feira Santa',flag:'🇧🇷'});
+  h.push({date:_fmtDate(easter),name:'Páscoa',flag:'🇧🇷'});
+  h.push({date:_fmtDate(_addDays(easter,60)),name:'Corpus Christi',flag:'🇧🇷'});
+  [['01-01',"New Year's Day"],['07-04','Independence Day'],
+   ['11-11','Veterans Day'],['12-25','Christmas Day']
+  ].forEach(([md,n]) => h.push({date:`${year}-${md}`,name:n,flag:'🇺🇸'}));
+  h.push({date:_nthWeekday(year,1,1,3),  name:'MLK Day',         flag:'🇺🇸'});
+  h.push({date:_nthWeekday(year,2,1,3),  name:"Presidents' Day", flag:'🇺🇸'});
+  h.push({date:_lastWeekday(year,5,1),   name:'Memorial Day',    flag:'🇺🇸'});
+  h.push({date:_nthWeekday(year,9,1,1),  name:'Labor Day',       flag:'🇺🇸'});
+  h.push({date:_nthWeekday(year,10,1,2), name:'Columbus Day',    flag:'🇺🇸'});
+  h.push({date:_nthWeekday(year,11,4,4), name:'Thanksgiving',    flag:'🇺🇸'});
+  return (_holCache[year] = h.filter(x=>x.date));
+}
+
+function _holidaysOn(dateStr) {
+  return _getHolidays(parseInt(dateStr.split('-')[0], 10)).filter(h=>h.date===dateStr);
+}
+
+function _holHtml(dateStr) {
+  return _holidaysOn(dateStr).map(h=>`<div class="cal-holiday">${h.flag} <em>${h.name}</em></div>`).join('');
+}
+
+// ---- View controls ----
+function setCalView(v) {
+  calView = v;
+  document.querySelectorAll('.cal-vbtn').forEach(b=>b.classList.toggle('active', b.id===`cal-vbtn-${v}`));
+  renderCalendar();
+}
+
+function calPrev() {
+  if (calView==='month')     calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1,1);
+  else if (calView==='week') calDate=_addDays(calDate,-7);
+  else                       calDate=_addDays(calDate,-1);
+  renderCalendar();
+}
+
+function calNext() {
+  if (calView==='month')     calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1,1);
+  else if (calView==='week') calDate=_addDays(calDate,7);
+  else                       calDate=_addDays(calDate,1);
+  renderCalendar();
+}
+
+function calToday()    { calDate=new Date(); renderCalendar(); }
+function calPrevMonth(){ calPrev(); }
+function calNextMonth(){ calNext(); }
+
+// ---- UTC helpers ----
 function wallToUTC(dateStr, timeStr, tz) {
   if (!dateStr || !timeStr) return null;
-  const [y, mo, d] = dateStr.split('-').map(Number);
-  const [h, m]     = timeStr.split(':').map(Number);
-  let guess = new Date(Date.UTC(y, mo - 1, d, h, m));
-  for (let i = 0; i < 3; i++) {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit',
-      hour:'2-digit', minute:'2-digit', hour12: false
+  const [y,mo,d]=dateStr.split('-').map(Number);
+  const [h,m]=timeStr.split(':').map(Number);
+  let guess=new Date(Date.UTC(y,mo-1,d,h,m));
+  for (let i=0;i<3;i++) {
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',hour12:false
     }).format(guess).split(', ');
-    const [fh, fm] = parts[1].split(':').map(Number);
-    guess = new Date(guess.getTime() + ((h - (fh === 24 ? 0 : fh)) * 60 + (m - fm)) * 60000);
+    const [fh,fm]=parts[1].split(':').map(Number);
+    guess=new Date(guess.getTime()+((h-(fh===24?0:fh))*60+(m-fm))*60000);
   }
   return guess.toISOString();
 }
 
-// Format UTC ISO string in a given timezone → "HH:MM"
 function utcToTzTime(utcStr, tz) {
   if (!utcStr) return '';
-  return new Intl.DateTimeFormat('pt-BR', { timeZone: tz, hour:'2-digit', minute:'2-digit', hour12: false }).format(new Date(utcStr));
+  return new Intl.DateTimeFormat('pt-BR',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(utcStr));
 }
 
+// ---- Render dispatcher ----
 function renderCalendar() {
-  const events = getCalEvents();
-  const y = calDate.getFullYear();
-  const m = calDate.getMonth();
-  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  document.getElementById('cal-month-label').textContent = `${MONTHS[m]} ${y}`;
-
-  const firstDay    = new Date(y, m, 1).getDay();
-  const daysInMonth = new Date(y, m + 1, 0).getDate();
-  const daysInPrev  = new Date(y, m, 0).getDate();
-  const today       = new Date();
-
-  let html = '';
-
-  // Prev-month filler
-  for (let i = firstDay - 1; i >= 0; i--)
-    html += `<div class="cal-cell other-month"><div class="cal-cell-num">${daysInPrev - i}</div></div>`;
-
-  // Current month
-  for (let d = 1; d <= daysInMonth; d++) {
-    const isToday  = today.getFullYear() === y && today.getMonth() === m && today.getDate() === d;
-    const dateStr  = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dayEvs   = events.filter(e => e.date === dateStr);
-    const chips    = dayEvs.slice(0, 3).map(ev => {
-      const label = ev.utc ? utcToTzTime(ev.utc, 'America/Sao_Paulo') : (ev.time || '');
-      return `<div class="cal-chip ${ev.isMeeting ? 'type-meeting' : 'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label ? label + ' ' : ''}${ev.title}</div>`;
-    }).join('');
-    const more = dayEvs.length > 3 ? `<div class="cal-chip type-event">+${dayEvs.length - 3} mais</div>` : '';
-    html += `<div class="cal-cell${isToday ? ' today' : ''}" onclick="openCalAdd('${dateStr}')">
-      <div class="cal-cell-num">${d}</div>${chips}${more}</div>`;
-  }
-
-  // Next-month filler
-  const filled = firstDay + daysInMonth;
-  const remainder = (7 - (filled % 7)) % 7;
-  for (let d = 1; d <= remainder; d++)
-    html += `<div class="cal-cell other-month"><div class="cal-cell-num">${d}</div></div>`;
-
-  document.getElementById('cal-cells').innerHTML = html;
+  if (calView==='month')     renderCalMonth();
+  else if (calView==='week') renderCalWeek();
+  else                       renderCalDay();
 }
 
-function calPrevMonth() { calDate = new Date(calDate.getFullYear(), calDate.getMonth() - 1, 1); renderCalendar(); }
-function calNextMonth() { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1); renderCalendar(); }
+// ---- Month view ----
+function renderCalMonth() {
+  const events=getCalEvents();
+  const y=calDate.getFullYear(), m=calDate.getMonth();
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-period-label').textContent=`${MONTHS[m]} ${y}`;
+  const firstDay=new Date(y,m,1).getDay(), daysInMonth=new Date(y,m+1,0).getDate(), daysInPrev=new Date(y,m,0).getDate();
+  const today=new Date();
+  let html='';
+  for (let i=firstDay-1;i>=0;i--)
+    html+=`<div class="cal-cell other-month"><div class="cal-cell-num">${daysInPrev-i}</div></div>`;
+  for (let d=1;d<=daysInMonth;d++) {
+    const isToday=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayEvs=events.filter(e=>e.date===dateStr);
+    const chips=dayEvs.slice(0,2).map(ev=>{
+      const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
+      return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+    }).join('');
+    const more=dayEvs.length>2?`<div class="cal-chip type-event">+${dayEvs.length-2}</div>`:'';
+    html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalAdd('${dateStr}')">
+      <div class="cal-cell-num">${d}</div>${_holHtml(dateStr)}${chips}${more}</div>`;
+  }
+  const filled=firstDay+daysInMonth, remainder=(7-(filled%7))%7;
+  for (let d=1;d<=remainder;d++)
+    html+=`<div class="cal-cell other-month"><div class="cal-cell-num">${d}</div></div>`;
+  document.getElementById('cal-cells').innerHTML=html;
+  document.getElementById('cal-month-view').style.display='';
+  document.getElementById('cal-week-view').style.display='none';
+  document.getElementById('cal-day-view').style.display='none';
+}
+
+// ---- Week view ----
+function renderCalWeek() {
+  const events=getCalEvents();
+  const today=new Date(), todayStr=_fmtDate(today);
+  const weekStart=_addDays(calDate,-calDate.getDay());
+  const weekEnd=_addDays(weekStart,6);
+  const MO=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const DN=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  document.getElementById('cal-period-label').textContent=
+    `${weekStart.getDate()} ${MO[weekStart.getMonth()]} – ${weekEnd.getDate()} ${MO[weekEnd.getMonth()]} ${weekEnd.getFullYear()}`;
+  let html='<div class="cal-week-grid">';
+  for (let i=0;i<7;i++) {
+    const day=_addDays(weekStart,i), dateStr=_fmtDate(day);
+    const isToday=dateStr===todayStr, isWknd=i===0||i===6;
+    const dayEvs=events.filter(e=>e.date===dateStr);
+    html+=`<div class="cal-week-col${isToday?' today':''}${isWknd?' weekend':''}" onclick="openCalAdd('${dateStr}')">
+      <div class="cal-week-head">
+        <div class="cal-week-dayname">${DN[i]}</div>
+        <div class="cal-week-daynum${isToday?' today':''}">${day.getDate()}</div>
+      </div>
+      <div class="cal-week-events">${_holHtml(dateStr)}`;
+    dayEvs.forEach(ev=>{
+      const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
+      html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+    });
+    html+=`</div></div>`;
+  }
+  html+='</div>';
+  document.getElementById('cal-week-grid').innerHTML=html;
+  document.getElementById('cal-month-view').style.display='none';
+  document.getElementById('cal-week-view').style.display='';
+  document.getElementById('cal-day-view').style.display='none';
+}
+
+// ---- Day view ----
+function renderCalDay() {
+  const events=getCalEvents();
+  const today=new Date(), todayStr=_fmtDate(today);
+  const dateStr=_fmtDate(calDate), isToday=dateStr===todayStr;
+  const MONTHS=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DAYS=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  document.getElementById('cal-period-label').textContent=
+    `${DAYS[calDate.getDay()]}, ${calDate.getDate()} de ${MONTHS[calDate.getMonth()]}`;
+  const dayEvs=events.filter(e=>e.date===dateStr).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  const dayHols=_holidaysOn(dateStr);
+  const allDay=dayEvs.filter(e=>!e.time), timed=dayEvs.filter(e=>e.time);
+  let html='<div class="cal-day-container">';
+  if (dayHols.length||allDay.length) {
+    html+=`<div class="cal-day-allday"><div class="cal-day-allday-label">Dia inteiro</div><div class="cal-day-allday-items">`;
+    dayHols.forEach(h=>{ html+=`<div class="cal-holiday" style="margin-bottom:3px">${h.flag} <em>${h.name}</em></div>`; });
+    allDay.forEach(ev=>{ html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="openCalView('${ev.id}')" style="margin-bottom:3px;display:inline-block">${ev.title}</div>`; });
+    html+='</div></div>';
+  }
+  html+='<div class="cal-day-slots">';
+  for (let hr=0;hr<=23;hr++) {
+    const timeStr=`${String(hr).padStart(2,'0')}:00`;
+    const slotEvs=timed.filter(e=>parseInt(e.time.split(':')[0],10)===hr);
+    const isNow=isToday&&today.getHours()===hr;
+    html+=`<div class="cal-day-slot${isNow?' now':''}" onclick="openCalAddWithTime('${dateStr}','${timeStr}')">
+      <div class="cal-day-slot-time">${timeStr}</div>
+      <div class="cal-day-slot-events">`;
+    slotEvs.forEach(ev=>{ html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${ev.time} ${ev.title}</div>`; });
+    html+='</div></div>';
+  }
+  html+='</div></div>';
+  document.getElementById('cal-day-content').innerHTML=html;
+  document.getElementById('cal-month-view').style.display='none';
+  document.getElementById('cal-week-view').style.display='none';
+  document.getElementById('cal-day-view').style.display='';
+  if (isToday) {
+    const nowSlot=document.querySelector('.cal-day-slot.now');
+    if (nowSlot) setTimeout(()=>nowSlot.scrollIntoView({behavior:'smooth',block:'center'}),100);
+  }
+}
 
 function openCalAdd(dateStr) {
-  calEditId = null; calMeeting = false; calSelTz = 'America/Sao_Paulo';
-  document.getElementById('cal-modal-title').textContent = 'Novo Compromisso';
-  document.getElementById('cal-event-title').value = '';
-  document.getElementById('cal-event-date').value  = dateStr;
-  document.getElementById('cal-event-time').value  = '';
-  document.getElementById('cal-event-notes').value = '';
-  document.getElementById('cal-delete-btn').style.display = 'none';
+  calEditId=null; calMeeting=false; calSelTz='America/Sao_Paulo';
+  document.getElementById('cal-modal-title').textContent='Novo Compromisso';
+  document.getElementById('cal-event-title').value='';
+  document.getElementById('cal-event-date').value=dateStr;
+  document.getElementById('cal-event-time').value='';
+  document.getElementById('cal-event-notes').value='';
+  document.getElementById('cal-delete-btn').style.display='none';
   refreshTzBtns(); refreshMeetingTog(); updateTimeConversion();
   document.getElementById('cal-modal').classList.add('show');
+}
+
+function openCalAddWithTime(dateStr, time) {
+  openCalAdd(dateStr);
+  document.getElementById('cal-event-time').value=time;
+  updateTimeConversion();
 }
 
 function openCalView(id) {
-  const ev = getCalEvents().find(e => e.id === id);
+  const ev=getCalEvents().find(e=>e.id===id);
   if (!ev) return;
-  calEditId = id; calMeeting = ev.isMeeting || false; calSelTz = ev.timezone || 'America/Sao_Paulo';
-  document.getElementById('cal-modal-title').textContent = 'Editar Compromisso';
-  document.getElementById('cal-event-title').value = ev.title;
-  document.getElementById('cal-event-date').value  = ev.date;
-  document.getElementById('cal-event-time').value  = ev.time || '';
-  document.getElementById('cal-event-notes').value = ev.notes || '';
-  document.getElementById('cal-delete-btn').style.display = 'inline-flex';
+  calEditId=id; calMeeting=ev.isMeeting||false; calSelTz=ev.timezone||'America/Sao_Paulo';
+  document.getElementById('cal-modal-title').textContent='Editar Compromisso';
+  document.getElementById('cal-event-title').value=ev.title;
+  document.getElementById('cal-event-date').value=ev.date;
+  document.getElementById('cal-event-time').value=ev.time||'';
+  document.getElementById('cal-event-notes').value=ev.notes||'';
+  document.getElementById('cal-delete-btn').style.display='inline-flex';
   refreshTzBtns(); refreshMeetingTog(); updateTimeConversion();
   document.getElementById('cal-modal').classList.add('show');
 }
 
-function selectTz(tz) { calSelTz = tz; refreshTzBtns(); updateTimeConversion(); }
-
-function refreshTzBtns() {
-  document.querySelectorAll('.tz-btn').forEach(b => b.classList.toggle('active', b.dataset.tz === calSelTz));
-}
-
-function toggleMeeting() { calMeeting = !calMeeting; refreshMeetingTog(); }
-function refreshMeetingTog() { document.getElementById('meeting-tog').classList.toggle('on', calMeeting); }
+function selectTz(tz) { calSelTz=tz; refreshTzBtns(); updateTimeConversion(); }
+function refreshTzBtns() { document.querySelectorAll('.tz-btn').forEach(b=>b.classList.toggle('active',b.dataset.tz===calSelTz)); }
+function toggleMeeting() { calMeeting=!calMeeting; refreshMeetingTog(); }
+function refreshMeetingTog() { document.getElementById('meeting-tog').classList.toggle('on',calMeeting); }
 
 function updateTimeConversion() {
-  const time = document.getElementById('cal-event-time').value;
-  const date = document.getElementById('cal-event-date').value;
-  const box  = document.getElementById('time-convert-box');
-  if (!time || !date || calSelTz === 'America/Sao_Paulo') { box.classList.remove('show'); return; }
+  const time=document.getElementById('cal-event-time').value;
+  const date=document.getElementById('cal-event-date').value;
+  const box=document.getElementById('time-convert-box');
+  if (!time||!date||calSelTz==='America/Sao_Paulo') { box.classList.remove('show'); return; }
   try {
-    const utc    = wallToUTC(date, time, calSelTz);
-    const brTime = utcToTzTime(utc, 'America/Sao_Paulo');
-    const tzInfo = CAL_TZS.find(t => t.id === calSelTz);
+    const utc=wallToUTC(date,time,calSelTz);
+    const brTime=utcToTzTime(utc,'America/Sao_Paulo');
+    const tzInfo=CAL_TZS.find(t=>t.id===calSelTz);
     box.classList.add('show');
-    box.innerHTML = `${tzInfo?.flag || ''} ${time} (${tzInfo?.code || calSelTz}) &nbsp;=&nbsp; 🇧🇷 <strong>${brTime}</strong> no Brasil`;
+    box.innerHTML=`${tzInfo?.flag||''} ${time} (${tzInfo?.code||calSelTz}) &nbsp;=&nbsp; 🇧🇷 <strong>${brTime}</strong> no Brasil`;
   } catch { box.classList.remove('show'); }
 }
 
 function saveCalEvent() {
-  const title = document.getElementById('cal-event-title').value.trim();
-  const date  = document.getElementById('cal-event-date').value;
-  const time  = document.getElementById('cal-event-time').value;
-  const notes = document.getElementById('cal-event-notes').value.trim();
-  if (!title || !date) { showToast('Título e data são obrigatórios.', 'error'); return; }
-  const utc    = time ? wallToUTC(date, time, calSelTz) : null;
-  const events = getCalEvents();
+  const title=document.getElementById('cal-event-title').value.trim();
+  const date=document.getElementById('cal-event-date').value;
+  const time=document.getElementById('cal-event-time').value;
+  const notes=document.getElementById('cal-event-notes').value.trim();
+  if (!title||!date) { showToast('Título e data são obrigatórios.','error'); return; }
+  const utc=time?wallToUTC(date,time,calSelTz):null;
+  const events=getCalEvents();
   if (calEditId) {
-    const idx = events.findIndex(e => e.id === calEditId);
-    if (idx >= 0) events[idx] = { ...events[idx], title, date, time, notes, timezone: calSelTz, isMeeting: calMeeting, utc };
+    const idx=events.findIndex(e=>e.id===calEditId);
+    if (idx>=0) events[idx]={...events[idx],title,date,time,notes,timezone:calSelTz,isMeeting:calMeeting,utc};
   } else {
-    events.push({ id: String(Date.now()), title, date, time, notes, timezone: calSelTz, isMeeting: calMeeting, utc, createdBy: session?.name?.split(' ')[0] || '' });
+    events.push({id:String(Date.now()),title,date,time,notes,timezone:calSelTz,isMeeting:calMeeting,utc,createdBy:session?.name?.split(' ')[0]||''});
   }
   saveCalEvents(events);
   closeCalModal();
   renderCalendar();
-  showToast(calEditId ? 'Compromisso atualizado!' : 'Compromisso adicionado!', 'success');
+  showToast(calEditId?'Compromisso atualizado!':'Compromisso adicionado!','success');
 }
 
 function deleteCalEvent() {
-  if (!calEditId || !confirm('Remover este compromisso?')) return;
-  saveCalEvents(getCalEvents().filter(e => e.id !== calEditId));
+  if (!calEditId||!confirm('Remover este compromisso?')) return;
+  saveCalEvents(getCalEvents().filter(e=>e.id!==calEditId));
   closeCalModal(); renderCalendar();
-  showToast('Compromisso removido.', 'info');
+  showToast('Compromisso removido.','info');
 }
 
 function closeCalModal() { document.getElementById('cal-modal').classList.remove('show'); }
 
-document.getElementById('cal-modal').addEventListener('click', e => { if (e.target === document.getElementById('cal-modal')) closeCalModal(); });
+document.getElementById('cal-modal').addEventListener('click', e => { if (e.target===document.getElementById('cal-modal')) closeCalModal(); });
+
+// Render calendar on script load (ensures it populates on page load)
+renderCalendar();
 </script>
 </body>
 </html>
