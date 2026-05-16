@@ -772,7 +772,14 @@ async function deleteLead() {
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
-loadLeads();
+loadLeads().then(() => {
+  initCountrySelector('comercial', () => {
+    renderKanban();
+    filterLeads();
+    renderPipeline();
+    renderMetrics();
+  });
+});
 </script>
 </body>
 </html>
