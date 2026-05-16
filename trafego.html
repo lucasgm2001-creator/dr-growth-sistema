@@ -450,7 +450,7 @@ function renderPorCliente() {
 }
 
 function updateKPIs() {
-  const active = campaigns.filter(c => c.status === 'active');
+  const active = (window.filterByCountry || (x=>x))(campaigns).filter(c => c.status === 'active');
   const totalSpend = active.reduce((s,c) => s+(c.spend||0), 0);
   const totalLeads = active.reduce((s,c) => s+(c.leads||0), 0);
   const cpl = totalLeads > 0 ? totalSpend / totalLeads : 0;
