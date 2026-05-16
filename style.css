@@ -3480,7 +3480,14 @@ body.hall-page { background: transparent; }
 .hall-quad .cal-legend { border-top-color: #e5e5ea; }
 .hall-quad .cal-holiday-legend { color: #6e6e73; }
 .hall-quad .cal-toolbar { background: #f7f7fa; border-bottom: 1px solid #e5e5ea; padding: 6px 8px; }
-.hall-quad .cal-wrap { padding: 6px 8px 8px; }
+.hall-quad .cal-wrap {
+  padding: 6px 8px 8px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 .hall-quad .cal-week-col { background: #fff; border-color: #e5e5ea; }
 .hall-quad .cal-week-col.today { background: var(--accent-dim); }
 .hall-quad .cal-week-col.weekend { background: #f7f7fa; }
