@@ -1637,7 +1637,9 @@ tbody td {
 
 /* Área de conteúdo principal do hall */
 .hall-body {
-  background: linear-gradient(160deg, #f0f0f5 0%, #f5f5f7 50%, #fafafa 100%);
+  background: rgba(8, 6, 18, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   border-radius: 16px 16px 0 0;
   padding: 16px;
   flex: 1;
