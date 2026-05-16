@@ -308,10 +308,7 @@ function updateDates() {
     `${now.getDate()} de ${monthNames[now.getMonth()]} de ${now.getFullYear()}`;
   document.getElementById('greeting-weekday').textContent = dayNames[now.getDay()];
 
-  const brTime = now.toLocaleTimeString('pt-BR', { timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit' });
-  const usTime = now.toLocaleTimeString('en-US', { timeZone:'America/New_York', hour:'2-digit', minute:'2-digit', hour12:true });
-  document.getElementById('clock-hero-br').textContent = brTime;
-  document.getElementById('clock-hero-us').textContent = usTime;
+  // horário agora só no topbar (removido do card de saudação)
 }
 
 setGreeting();
