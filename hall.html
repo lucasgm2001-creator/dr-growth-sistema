@@ -82,7 +82,7 @@
     <div class="hall-body">
       <div class="hall-grid">
 
-        <!-- Coluna esquerda: Feed + Calendário -->
+        <!-- Coluna esquerda: Feed -->
         <div class="hall-left-col">
 
           <!-- Feed -->
@@ -102,15 +102,20 @@
             </div>
           </div>
 
-          <!-- Calendário (abaixo do feed) -->
-          <div class="hall-accordion animate-in open" id="acc-cal" style="animation-delay:0.18s">
+        </div><!-- /hall-left-col -->
+
+        <!-- Coluna direita: Calendário + Mural + Time -->
+        <div class="hall-right-col">
+
+          <!-- Calendário -->
+          <div class="hall-accordion animate-in open" id="acc-cal" style="animation-delay:0.13s">
             <div class="hall-acc-header" onclick="toggleAcc('acc-cal')">
               <span style="font-size:15px;flex-shrink:0">📅</span>
               <span class="hall-acc-title">Calendário</span>
               <span class="hall-acc-chevron">›</span>
             </div>
-            <div class="hall-acc-body">
-              <div class="cal-wrap animate-in">
+            <div class="hall-acc-body" style="padding:12px">
+              <div class="cal-wrap">
 
                 <!-- Toolbar: view switcher + navigation -->
                 <div class="cal-toolbar">
@@ -129,14 +134,14 @@
 
                 <!-- Month view -->
                 <div id="cal-month-view">
-                  <div class="cal-grid">
-                    <div class="cal-day-name">Dom</div>
-                    <div class="cal-day-name">Seg</div>
-                    <div class="cal-day-name">Ter</div>
-                    <div class="cal-day-name">Qua</div>
-                    <div class="cal-day-name">Qui</div>
-                    <div class="cal-day-name">Sex</div>
-                    <div class="cal-day-name">Sáb</div>
+                  <div class="cal-grid cal-grid-compact">
+                    <div class="cal-day-name">D</div>
+                    <div class="cal-day-name">S</div>
+                    <div class="cal-day-name">T</div>
+                    <div class="cal-day-name">Q</div>
+                    <div class="cal-day-name">Q</div>
+                    <div class="cal-day-name">S</div>
+                    <div class="cal-day-name">S</div>
                     <div id="cal-cells" style="display:contents"></div>
                   </div>
                 </div>
@@ -153,19 +158,14 @@
 
                 <!-- Legend -->
                 <div class="cal-legend">
-                  <span class="cal-chip type-event" style="position:static;font-size:10px;display:inline">Compromisso</span>
-                  <span class="cal-chip type-meeting" style="position:static;font-size:10px;display:inline">Reunião</span>
+                  <span class="cal-chip type-event" style="position:static;font-size:9px;display:inline">Compromisso</span>
+                  <span class="cal-chip type-meeting" style="position:static;font-size:9px;display:inline">Reunião</span>
                   <span class="cal-holiday-legend">🇧🇷🇺🇸 <em>feriado</em></span>
                 </div>
 
               </div>
             </div>
           </div>
-
-        </div><!-- /hall-left-col -->
-
-        <!-- Coluna direita: Mural + Time -->
-        <div>
 
           <!-- Mural de Avisos -->
           <div class="hall-accordion animate-in open" id="acc-mural" style="animation-delay:0.15s">
@@ -199,7 +199,7 @@
             </div>
           </div>
 
-        </div>
+        </div><!-- /hall-right-col -->
       </div>
     </div><!-- /hall-body -->
 
