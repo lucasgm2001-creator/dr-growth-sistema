@@ -823,20 +823,23 @@ function initSky() {
   const moonEmoji = getMoonEmoji();
 
   if (h >= 6 && h < 12) {
-    // Bom dia — céu azul + sol nascendo
+    // Bom dia — aurora suave, horizonte quente, azul DR Growth no topo
     const pct      = (h - 6) / 6;
     const leftPct  = (4 + pct * 50).toFixed(1);
     const topPct   = (42 - Math.sin(Math.PI * pct * 0.7) * 26).toFixed(1);
-    sky.style.background = 'linear-gradient(to bottom, #1e3a8a 0%, #2563eb 45%, #93c5fd 100%)';
+    // Cedo: cobre/dourado no horizonte; mais tarde: azul profundo no topo
+    const horizonColor = pct < 0.4 ? '#c47a3a' : '#6a8fbf';
+    const midColor     = pct < 0.4 ? '#7a9fc0' : '#5a7db5';
+    sky.style.background = `linear-gradient(to bottom, #234080 0%, ${midColor} 50%, ${horizonColor} 100%)`;
     sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
     moon.style.cssText = 'display:none';
 
   } else if (h >= 12 && h < 18) {
-    // Boa tarde — céu azul intenso + sol descendo
+    // Boa tarde — azul DR Growth profundo, sem brilho artificial
     const pct      = (h - 12) / 6;
     const leftPct  = (54 + pct * 36).toFixed(1);
     const topPct   = (16 + Math.sin(Math.PI * pct * 0.7) * 22).toFixed(1);
-    sky.style.background = 'linear-gradient(to bottom, #1e40af 0%, #3b82f6 50%, #bfdbfe 100%)';
+    sky.style.background = 'linear-gradient(to bottom, #234080 0%, #24448d 45%, #4a6fa8 100%)';
     sun.style.cssText = `display:block;left:${leftPct}%;top:${topPct}%`;
     moon.style.cssText = 'display:none';
 
