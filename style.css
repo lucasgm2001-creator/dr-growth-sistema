@@ -2706,7 +2706,31 @@ body.hall-page { background: transparent; }
   color: var(--text-secondary);
   line-height: 1;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+
+.cal-add-btn {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  opacity: 0;
+  line-height: 1;
+  transition: opacity 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.cal-cell:hover .cal-add-btn { opacity: 1; color: var(--orange); }
+
+.cal-chip.cal-chip-more {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  border-left: 2px solid var(--border-light);
+  font-style: italic;
+}
+
+.cal-chip.cal-chip-more:hover { color: var(--orange); border-left-color: var(--orange); }
 
 /* ---- Event chips ---- */
 .cal-chip {
