@@ -704,8 +704,8 @@ function showPulso() {
   const content = buildPulsoContent(session.role);
 
   // Saudação
-  const h       = new Date().getHours();
-  const period  = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  const h       = getSPHour();
+  const period  = h >= 6 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : h >= 18 ? 'Boa noite' : 'Boa madrugada';
   const firstName = session.name.split(' ')[0];
   const now     = new Date();
   const days    = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
