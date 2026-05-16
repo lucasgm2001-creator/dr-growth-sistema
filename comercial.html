@@ -949,7 +949,7 @@ async function saveLead() {
   const nicho = nichoSel === 'outros' ? nichoCustom : nichoSel;
   const stage = document.getElementById('lead-stage').value;
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
-  if (!nicho) { showToast(nichoSel === 'outros' ? 'Descreva o nicho em "Outros".' : 'Selecione o nicho do lead.', 'error'); return; }
+  if (nichoSel === 'outros' && !nicho) { showToast('Descreva o nicho em "Outros".', 'error'); return; }
   const data = { name, nicho, region: document.getElementById('lead-region').value.trim(), company: document.getElementById('lead-company').value.trim(), email: document.getElementById('lead-email').value.trim(), phone: document.getElementById('lead-phone').value.trim(), value: Number(document.getElementById('lead-value').value)||null, origin: document.getElementById('lead-origin').value, notes: document.getElementById('lead-notes').value.trim(), stage, responsible: document.getElementById('lead-responsible').value, country: document.getElementById('lead-country').value };
   if (id) {
     try {
