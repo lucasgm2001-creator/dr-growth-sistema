@@ -448,7 +448,7 @@ img { display: block; max-width: 100%; }
   transition: background var(--transition);
 }
 
-.user-profile:hover { background: var(--bg-hover); }
+.user-profile:hover { background: rgba(255,255,255,0.10); }
 
 .user-avatar {
   width: 32px;
