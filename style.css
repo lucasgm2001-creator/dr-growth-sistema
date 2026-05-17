@@ -1681,19 +1681,19 @@ tbody td {
   letter-spacing: -0.5px;
   line-height: 1.2;
   margin-bottom: 6px;
-  color: var(--text-primary);
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   padding: 7px 20px 8px;
   border-radius: 14px;
-  border: 1px solid rgba(36,76,156,0.18);
-  background: rgba(255,255,255,0.90);
-  box-shadow: 0 2px 12px rgba(36,76,156,0.08);
+  border: 1px solid rgba(30,58,111,0.30);
+  background: #1e3a6f;
+  box-shadow: 0 2px 12px rgba(30,58,111,0.22);
 }
 
 .greeting-text h1 span {
-  color: var(--text-primary);
-  -webkit-text-fill-color: var(--text-primary);
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
 }
 
 .greeting-text p {
