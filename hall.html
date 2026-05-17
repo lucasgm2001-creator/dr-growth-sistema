@@ -1378,15 +1378,16 @@ function renderCalWeek() {
     const day=_addDays(weekStart,i), dateStr=_fmtDate(day);
     const isToday=dateStr===todayStr, isWknd=i===0||i===6;
     const dayEvs=events.filter(e=>e.date===dateStr);
-    html+=`<div class="cal-week-col${isToday?' today':''}${isWknd?' weekend':''}" onclick="openCalAdd('${dateStr}')">
+    html+=`<div class="cal-week-col${isToday?' today':''}${isWknd?' weekend':''}" onclick="openCalDayPanel('${dateStr}')">
       <div class="cal-week-head">
         <div class="cal-week-dayname">${DN[i]}</div>
         <div class="cal-week-daynum${isToday?' today':''}">${day.getDate()}</div>
       </div>
-      <div class="cal-week-events">${_holHtml(dateStr)}`;
+      <div class="cal-week-events">${_holCellHtml(dateStr)}`;
     dayEvs.forEach(ev=>{
       const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
-      html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+      const shortTitle=ev.title.length>12?ev.title.slice(0,11)+'…':ev.title;
+      html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">${label?label+' ':''}${shortTitle}</div>`;
     });
     html+=`</div></div>`;
   }
