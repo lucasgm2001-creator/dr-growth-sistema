@@ -1517,9 +1517,99 @@ function deleteCalEvent() {
   showToast('Compromisso removido.','info');
 }
 
-function closeCalModal() { document.getElementById('cal-modal').classList.remove('show'); }
+function closeCalModal() {
+  document.getElementById('cal-modal').classList.remove('show');
+  // Re-render day panel if open
+  if (calDayPanelDate) renderDayPanel(calDayPanelDate);
+}
 
 document.getElementById('cal-modal').addEventListener('click', e => { if (e.target===document.getElementById('cal-modal')) closeCalModal(); });
+
+// ---- Day Detail Panel (iOS-style) ----
+let calDayPanelDate = null;
+
+const _DAYS_FULL  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const _MONTHS_FULL= ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function openCalDayPanel(dateStr) {
+  calDayPanelDate = dateStr;
+  renderDayPanel(dateStr);
+  document.getElementById('cal-day-panel').classList.add('open');
+}
+
+function hideCalDayPanel() {
+  document.getElementById('cal-day-panel').classList.remove('open');
+  calDayPanelDate = null;
+}
+
+function renderDayPanel(dateStr) {
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, mo-1, d);
+  document.getElementById('cal-dp-dayname').textContent = _DAYS_FULL[dt.getDay()];
+  document.getElementById('cal-dp-datestr').textContent = `${d} de ${_MONTHS_FULL[mo-1]} de ${y}`;
+  document.getElementById('cal-dp-add-btn').onclick = () => openCalAdd(dateStr);
+
+  const holidays = _holidaysOn(dateStr);
+  const events   = getCalEvents().filter(e=>e.date===dateStr).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  const list     = document.getElementById('cal-dp-list');
+
+  let html = '';
+
+  holidays.forEach(h => {
+    html += `<div class="cal-dp-holiday"><span class="cal-dp-holiday-flag">${h.flag}</span><span class="cal-dp-holiday-name">${h.name}</span></div>`;
+  });
+
+  if (!events.length) {
+    if (!holidays.length) {
+      html += `<div class="cal-dp-empty"><div class="cal-dp-empty-icon">📅</div>Nenhum compromisso.<div class="cal-dp-empty-hint">Toque em + para adicionar.</div></div>`;
+    }
+  } else {
+    events.forEach(ev => {
+      const timeStr  = ev.utc ? utcToTzTime(ev.utc,'America/Sao_Paulo') : (ev.time||'');
+      const typeClass= ev.isMeeting ? 'meeting' : 'event';
+      const typeLabel= ev.isMeeting ? '📹 Reunião' : '📌 Compromisso';
+      const tzInfo   = ev.timezone ? CAL_TZS.find(t=>t.id===ev.timezone) : null;
+      const tzStr    = tzInfo ? `${tzInfo.flag} ${tzInfo.name} (${tzInfo.code})` : '';
+      const metaItems= [];
+      if (timeStr && ev.timezone && ev.timezone !== 'America/Sao_Paulo') metaItems.push(tzStr);
+      if (ev.createdBy) metaItems.push(`Criado por ${ev.createdBy}`);
+      const notesHtml = ev.notes ? `<div class="cal-dp-event-notes">${ev.notes}</div>` : '<div class="cal-dp-event-notes" style="color:var(--text-muted);font-style:italic">Sem observações.</div>';
+      const metaHtml  = metaItems.length ? `<div class="cal-dp-event-meta">${metaItems.map(m=>`<span>${m}</span>`).join('')}</div>` : '';
+
+      html += `<div class="cal-dp-event" id="cal-dp-ev-${ev.id}" onclick="toggleDayPanelEvent('${ev.id}')">
+        <div class="cal-dp-event-time">${timeStr||'Sem horário definido'}</div>
+        <div class="cal-dp-event-title">${ev.title}</div>
+        <span class="cal-dp-event-badge ${typeClass}">${typeLabel}</span>
+        <div class="cal-dp-event-detail">
+          ${notesHtml}
+          ${metaHtml}
+          <div class="cal-dp-event-actions">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openCalView('${ev.id}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteDayPanelEvent('${ev.id}')">Excluir</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  list.innerHTML = html;
+}
+
+function toggleDayPanelEvent(id) {
+  const el = document.getElementById(`cal-dp-ev-${id}`);
+  if (!el) return;
+  // Collapse others
+  document.querySelectorAll('.cal-dp-event.expanded').forEach(e => { if (e !== el) e.classList.remove('expanded'); });
+  el.classList.toggle('expanded');
+}
+
+function deleteDayPanelEvent(id) {
+  if (!confirm('Remover este compromisso?')) return;
+  saveCalEvents(getCalEvents().filter(e=>e.id!==id));
+  renderCalendar();
+  if (calDayPanelDate) renderDayPanel(calDayPanelDate);
+  showToast('Compromisso removido.','info');
+}
 
 // Render calendar on script load (ensures it populates on page load)
 renderCalendar();
