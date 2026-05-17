@@ -1645,18 +1645,19 @@ tbody td {
 }
 
 .hall-greeting-inner {
-  background: rgba(8, 8, 16, 0.55);
+  background: rgba(255,255,255,0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 6px;
-  border: 1px solid rgba(36, 76, 156, 0.25);
+  border: 1px solid rgba(0,102,204,0.12);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 
 /* Área de conteúdo principal do hall */
 .hall-body {
-  background: rgba(6, 6, 12, 0.60);
+  background: rgba(245,245,247,0.80);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-radius: 16px 16px 0 0;
