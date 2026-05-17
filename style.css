@@ -2981,7 +2981,7 @@ body.hall-page { background: transparent; }
 }
 .cal-week-col:hover { border-color: var(--accent); }
 .cal-week-col.today { border-color: var(--accent); background: var(--accent-dim); }
-.cal-week-col.weekend { background: rgba(255,255,255,0.012); }
+.cal-week-col.weekend { background: #f7f7fa; }
 
 .cal-week-head {
   display: flex;
