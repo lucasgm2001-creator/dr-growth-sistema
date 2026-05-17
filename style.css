@@ -3700,3 +3700,102 @@ body.hall-page { background: transparent; }
   }
   .team-pill-panel { right: auto; left: 0; min-width: 200px; }
 }
+
+
+/* ============================================
+   RESPONSIVO — MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* Topbar */
+  .topbar {
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .topbar-actions .clock-row { display: none; }
+  .topbar-title h1 { font-size: 14px; }
+  .topbar-title p  { font-size: 11px; }
+
+  /* Greeting */
+  .hall-greeting { padding: 20px 0 16px; }
+  .hall-greeting-inner {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .greeting-text h1 { font-size: 22px; }
+  .greeting-date { text-align: left; }
+  .greeting-date .clock-row { justify-content: flex-start; }
+
+  /* Page content */
+  .page-content { padding: 14px; }
+
+  /* Sector tabs */
+  .sector-tabs { gap: 0; }
+  .sector-tab { padding: 10px 14px; font-size: 12px; }
+
+  /* KPIs */
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Kanban */
+  .kanban-board { flex-direction: column; }
+  .kanban-col   { min-width: unset; width: 100%; max-height: none; }
+
+  /* Grids genéricos */
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+  /* Hall */
+  .hall-acc-body { padding: 10px; }
+  .hall-grid { grid-template-columns: 1fr; }
+
+  /* Calendário */
+  .cal-cell { min-height: 52px; padding: 4px; }
+  .cal-cell-num { font-size: 11px; }
+  .cal-chip { font-size: 8px; padding: 1px 3px; }
+  .cal-day-name { font-size: 10px; }
+  .cal-nav { gap: 8px; }
+  .cal-month-label { font-size: 13px; }
+
+  /* Métricas */
+  .metrics-kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .metric-kpi .mk-val { font-size: 18px; }
+
+  /* Meta Ads */
+  .meta-kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .meta-kpi .mkv { font-size: 16px; }
+  .meta-campaign-grid { grid-template-columns: 1fr; }
+  .meta-stats { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .meta-stat .msv { font-size: 11px; }
+  .meta-config-banner { flex-wrap: wrap; gap: 8px; }
+
+  /* Pulso diário */
+  .pulso-modal { padding: 22px 18px; }
+  .pulso-modal h2 { font-size: 17px; }
+
+  /* Cards */
+  .card-header { padding: 14px 16px 12px; }
+
+  /* Modal */
+  .modal { width: 95vw; padding: 0; }
+  .modal-body { padding: 16px; }
+  .modal-footer { padding: 12px 16px; }
+  .modal-header { padding: 14px 16px; }
+
+  /* Login */
+  .login-card { padding: 28px 20px; }
+}
+
+@media (max-width: 480px) {
+
+  .kpi-grid { grid-template-columns: 1fr; }
+  .greeting-text h1 { font-size: 19px; }
+  .metrics-kpi-row { grid-template-columns: 1fr; }
+  .meta-kpi-row    { grid-template-columns: 1fr 1fr; }
+  .meta-stats      { grid-template-columns: repeat(2, 1fr); }
+  .cal-cell { min-height: 42px; }
+  .cal-chip { display: none; }
+  .cal-cell.today .cal-chip { display: block; }
+  .topbar-title h1 { font-size: 13px; }
+  .tz-btn { padding: 6px 10px; font-size: 11px; }
+  .sector-tab { padding: 8px 12px; font-size: 11px; }
+}
