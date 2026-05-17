@@ -3820,7 +3820,6 @@ body.hall-page { background: transparent; }
 
   /* ---- Sidebar ---- */
   .sidebar { transition: transform 0.25s ease; }
-  .sidebar-overlay { display: block; }
 
   /* ---- Sector header margin fix ---- */
   .sector-header {
