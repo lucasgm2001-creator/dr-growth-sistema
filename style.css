@@ -3737,9 +3737,11 @@ body.hall-page { background: transparent; }
   padding: 6px 8px 8px;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .hall-quad .cal-week-col { background: var(--bg-tertiary); border-color: var(--border); }
 .hall-quad .cal-week-col.today { background: var(--accent-dim); }
