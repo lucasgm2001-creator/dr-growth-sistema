@@ -1484,7 +1484,7 @@ tbody td {
 .elevator-label {
   font-size: 9px;
   font-weight: 800;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.40);
   text-transform: uppercase;
   letter-spacing: 2px;
   padding: 14px 16px 8px;
