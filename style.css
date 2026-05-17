@@ -2693,12 +2693,13 @@ body.hall-page { background: transparent; }
 }
 
 .cal-cell {
-  min-height: 82px;
+  height: 78px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 6px;
   cursor: pointer;
+  overflow: hidden;
   transition: border-color var(--transition), background var(--transition);
 }
 
