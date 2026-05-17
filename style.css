@@ -77,8 +77,8 @@ img { display: block; max-width: 100%; }
 /* ---- Scrollbar ---- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar-thumb { background: #b0bde0; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
 
 /* ============================================
    LOGIN PAGE
