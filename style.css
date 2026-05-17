@@ -1385,12 +1385,13 @@ tbody td {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.5px;
+  color: #ffffff;
 }
 
 .clock-divider {
   width: 1px;
   height: 28px;
-  background: var(--border);
+  background: rgba(255,255,255,0.18);
 }
 
 /* ============================================
