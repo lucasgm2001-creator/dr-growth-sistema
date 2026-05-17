@@ -1,4 +1,4 @@
-const CACHE = 'drg-v5';
+const CACHE = 'drg-v6';
 
 self.addEventListener('install', () => self.skipWaiting());
 
