@@ -671,7 +671,7 @@ img { display: block; max-width: 100%; }
 .badge-yellow { background: var(--yellow-dim); color: var(--yellow); border-color: rgba(234,179,8,0.2); }
 .badge-red    { background: var(--red-dim);    color: var(--red);    border-color: rgba(239,68,68,0.2); }
 .badge-blue   { background: var(--blue-dim);   color: var(--blue);   border-color: rgba(59,130,246,0.2); }
-.badge-accent { background: var(--accent-dim); color: var(--accent); border-color: rgba(99,102,241,0.2); }
+.badge-accent { background: var(--accent-dim); color: var(--accent); border-color: rgba(0,102,204,0.2); }
 .badge-purple { background: var(--purple-dim); color: var(--purple); border-color: rgba(168,85,247,0.2); }
 .badge-orange { background: var(--orange-dim); color: var(--orange); border-color: rgba(249,115,22,0.2); }
 .badge-muted  { background: var(--bg-hover); color: var(--text-muted); border-color: var(--border); }
