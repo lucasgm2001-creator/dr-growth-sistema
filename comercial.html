@@ -969,7 +969,7 @@ function buildCard(lead) {
       <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
         <div class="avatar avatar-sm avatar-${fmt.avatarClass(lead.responsible)}">${fmt.initials(lead.responsible)}</div>
         <span style="font-size:11px;color:var(--text-muted)">${lead.responsible}</span>
-        ${lead.origin ? `<span class="badge badge-muted" style="margin-left:auto;font-size:10px">${lead.origin}</span>` : ''}
+        ${lead.origin ? `<span class="badge ${lead.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}" style="margin-left:auto;font-size:10px">${lead.origin === 'Magnetic Funnels' ? '🧲 ' : ''}${lead.origin}</span>` : ''}
       </div>
       <div class="lead-card-meta">
         <div class="lead-card-dates">
