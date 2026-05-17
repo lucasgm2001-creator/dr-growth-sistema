@@ -1371,7 +1371,7 @@ tbody td {
 .clock-item .clock-tz {
   font-size: 10px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.50);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
