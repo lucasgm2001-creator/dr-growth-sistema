@@ -327,15 +327,15 @@ function getMoonEmoji() {
 // ---- Saudação dinâmica ----
 function setGreeting() {
   const h = getSPHour();
-  let period, emoji;
-  if      (h >= 6  && h < 12) { period = 'Bom dia';       emoji = '☀️'; }
-  else if (h >= 12 && h < 18) { period = 'Boa tarde';      emoji = '🌤️'; }
-  else if (h >= 18)            { period = 'Boa noite';      emoji = getMoonEmoji(); }
-  else                          { period = 'Boa madrugada'; emoji = getMoonEmoji(); }
+  let period;
+  if      (h >= 6  && h < 12) { period = 'Bom dia'; }
+  else if (h >= 12 && h < 18) { period = 'Boa tarde'; }
+  else if (h >= 18)            { period = 'Boa noite'; }
+  else                          { period = 'Boa madrugada'; }
 
   const firstName = session.name.split(' ')[0];
   document.getElementById('greeting-msg').innerHTML =
-    `${period},&nbsp;<span>${firstName}</span>&nbsp;${emoji}`;
+    `${period},&nbsp;<span>${firstName}</span>!`;
 
   const subs = {
     admin:     'Você tem acesso total ao sistema. Bom trabalho!',
