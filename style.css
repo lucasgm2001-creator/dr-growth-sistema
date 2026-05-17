@@ -1877,7 +1877,7 @@ tbody td {
 
 .aviso-item {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .aviso-item:last-child { border-bottom: none; }
