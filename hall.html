@@ -146,6 +146,19 @@
                 <span class="cal-chip type-meeting" style="position:static;font-size:9px;display:inline">Reunião</span>
                 <span class="cal-holiday-legend">🇧🇷🇺🇸 <em>feriado</em></span>
               </div>
+
+              <!-- Day detail panel (iOS-style) -->
+              <div id="cal-day-panel" class="cal-day-panel">
+                <div class="cal-dp-header">
+                  <button class="cal-dp-back" onclick="hideCalDayPanel()">‹</button>
+                  <div class="cal-dp-title-wrap">
+                    <div class="cal-dp-dayname" id="cal-dp-dayname">—</div>
+                    <div class="cal-dp-datestr" id="cal-dp-datestr">—</div>
+                  </div>
+                  <button class="cal-dp-add-btn" id="cal-dp-add-btn" title="Novo compromisso">+</button>
+                </div>
+                <div class="cal-dp-list" id="cal-dp-list"></div>
+              </div>
             </div>
           </div>
         </div>
