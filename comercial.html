@@ -1433,6 +1433,36 @@ loadLeads().then(() => {
     renderMetrics();
   });
 });
+
+// ---- Auto-refresh: detecta novos leads do Magnetic Funnels a cada 30s ----
+if (window.drSupabase) {
+  let lastCheck = new Date().toISOString();
+  setInterval(async () => {
+    try {
+      const { data, error } = await window.drSupabase
+        .from('leads')
+        .select('*')
+        .gt('created_at', lastCheck)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        lastCheck = new Date().toISOString();
+        data.forEach(newLead => {
+          if (!leads.find(l => l.id === newLead.id)) {
+            leads.unshift(newLead);
+            saveLeadsLocal();
+            SFX.newLead();
+            showToast(`🧲 Novo lead do Magnetic Funnels: ${newLead.name}`, 'success');
+            logActivity({ icon:'🧲', color:'#a855f7', msg:`Lead automático via Magnetic Funnels — ${newLead.name}${newLead.phone ? ' ('+newLead.phone+')' : ''}`, sector:'comercial' });
+          }
+        });
+        renderKanban();
+        renderLeadsTable(leads);
+        updateSubtitle();
+      }
+    } catch (_) {}
+  }, 30000);
+}
 </script>
 </body>
 </html>
