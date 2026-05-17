@@ -3383,86 +3383,74 @@ body.hall-page { background: transparent; }
 }
 
 /* ============================================
-   HALL RIGHT COLUMN — off-white apple background
+   HALL RIGHT COLUMN — DR Growth palette
    ============================================ */
 .hall-right-col .hall-accordion {
   background: #fff;
-  border: 1px solid #e5e5ea;
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
 .hall-right-col .hall-acc-header {
   background: #fff;
-  border-bottom-color: #e5e5ea;
+  border-bottom-color: var(--border);
 }
 
-.hall-right-col .hall-acc-title {
-  color: #1d1d1f;
-}
+.hall-right-col .hall-acc-title   { color: var(--text-primary); }
+.hall-right-col .hall-acc-chevron { color: var(--text-muted); }
+.hall-right-col .hall-acc-body    { background: #fff; }
 
-.hall-right-col .hall-acc-chevron {
-  color: #8e8e93;
-}
-
-.hall-right-col .hall-acc-body {
-  background: #fefefe;
-}
-
-/* Calendar cells in light mode */
-.hall-right-col .cal-cell {
-  background: #fff;
-  border-color: #e5e5ea;
-  color: #1d1d1f;
-}
+/* Calendar cells */
+.hall-right-col .cal-cell { background: #fff; border-color: var(--border); }
 .hall-right-col .cal-cell:hover { border-color: var(--accent); }
 .hall-right-col .cal-cell.today { background: var(--accent-dim); border-color: var(--accent); }
-.hall-right-col .cal-cell.other-month { background: #f0f0f5; }
-.hall-right-col .cal-cell-num { color: #3a3a3c; }
-.hall-right-col .cal-day-name { color: #8e8e93; }
-.hall-right-col .cal-holiday { color: #6e6e73; }
-.hall-right-col .cal-period-label { color: #1d1d1f; }
-.hall-right-col .cal-vbtn { color: #6e6e73; background: #ebebf0; border-color: #d1d1d6; }
+.hall-right-col .cal-cell.other-month { background: var(--bg-tertiary); }
+.hall-right-col .cal-cell-num { color: var(--text-primary); }
+.hall-right-col .cal-day-name { color: var(--text-muted); }
+.hall-right-col .cal-holiday { color: var(--text-secondary); }
+.hall-right-col .cal-period-label { color: var(--text-primary); }
+.hall-right-col .cal-vbtn { color: var(--text-secondary); background: var(--bg-tertiary); border-color: var(--border); }
 .hall-right-col .cal-vbtn.active { background: var(--accent); color: #fff; }
-.hall-right-col .cal-nav-btn { background: #ebebf0; border-color: #d1d1d6; color: #3a3a3c; }
-.hall-right-col .cal-nav-btn:hover { background: #e0e0e8; }
-.hall-right-col .cal-view-btns { background: #ebebf0; border-color: #d1d1d6; }
-.hall-right-col .cal-legend { border-top-color: #e5e5ea; }
-.hall-right-col .cal-holiday-legend { color: #6e6e73; }
+.hall-right-col .cal-nav-btn { background: var(--bg-tertiary); border-color: var(--border); color: var(--text-primary); }
+.hall-right-col .cal-nav-btn:hover { background: var(--bg-hover); }
+.hall-right-col .cal-view-btns { background: var(--bg-tertiary); border-color: var(--border); }
+.hall-right-col .cal-legend { border-top-color: var(--border); }
+.hall-right-col .cal-holiday-legend { color: var(--text-muted); }
 .hall-right-col .cal-toolbar { background: transparent; }
 
-/* Week view in light mode */
-.hall-right-col .cal-week-col { background: #fff; border-color: #e5e5ea; }
+/* Week view */
+.hall-right-col .cal-week-col { background: #fff; border-color: var(--border); }
 .hall-right-col .cal-week-col.today { background: var(--accent-dim); }
-.hall-right-col .cal-week-col.weekend { background: #f7f7fa; }
-.hall-right-col .cal-week-dayname { color: #8e8e93; }
-.hall-right-col .cal-week-daynum { color: #3a3a3c; }
+.hall-right-col .cal-week-col.weekend { background: var(--bg-tertiary); }
+.hall-right-col .cal-week-dayname { color: var(--text-muted); }
+.hall-right-col .cal-week-daynum { color: var(--text-primary); }
 
-/* Day view in light mode */
-.hall-right-col .cal-day-slot { border-bottom-color: #ebebf0; }
-.hall-right-col .cal-day-slot:hover { background: #f0f0f5; }
+/* Day view */
+.hall-right-col .cal-day-slot { border-bottom-color: var(--border-light); }
+.hall-right-col .cal-day-slot:hover { background: var(--bg-hover); }
 .hall-right-col .cal-day-slot.now { background: var(--accent-dim); }
-.hall-right-col .cal-day-slot-time { color: #8e8e93; }
-.hall-right-col .cal-day-allday { border-bottom-color: #e5e5ea; }
-.hall-right-col .cal-day-allday-label { color: #8e8e93; }
+.hall-right-col .cal-day-slot-time { color: var(--text-muted); }
+.hall-right-col .cal-day-allday { border-bottom-color: var(--border); }
+.hall-right-col .cal-day-allday-label { color: var(--text-muted); }
 
-/* Mural in light mode */
-.hall-right-col .aviso-item { border-bottom-color: #ebebf0; }
-.hall-right-col .aviso-text { color: #3a3a3c; }
-.hall-right-col .aviso-author { color: #8e8e93; }
-.hall-right-col .aviso-pinned { color: #b45309; }
-.hall-right-col .aviso-form { border-top-color: #e5e5ea; }
-.hall-right-col .aviso-form input { background: #fff; border-color: #d1d1d6; color: #1d1d1f; }
-.hall-right-col .aviso-form input::placeholder { color: #aeaeb2; }
+/* Mural */
+.hall-right-col .aviso-item { border-bottom-color: var(--border-light); }
+.hall-right-col .aviso-text { color: var(--text-primary); }
+.hall-right-col .aviso-author { color: var(--text-muted); }
+.hall-right-col .aviso-pinned { color: var(--yellow); }
+.hall-right-col .aviso-form { border-top-color: var(--border); }
+.hall-right-col .aviso-form input { background: var(--bg-tertiary); border-color: var(--border); color: var(--text-primary); }
+.hall-right-col .aviso-form input::placeholder { color: var(--text-muted); }
 
-/* Team in light mode */
-.hall-right-col .team-member { border-bottom-color: #ebebf0; }
-.hall-right-col .team-member:hover { background: #f0f0f5; }
-.hall-right-col .tm-name { color: #1d1d1f; }
-.hall-right-col .tm-role { color: #8e8e93; }
+/* Team */
+.hall-right-col .team-member { border-bottom-color: var(--border-light); }
+.hall-right-col .team-member:hover { background: var(--bg-hover); }
+.hall-right-col .tm-name { color: var(--text-primary); }
+.hall-right-col .tm-role { color: var(--text-muted); }
 
-.hall-right-col .empty-state h3 { color: #3a3a3c; }
-.hall-right-col .empty-state p  { color: #8e8e93; }
+.hall-right-col .empty-state h3 { color: var(--text-secondary); }
+.hall-right-col .empty-state p  { color: var(--text-muted); }
 
 /* ============================================
    PERSONAL TO-DO WIDGET
