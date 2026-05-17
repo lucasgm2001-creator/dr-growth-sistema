@@ -301,15 +301,15 @@ function renderTable(data) {
           <div class="td-sub">${l.company || '—'}</div>
         </td>
         <td><span class="badge ${si.cls}">${si.label}</span></td>
-        <td style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
+        <td class="col-hide-mobile" style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
         <td>
           <div style="display:flex;align-items:center;gap:6px">
             <div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>
             ${l.responsible}
           </div>
         </td>
-        <td>${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
-        <td>${fmt.date(l.created_at)}</td>
+        <td class="col-hide-mobile">${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
+        <td class="col-hide-mobile">${fmt.date(l.created_at)}</td>
         <td>
           <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
             ${l.phone
