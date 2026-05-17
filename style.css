@@ -4,39 +4,39 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ---- CSS Variables ---- */
+/* ---- CSS Variables — Light Theme (Apple-inspired) ---- */
 :root {
-  --bg-primary:    #0a0a0f;
-  --bg-secondary:  #111118;
-  --bg-tertiary:   #16161f;
-  --bg-card:       #1a1a26;
-  --bg-hover:      #1f1f2e;
-  --bg-active:     #252535;
+  --bg-primary:    #f5f5f7;
+  --bg-secondary:  #ffffff;
+  --bg-tertiary:   #fafafa;
+  --bg-card:       #ffffff;
+  --bg-hover:      #f0f0f5;
+  --bg-active:     #e8e8ed;
 
-  --border:        #2a2a3d;
-  --border-light:  #333348;
+  --border:        #d2d2d7;
+  --border-light:  #e5e5ea;
 
-  --accent:        #244c9c;
-  --accent-hover:  #24448d;
-  --accent-dim:    rgba(36,76,156,0.15);
-  --accent-glow:   rgba(36,76,156,0.3);
+  --accent:        #0066cc;
+  --accent-hover:  #0055aa;
+  --accent-dim:    rgba(0,102,204,0.10);
+  --accent-glow:   rgba(0,102,204,0.20);
 
-  --green:         #22c55e;
-  --green-dim:     rgba(34,197,94,0.12);
-  --yellow:        #eab308;
-  --yellow-dim:    rgba(234,179,8,0.12);
-  --red:           #ef4444;
-  --red-dim:       rgba(239,68,68,0.12);
-  --blue:          #244c94;
-  --blue-dim:      rgba(36,76,148,0.15);
-  --purple:        #a855f7;
-  --purple-dim:    rgba(168,85,247,0.12);
-  --orange:        #f97316;
-  --orange-dim:    rgba(249,115,22,0.12);
+  --green:         #1a8a3c;
+  --green-dim:     rgba(26,138,60,0.10);
+  --yellow:        #b8860b;
+  --yellow-dim:    rgba(184,134,11,0.10);
+  --red:           #d93025;
+  --red-dim:       rgba(217,48,37,0.10);
+  --blue:          #0066cc;
+  --blue-dim:      rgba(0,102,204,0.10);
+  --purple:        #7c3aed;
+  --purple-dim:    rgba(124,58,237,0.10);
+  --orange:        #e8590c;
+  --orange-dim:    rgba(232,89,12,0.10);
 
-  --text-primary:  #f1f1f5;
-  --text-secondary:#9898b0;
-  --text-muted:    #5c5c78;
+  --text-primary:  #1d1d1f;
+  --text-secondary:#6e6e73;
+  --text-muted:    #86868b;
 
   --sidebar-width: 240px;
   --topbar-height: 60px;
@@ -46,10 +46,10 @@
   --radius-lg:  14px;
   --radius-xl:  20px;
 
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.6);
-  --shadow-accent: 0 0 24px rgba(36,76,156,0.2);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
+  --shadow-accent: 0 0 24px rgba(0,102,204,0.15);
 
   --transition: 0.18s ease;
 }
