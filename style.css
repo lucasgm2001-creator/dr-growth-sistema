@@ -434,7 +434,7 @@ img { display: block; max-width: 100%; }
 
 .sidebar-footer {
   padding: 12px 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid rgba(255,255,255,0.12);
   flex-shrink: 0;
 }
 
