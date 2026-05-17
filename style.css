@@ -3700,3 +3700,224 @@ body.hall-page { background: transparent; }
   }
   .team-pill-panel { right: auto; left: 0; min-width: 200px; }
 }
+
+
+/* ============================================
+   RESPONSIVO — MOBILE
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* Topbar */
+  .topbar {
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .topbar-actions .clock-row { display: none; }
+  .topbar-title h1 { font-size: 14px; }
+  .topbar-title p  { font-size: 11px; }
+
+  /* Greeting */
+  .hall-greeting { padding: 20px 0 16px; }
+  .hall-greeting-inner {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .greeting-text h1 { font-size: 22px; }
+  .greeting-date { text-align: left; }
+  .greeting-date .clock-row { justify-content: flex-start; }
+
+  /* Page content */
+  .page-content { padding: 14px; }
+
+  /* Sector tabs */
+  .sector-tabs { gap: 0; }
+  .sector-tab { padding: 10px 14px; font-size: 12px; }
+
+  /* KPIs */
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Kanban */
+  .kanban-board { flex-direction: column; }
+  .kanban-col   { min-width: unset; width: 100%; max-height: none; }
+
+  /* Grids genéricos */
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+
+  /* Hall */
+  .hall-acc-body { padding: 10px; }
+  .hall-grid { grid-template-columns: 1fr; }
+
+  /* Calendário */
+  .cal-cell { min-height: 52px; padding: 4px; }
+  .cal-cell-num { font-size: 11px; }
+  .cal-chip { font-size: 8px; padding: 1px 3px; }
+  .cal-day-name { font-size: 10px; }
+  .cal-nav { gap: 8px; }
+  .cal-month-label { font-size: 13px; }
+
+  /* Métricas */
+  .metrics-kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .metric-kpi .mk-val { font-size: 18px; }
+
+  /* Meta Ads */
+  .meta-kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .meta-kpi .mkv { font-size: 16px; }
+  .meta-campaign-grid { grid-template-columns: 1fr; }
+  .meta-stats { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .meta-stat .msv { font-size: 11px; }
+  .meta-config-banner { flex-wrap: wrap; gap: 8px; }
+
+  /* Pulso diário */
+  .pulso-modal { padding: 22px 18px; }
+  .pulso-modal h2 { font-size: 17px; }
+
+  /* Cards */
+  .card-header { padding: 14px 16px 12px; }
+
+  /* Modal */
+  .modal { width: 95vw; padding: 0; }
+  .modal-body { padding: 16px; }
+  .modal-footer { padding: 12px 16px; }
+  .modal-header { padding: 14px 16px; }
+
+  /* Login */
+  .login-card { padding: 28px 20px; }
+}
+
+@media (max-width: 480px) {
+
+  .kpi-grid { grid-template-columns: 1fr; }
+  .greeting-text h1 { font-size: 19px; }
+  .metrics-kpi-row { grid-template-columns: 1fr; }
+  .meta-kpi-row    { grid-template-columns: 1fr 1fr; }
+  .meta-stats      { grid-template-columns: repeat(2, 1fr); }
+  .cal-cell { min-height: 42px; }
+  .cal-chip { display: none; }
+  .cal-cell.today .cal-chip { display: block; }
+  .topbar-title h1 { font-size: 13px; }
+  .tz-btn { padding: 6px 10px; font-size: 11px; }
+  .sector-tab { padding: 8px 12px; font-size: 11px; }
+}
+
+/* ============================================
+   MOBILE — CORREÇÕES COMPLETAS
+   ============================================ */
+
+@media (max-width: 768px) {
+
+  /* ---- Topbar ---- */
+  .topbar {
+    height: auto;
+    min-height: var(--topbar-height);
+    padding: 10px 14px;
+    flex-wrap: nowrap;
+  }
+  .topbar-title { min-width: 0; overflow: hidden; }
+  .topbar-title h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-actions { flex-shrink: 0; gap: 8px; }
+  .topbar-actions .btn { font-size: 12px; padding: 7px 12px; white-space: nowrap; }
+
+  /* ---- Sidebar ---- */
+  .sidebar { transition: transform 0.25s ease; }
+  .sidebar-overlay { display: block; }
+
+  /* ---- Sector header margin fix ---- */
+  .sector-header {
+    margin-left: -14px;
+    margin-right: -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* ---- Sector tabs: scroll horizontal suave ---- */
+  .sector-tabs {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .sector-tabs::-webkit-scrollbar { display: none; }
+
+  /* ---- Hall grid: empilha em coluna ---- */
+  .hall-grid { flex-direction: column; }
+  .hall-right-col { width: 100%; }
+
+  /* ---- Filter bar: cada item ocupa linha inteira ---- */
+  .filter-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .filter-bar .search-input-wrap { min-width: unset; width: 100%; }
+  .filter-bar .filter-select { width: 100%; min-width: unset; }
+  .filter-bar .btn { width: 100%; justify-content: center; }
+
+  /* ---- Tabelas: scroll suave no iOS ---- */
+  .table-container { -webkit-overflow-scrolling: touch; }
+  tbody td { font-size: 12px; padding: 10px 12px; }
+  thead th { padding: 10px 12px; }
+
+  /* ---- Colunas opcionais: esconde em telas pequenas ---- */
+  .col-hide-mobile { display: none !important; }
+
+  /* ---- Modal: full-width e formulários em coluna ---- */
+  .modal { width: 100vw; max-width: 100vw; border-radius: 20px 20px 0 0; margin: 0; align-self: flex-end; }
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal .grid-2 { grid-template-columns: 1fr; }
+  .modal-body { padding: 16px; max-height: 75vh; overflow-y: auto; }
+  .modal-footer { padding: 12px 16px; }
+  .modal-header { padding: 14px 16px; }
+
+  /* ---- Country selector: linha única ---- */
+  .country-selector { gap: 8px; }
+  .country-card { padding: 8px 12px; min-width: unset; flex: 1; }
+  .country-card-desc { display: none; }
+
+  /* ---- KPI cards ---- */
+  .kpi-card { padding: 14px 16px; }
+  .kpi-value { font-size: 24px; }
+  .kpi-label { font-size: 11px; }
+
+  /* ---- Cards genéricos ---- */
+  .card { border-radius: var(--radius-lg); }
+  .card-header { padding: 12px 14px 10px; }
+  .card-body { padding: 12px 14px; }
+
+  /* ---- User profile na sidebar ---- */
+  .user-info .role { display: none; }
+
+  /* ---- Botões de ação em tabelas ---- */
+  .btn-xs { font-size: 10px; padding: 3px 7px; }
+
+  /* ---- Kanban cards ---- */
+  .kanban-col { border-radius: var(--radius-md); }
+  .lead-card { padding: 10px 12px; }
+  .lead-card-name { font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+
+  /* ---- Page content ---- */
+  .page-content { padding: 10px; }
+
+  /* ---- Topbar ainda menor ---- */
+  .topbar { padding: 8px 10px; }
+  .topbar-actions .btn span { display: none; } /* Esconde texto, mantém ícone */
+
+  /* ---- Sector header ---- */
+  .sector-header { margin-left: -10px; margin-right: -10px; padding-left: 10px; padding-right: 10px; }
+  .sector-name { font-size: 14px; }
+  .sector-icon { width: 32px; height: 32px; }
+
+  /* ---- Modal ainda mais compacto ---- */
+  .modal-body { padding: 12px; max-height: 80vh; }
+
+  /* ---- Login ---- */
+  .login-card { padding: 28px 18px; }
+  .login-logo .logo-icon { width: 44px; height: 44px; font-size: 16px; }
+
+  /* ---- KPIs coluna única ---- */
+  .kpi-grid { gap: 8px; }
+
+  /* ---- Greeting ---- */
+  .hall-greeting { padding: 14px 0 12px; }
+}
