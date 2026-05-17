@@ -1692,8 +1692,8 @@ tbody td {
 }
 
 .greeting-text h1 span {
-  color: var(--accent);
-  -webkit-text-fill-color: var(--accent);
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
 }
 
 .greeting-text p {
