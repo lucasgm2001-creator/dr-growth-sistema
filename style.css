@@ -3882,7 +3882,7 @@ body.hall-page { background: transparent; }
 
   /* Relógio: troca label completo pelo abreviado com emoji + sigla */
   .tz-full { display: none; }
-  .tz-short { display: inline; font-size: 9px; color: var(--text-muted); }
+  .tz-short { display: inline; font-size: 9px; color: rgba(255,255,255,0.55); }
   .tz-short small { font-size: 8px; font-weight: 800; letter-spacing: 0.5px; }
   .clock-row .clock-time { font-size: 11px; }
   .clock-row .clock-divider { display: none; }
