@@ -296,6 +296,33 @@ async function onDrop(e, stage) {
   renderBoard();
   updateSubtitle();
   showToast(`Lead movido para "${STAGES.find(s=>s.key===stage)?.label}"`, 'success');
+
+  // Migrar para Clientes ao fechar venda
+  if (stage === 'fechado') {
+    setTimeout(() => {
+      if (confirm(`Venda fechada! Deseja migrar "${lead.company || lead.name}" para a área de Clientes?`)) {
+        try {
+          // Salva dados do lead para clientes.html consumir
+          const pending = JSON.parse(localStorage.getItem('drg_pending_clients') || '[]');
+          pending.push({ ...lead, migratedAt: new Date().toISOString() });
+          localStorage.setItem('drg_pending_clients', JSON.stringify(pending));
+
+          // Migração direta se módulo estiver carregado
+          if (typeof window.migrateLeadToClient === 'function') {
+            window.migrateLeadToClient(lead);
+          } else {
+            // Processa na próxima vez que clientes.html abrir
+            const pending2 = JSON.parse(localStorage.getItem('drg_migrate_queue') || '[]');
+            pending2.push(lead);
+            localStorage.setItem('drg_migrate_queue', JSON.stringify(pending2));
+          }
+          showToast('Lead migrado para Clientes!', 'success');
+          logActivity({ icon:'🤝', color:'#10B981', msg:`Venda fechada → Cliente: ${lead.company || lead.name}`, sector:'comercial' });
+        } catch(err) { console.error(err); }
+      }
+    }, 400);
+  }
+
   draggedId = null;
 }
 
