@@ -1620,5 +1620,6 @@ function deleteDayPanelEvent(id) {
 // Render calendar on script load (ensures it populates on page load)
 renderCalendar();
 </script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>

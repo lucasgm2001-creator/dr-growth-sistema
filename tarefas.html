@@ -419,5 +419,6 @@ async function deleteTask() {
 document.getElementById('task-modal').addEventListener('click', e => { if (e.target === document.getElementById('task-modal')) closeModal(); });
 loadTasks();
 </script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>

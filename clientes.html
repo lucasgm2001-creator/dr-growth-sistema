@@ -401,5 +401,6 @@ async function deleteClient() {
 document.getElementById('client-modal').addEventListener('click', e => { if (e.target === document.getElementById('client-modal')) closeModal(); });
 loadClients();
 </script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js");</script>
 </body>
 </html>
