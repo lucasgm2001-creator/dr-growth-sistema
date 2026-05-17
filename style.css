@@ -4,39 +4,39 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ---- CSS Variables — Light Theme (Apple-inspired) ---- */
+/* ---- CSS Variables — DR Growth Brand Theme ---- */
 :root {
-  --bg-primary:    #f5f5f7;
+  --bg-primary:    #F0F4FF;
   --bg-secondary:  #ffffff;
-  --bg-tertiary:   #fafafa;
+  --bg-tertiary:   #f4f7ff;
   --bg-card:       #ffffff;
-  --bg-hover:      #f0f0f5;
-  --bg-active:     #e8e8ed;
+  --bg-hover:      #e8eeff;
+  --bg-active:     #dce6ff;
 
-  --border:        #d2d2d7;
-  --border-light:  #e5e5ea;
+  --border:        #dce6ff;
+  --border-light:  #e8eeff;
 
-  --accent:        #0066cc;
-  --accent-hover:  #0055aa;
-  --accent-dim:    rgba(0,102,204,0.10);
-  --accent-glow:   rgba(0,102,204,0.20);
+  --accent:        #244c9c;
+  --accent-hover:  #234080;
+  --accent-dim:    rgba(36,76,156,0.10);
+  --accent-glow:   rgba(36,76,156,0.22);
 
-  --green:         #1a8a3c;
-  --green-dim:     rgba(26,138,60,0.10);
-  --yellow:        #b8860b;
-  --yellow-dim:    rgba(184,134,11,0.10);
+  --green:         #10B981;
+  --green-dim:     rgba(16,185,129,0.10);
+  --yellow:        #F59E0B;
+  --yellow-dim:    rgba(245,158,11,0.10);
   --red:           #d93025;
   --red-dim:       rgba(217,48,37,0.10);
-  --blue:          #0066cc;
-  --blue-dim:      rgba(0,102,204,0.10);
+  --blue:          #244c9c;
+  --blue-dim:      rgba(36,76,156,0.10);
   --purple:        #7c3aed;
   --purple-dim:    rgba(124,58,237,0.10);
   --orange:        #e8590c;
   --orange-dim:    rgba(232,89,12,0.10);
 
-  --text-primary:  #1d1d1f;
-  --text-secondary:#6e6e73;
-  --text-muted:    #86868b;
+  --text-primary:  #1e3a6f;
+  --text-secondary:#4b5878;
+  --text-muted:    #7a8db0;
 
   --sidebar-width: 240px;
   --topbar-height: 60px;
@@ -46,10 +46,10 @@
   --radius-lg:  14px;
   --radius-xl:  20px;
 
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md:  0 4px 16px rgba(0,0,0,0.10);
-  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
-  --shadow-accent: 0 0 24px rgba(0,102,204,0.15);
+  --shadow-sm:  0 1px 4px rgba(36,76,156,0.08);
+  --shadow-md:  0 4px 16px rgba(36,76,156,0.10);
+  --shadow-lg:  0 8px 32px rgba(36,76,156,0.12);
+  --shadow-accent: 0 0 24px rgba(36,76,156,0.20);
 
   --transition: 0.18s ease;
 }
