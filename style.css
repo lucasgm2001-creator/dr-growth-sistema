@@ -2731,7 +2731,7 @@ body.hall-page { background: transparent; }
 .cal-cell:hover .cal-add-btn { opacity: 1; color: var(--orange); }
 
 .cal-chip.cal-chip-more {
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-hover);
   color: var(--text-muted);
   border-left: 2px solid var(--border-light);
   font-style: italic;
