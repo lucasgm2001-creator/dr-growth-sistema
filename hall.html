@@ -1516,8 +1516,12 @@ function saveCalEvent() {
 
 function deleteCalEvent() {
   if (!calEditId||!confirm('Remover este compromisso?')) return;
+  const dateOfEvent = getCalEvents().find(e=>e.id===calEditId)?.date;
   saveCalEvents(getCalEvents().filter(e=>e.id!==calEditId));
-  closeCalModal(); renderCalendar();
+  document.getElementById('cal-modal').classList.remove('show');
+  renderCalendar();
+  // Re-render (or re-open) panel for the same day
+  if (dateOfEvent) openCalDayPanel(dateOfEvent);
   showToast('Compromisso removido.','info');
 }
 
