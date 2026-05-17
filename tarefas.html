@@ -194,8 +194,7 @@ async function loadTasks() {
     } catch {}
   }
   if (!loadedFromRemote) {
-    const local = loadTasksLocal();
-    allTasks = local.length ? local : DEMO_TASKS;
+    allTasks = loadTasksLocal();
   }
   updateKPIs();
   renderTasks(allTasks);
