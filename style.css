@@ -2376,7 +2376,7 @@ tbody td {
 .btn-pulso {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+  background: linear-gradient(135deg, #1e3a6f, var(--accent));
   color: white;
   border: none;
   border-radius: var(--radius-md);
@@ -2385,7 +2385,7 @@ tbody td {
   cursor: pointer;
   font-family: inherit;
   letter-spacing: 0.3px;
-  box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+  box-shadow: 0 4px 20px rgba(0,102,204,0.35);
   animation: pulso-pulse 2.8s ease-in-out infinite;
   transition: transform 0.15s, box-shadow 0.15s;
 }
@@ -2393,7 +2393,7 @@ tbody td {
 .btn-pulso:hover {
   animation: none;
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(99,102,241,0.55);
+  box-shadow: 0 8px 28px rgba(0,102,204,0.50);
 }
 
 .btn-pulso:active {
@@ -2402,8 +2402,8 @@ tbody td {
 }
 
 @keyframes pulso-pulse {
-  0%, 100% { transform: scale(1);    box-shadow: 0 4px 20px rgba(99,102,241,0.38); }
-  50%       { transform: scale(1.02); box-shadow: 0 6px 28px rgba(99,102,241,0.55); }
+  0%, 100% { transform: scale(1);    box-shadow: 0 4px 20px rgba(0,102,204,0.32); }
+  50%       { transform: scale(1.02); box-shadow: 0 6px 28px rgba(0,102,204,0.48); }
 }
 
 .pulso-ai-tag {
