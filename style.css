@@ -1610,7 +1610,9 @@ tbody td {
   width: 3px;
   border-radius: 0 3px 3px 0;
   margin-left: -10px;
+  background: rgba(255,255,255,0.55);
 }
+.elevator-floor.active .floor-indicator { background: #ffffff; }
 
 /* ============================================
    HALL PAGE
