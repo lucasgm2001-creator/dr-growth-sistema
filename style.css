@@ -1422,20 +1422,6 @@ tbody td {
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-
-  .menu-toggle { display: flex; }
-
   .kpi-grid { grid-template-columns: 1fr 1fr; }
 
   .kanban-board { flex-direction: column; }
