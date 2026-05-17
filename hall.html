@@ -322,7 +322,7 @@ function setGreeting() {
 
   const firstName = session.name.split(' ')[0];
   document.getElementById('greeting-msg').innerHTML =
-    `${period}, <span>${firstName}</span> ${emoji}`;
+    `${period},&nbsp;<span>${firstName}</span>&nbsp;${emoji}`;
 
   const subs = {
     admin:     'Você tem acesso total ao sistema. Bom trabalho!',
