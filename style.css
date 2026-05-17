@@ -3713,9 +3713,13 @@ body.hall-page { background: transparent; }
     padding: 0 14px;
     gap: 10px;
   }
-  .topbar-actions .clock-row { display: none; }
   .topbar-title h1 { font-size: 14px; }
   .topbar-title p  { font-size: 11px; }
+  /* Relógio: esconde labels, mantém os horários e o botão do time */
+  .clock-row .clock-tz { display: none; }
+  .clock-row .clock-time { font-size: 11px; }
+  .clock-row .clock-divider { display: none; }
+  .team-pill-btn { font-size: 11px; padding: 4px 8px; }
 
   /* Greeting */
   .hall-greeting { padding: 20px 0 16px; }
