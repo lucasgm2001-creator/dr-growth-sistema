@@ -1505,8 +1505,12 @@ function saveCalEvent() {
     events.push({id:String(Date.now()),title,date,time,notes,timezone:calSelTz,isMeeting:calMeeting,utc,createdBy:session?.name?.split(' ')[0]||''});
   }
   saveCalEvents(events);
+  // After saving: if day panel is open for the same date, update it; else open panel for the new date
+  const savedDate = date;
   closeCalModal();
   renderCalendar();
+  // Show the day panel for the saved date
+  openCalDayPanel(savedDate);
   showToast(calEditId?'Compromisso atualizado!':'Compromisso adicionado!','success');
 }
 
