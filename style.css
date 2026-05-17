@@ -2207,7 +2207,7 @@ tbody td {
 }
 
 .pulso-header {
-  background: linear-gradient(135deg, rgba(99,102,241,0.14), rgba(168,85,247,0.08));
+  background: linear-gradient(135deg, rgba(0,102,204,0.08), rgba(0,102,204,0.03));
   border-bottom: 1px solid var(--border);
   padding: 22px 24px 18px;
   display: flex;
