@@ -168,8 +168,6 @@ async function loadLeads() {
       const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending: false });
       if (!error && data) leads = data;
     } catch {}
-  } else {
-    leads = DEMO_LEADS;
   }
   renderBoard();
   updateSubtitle();
