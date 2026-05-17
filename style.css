@@ -464,17 +464,17 @@ img { display: block; max-width: 100%; }
 }
 
 .user-info { overflow: hidden; flex: 1; }
-.user-info .name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-info .role { font-size: 11px; color: var(--text-muted); }
+.user-info .name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ffffff; }
+.user-info .role { font-size: 11px; color: rgba(255,255,255,0.50); }
 
 .logout-btn {
   padding: 6px;
   border-radius: var(--radius-sm);
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.45);
   transition: all var(--transition);
 }
 
-.logout-btn:hover { color: var(--red); background: var(--red-dim); }
+.logout-btn:hover { color: #fff; background: rgba(239,68,68,0.25); }
 
 /* ---- Main Content ---- */
 .main-content {
