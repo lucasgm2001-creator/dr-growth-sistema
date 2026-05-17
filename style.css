@@ -488,7 +488,7 @@ img { display: block; max-width: 100%; }
 .topbar {
   height: var(--topbar-height);
   background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   display: flex;
   align-items: center;
   padding: 0 24px;
@@ -496,6 +496,7 @@ img { display: block; max-width: 100%; }
   top: 0;
   z-index: 50;
   gap: 16px;
+  box-shadow: 0 2px 8px rgba(36,76,156,0.06);
 }
 
 .topbar-title {
