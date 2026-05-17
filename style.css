@@ -3707,7 +3707,7 @@ body.hall-page { background: transparent; }
 }
 .hall-quad .cal-cell:hover { border-color: var(--accent); }
 .hall-quad .cal-cell.today { background: var(--accent-dim); border-color: var(--accent); }
-.hall-quad .cal-cell.other-month { background: #f0f0f5; color: #c7c7cc; }
+.hall-quad .cal-cell.other-month { background: var(--bg-tertiary); color: var(--border); }
 .hall-quad .cal-cell-num { color: var(--text-secondary); }
 .hall-quad .cal-add-btn { color: var(--text-muted); }
 .hall-quad .cal-cell:hover .cal-add-btn { color: var(--orange); }
