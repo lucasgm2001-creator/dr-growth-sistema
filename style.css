@@ -1367,6 +1367,10 @@ tbody td {
   letter-spacing: 0.5px;
 }
 
+/* Desktop: mostra nome completo, esconde abreviado */
+.tz-short { display: none; }
+.tz-full  { display: inline; }
+
 .clock-item .clock-time {
   font-size: 14px;
   font-weight: 700;
