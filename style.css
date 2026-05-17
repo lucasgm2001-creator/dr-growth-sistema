@@ -3715,11 +3715,20 @@ body.hall-page { background: transparent; }
   }
   .topbar-title h1 { font-size: 14px; }
   .topbar-title p  { font-size: 11px; }
-  /* Relógio: esconde labels, mantém os horários e o botão do time */
-  .clock-row .clock-tz { display: none; }
+
+  /* Relógio: troca label completo pelo abreviado com emoji + sigla */
+  .tz-full { display: none; }
+  .tz-short { display: inline; font-size: 9px; color: var(--text-muted); }
+  .tz-short small { font-size: 8px; font-weight: 800; letter-spacing: 0.5px; }
   .clock-row .clock-time { font-size: 11px; }
   .clock-row .clock-divider { display: none; }
   .team-pill-btn { font-size: 11px; padding: 4px 8px; }
+
+  /* Hall — reordena painéis no mobile: Feed → Mural → Calendário */
+  .hall-quad-grid { display: flex; flex-direction: column; height: auto; }
+  #acc-feed  { order: 1; min-height: 220px; }
+  #acc-mural { order: 2; min-height: 200px; }
+  #acc-cal   { order: 3; min-height: 340px; grid-row: unset; }
 
   /* Greeting */
   .hall-greeting { padding: 20px 0 16px; }
