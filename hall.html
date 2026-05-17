@@ -1527,8 +1527,6 @@ function deleteCalEvent() {
 
 function closeCalModal() {
   document.getElementById('cal-modal').classList.remove('show');
-  // Re-render day panel if open
-  if (calDayPanelDate) renderDayPanel(calDayPanelDate);
 }
 
 document.getElementById('cal-modal').addEventListener('click', e => { if (e.target===document.getElementById('cal-modal')) closeCalModal(); });
