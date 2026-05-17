@@ -3778,12 +3778,12 @@ body.hall-page { background: transparent; }
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-light);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
   border-radius: 99px;
   padding: 5px 12px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.85);
   cursor: pointer;
   font-family: inherit;
   transition: background var(--transition), border-color var(--transition), color var(--transition);
@@ -3791,9 +3791,9 @@ body.hall-page { background: transparent; }
 }
 
 .team-pill-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent);
-  color: var(--text-primary);
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.35);
+  color: #ffffff;
 }
 
 .team-pill-panel {
