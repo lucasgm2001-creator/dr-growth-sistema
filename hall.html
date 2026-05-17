@@ -1341,13 +1341,18 @@ function renderCalMonth() {
     const isToday=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
     const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dayEvs=events.filter(e=>e.date===dateStr);
-    const chips=dayEvs.slice(0,2).map(ev=>{
+    // Show 1 chip if there's a holiday, else 2 chips
+    const hasHol=_holidaysOn(dateStr).length>0;
+    const maxChips=hasHol?1:2;
+    const chips=dayEvs.slice(0,maxChips).map(ev=>{
       const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
-      return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+      const shortTitle=ev.title.length>12?ev.title.slice(0,11)+'…':ev.title;
+      return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">${label?label+' ':''}${shortTitle}</div>`;
     }).join('');
-    const extra=dayEvs.length>2?`<div class="cal-chip cal-chip-more" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+${dayEvs.length-2} mais</div>`:'';
-    html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalAdd('${dateStr}')">
-      <div class="cal-cell-num">${d}<span class="cal-add-btn" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+</span></div>${_holHtml(dateStr)}${chips}${extra}</div>`;
+    const moreCount=dayEvs.length-maxChips;
+    const extra=moreCount>0?`<div class="cal-chip cal-chip-more" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">+${moreCount}</div>`:'';
+    html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalDayPanel('${dateStr}')">
+      <div class="cal-cell-num">${d}</div>${_holCellHtml(dateStr)}${chips}${extra}</div>`;
   }
   const filled=firstDay+daysInMonth, remainder=(7-(filled%7))%7;
   for (let d=1;d<=remainder;d++)
