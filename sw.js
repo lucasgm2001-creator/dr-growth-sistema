@@ -1,4 +1,4 @@
-const CACHE = 'drg-v1';
+const CACHE = 'drg-v2';
 
 self.addEventListener('install', () => self.skipWaiting());
 
@@ -15,8 +15,12 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // HTML, CSS e JS: ignora cache HTTP, sempre busca da rede
+  const bypass = /\.(html|css|js)(\?.*)?$/.test(url.pathname) || url.pathname === '/' || url.pathname === '';
+  const req = bypass ? new Request(e.request.url, { cache: 'reload' }) : e.request;
+
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then(res => {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
