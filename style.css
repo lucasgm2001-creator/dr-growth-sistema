@@ -843,7 +843,7 @@ tbody td {
   outline: none;
   appearance: none;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235c5c78' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23244c9c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   transition: border-color var(--transition);
