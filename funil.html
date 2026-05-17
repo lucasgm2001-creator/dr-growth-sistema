@@ -162,23 +162,12 @@ const STAGES = [
 let leads = [];
 let draggedId = null;
 
-const DEMO_LEADS = [
-  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', created_at:'2026-05-10T10:00:00' },
-  { id:2, name:'Sarah Johnson',   company:'US Digital LLC', stage:'reuniao',  value:8200, responsible:'Lucas', origin:'Indicação', created_at:'2026-05-08T14:30:00' },
-  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo', stage:'contato', value:2800, responsible:'Gabriel', origin:'Instagram', created_at:'2026-05-12T09:15:00' },
-  { id:4, name:'Robert Davis',    company:'GrowthX Agency', stage:'fechado',  value:12000, responsible:'Lucas', origin:'Google Ads', created_at:'2026-05-01T11:00:00' },
-  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', stage:'novo',    value:3200, responsible:'Gabriel', origin:'Referência', created_at:'2026-05-14T08:00:00' },
-  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+', stage:'perdido',  value:1800, responsible:'Gabriel', origin:'Facebook', created_at:'2026-05-03T16:00:00' },
-  { id:7, name:'Marcos Souza',    company:'TechStar',        stage:'novo',    value:5500, responsible:'Daniel', origin:'LinkedIn', created_at:'2026-05-13T10:00:00' },
-];
-
 async function loadLeads() {
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending: false });
-      if (!error && data?.length) { leads = data; }
-      else leads = DEMO_LEADS;
-    } catch { leads = DEMO_LEADS; }
+      if (!error && data) leads = data;
+    } catch {}
   } else {
     leads = DEMO_LEADS;
   }
