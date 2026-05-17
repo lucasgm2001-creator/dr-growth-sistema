@@ -240,9 +240,7 @@ async function loadLeads() {
     } catch {}
   }
   if (!loadedFromRemote) {
-    const local = loadLeadsLocal();
-    allLeads = local.length ? local : DEMO_LEADS;
-    history = DEMO_HISTORY;
+    allLeads = loadLeadsLocal();
   }
   updateSubtitle();
   renderTable(allLeads);
