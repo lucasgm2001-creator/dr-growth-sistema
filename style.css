@@ -3736,7 +3736,7 @@ body.hall-page { background: transparent; }
 }
 .hall-quad .cal-week-col { background: var(--bg-tertiary); border-color: var(--border); }
 .hall-quad .cal-week-col.today { background: var(--accent-dim); }
-.hall-quad .cal-week-col.weekend { background: #f5f5f7; }
+.hall-quad .cal-week-col.weekend { background: var(--bg-tertiary); }
 .hall-quad .cal-week-dayname { color: var(--text-muted); }
 .hall-quad .cal-week-daynum { color: var(--text-secondary); }
 .hall-quad .cal-day-slot { border-bottom-color: var(--border-light); }
