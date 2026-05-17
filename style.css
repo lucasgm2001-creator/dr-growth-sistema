@@ -302,8 +302,9 @@ img { display: block; max-width: 100%; }
 /* ---- Sidebar ---- */
 .sidebar {
   width: var(--sidebar-width);
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border);
+  background: #1e3a6f;
+  border-right: none;
+  box-shadow: 2px 0 16px rgba(30,58,111,0.18);
   display: flex;
   flex-direction: column;
   position: fixed;
