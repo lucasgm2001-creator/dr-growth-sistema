@@ -692,6 +692,7 @@ function dropJob(e, status) {
   const job = allJobs.find(j => j.id === dragJobId);
   if (!job || job.status === status) return;
   job.status = status;
+  window.DRCache?.clear('clientes');
   if (window.drSupabase) window.drSupabase.from('jobs').update({ status, updated_at: new Date().toISOString() }).eq('id', dragJobId).then(()=>{});
   renderJobs();
   dragJobId = null;
