@@ -104,6 +104,87 @@ CREATE POLICY "auth_full" ON tasks        FOR ALL USING (auth.role() = 'authenti
 CREATE POLICY "auth_full" ON clients      FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "auth_full" ON payments     FOR ALL USING (auth.role() = 'authenticated');
 
+-- Vendedores do comercial
+CREATE TABLE sellers (
+  id         BIGSERIAL PRIMARY KEY,
+  name       TEXT NOT NULL,
+  short      TEXT NOT NULL,
+  color      TEXT DEFAULT '#6366f1',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Comissões
+CREATE TABLE commissions (
+  id                BIGSERIAL PRIMARY KEY,
+  lead_id           BIGINT REFERENCES leads(id) ON DELETE SET NULL,
+  lead_name         TEXT,
+  lead_company      TEXT,
+  lead_value        NUMERIC(12,2),
+  seller            TEXT,
+  commission_amount NUMERIC(12,2),
+  notes             TEXT,
+  created_at        TIMESTAMPTZ DEFAULT now()
+);
+
+-- Despesas
+CREATE TABLE expenses (
+  id         BIGSERIAL PRIMARY KEY,
+  desc       TEXT NOT NULL,
+  tipo       TEXT DEFAULT 'outro',
+  valor      NUMERIC(12,2),
+  data       DATE,
+  status     TEXT DEFAULT 'pending',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Campanhas de tráfego
+CREATE TABLE campaigns (
+  id          BIGSERIAL PRIMARY KEY,
+  name        TEXT NOT NULL,
+  client      TEXT,
+  platform    TEXT,
+  status      TEXT DEFAULT 'active',
+  budget      NUMERIC(12,2) DEFAULT 0,
+  spend       NUMERIC(12,2) DEFAULT 0,
+  impressions BIGINT DEFAULT 0,
+  clicks      BIGINT DEFAULT 0,
+  leads       BIGINT DEFAULT 0,
+  objective   TEXT,
+  notes       TEXT,
+  country     TEXT DEFAULT 'br',
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- Conteúdo programado
+CREATE TABLE content_pieces (
+  id         BIGSERIAL PRIMARY KEY,
+  title      TEXT NOT NULL,
+  client     TEXT,
+  platform   TEXT,
+  format     TEXT,
+  date       DATE,
+  status     TEXT DEFAULT 'draft',
+  desc       TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Add country to existing tables (run these ALTER statements)
+ALTER TABLE leads   ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
+
+-- RLS for new tables
+ALTER TABLE sellers        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE commissions    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE expenses       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE campaigns      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_pieces ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "auth_full" ON sellers        FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "auth_full" ON commissions    FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "auth_full" ON expenses       FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "auth_full" ON campaigns      FOR ALL USING (auth.role() = 'authenticated');
+CREATE POLICY "auth_full" ON content_pieces FOR ALL USING (auth.role() = 'authenticated');
+
 */
 
 // ============================================================
