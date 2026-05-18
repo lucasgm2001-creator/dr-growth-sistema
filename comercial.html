@@ -1141,6 +1141,7 @@ async function addInteraction() {
   const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: text, created_at: new Date().toISOString() };
   if (!history[selectedLeadId]) history[selectedLeadId] = [];
   history[selectedLeadId].push(entry);
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) await window.drSupabase.from('lead_history').insert(entry);
   input.value = '';
   renderHistory(selectedLeadId);
