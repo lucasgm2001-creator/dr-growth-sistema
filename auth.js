@@ -136,6 +136,57 @@ const AUTH = {
     return { user: null, error: 'Credenciais inválidas.' };
   },
 
+  // Cria os usuários demo no Supabase Auth (roda uma vez por dispositivo)
+  async ensureDemoUsers() {
+    if (!window.drSupabase) return;
+    const key = 'drg_demo_seeded_v2';
+    if (localStorage.getItem(key)) return;
+
+    for (const u of this.demoUsers) {
+      const { data, error } = await window.drSupabase.auth.signUp({
+        email: u.email,
+        password: u.password,
+        options: { data: { name: u.name, role: u.role } },
+      });
+
+      if (!error && data?.user) {
+        await window.drSupabase.from('profiles').upsert({
+          id: data.user.id,
+          name: u.name,
+          role: u.role,
+          avatar_color: u.color,
+        }, { onConflict: 'id' });
+      }
+    }
+
+    localStorage.setItem(key, '1');
+  },
+
+  // Cria um novo usuário via Supabase Auth + profiles
+  async createUser({ name, email, password, role }) {
+    if (!window.drSupabase) return { error: 'Supabase não disponível.' };
+
+    const { data, error } = await window.drSupabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name, role } },
+    });
+
+    if (error) return { error: error.message };
+
+    if (data?.user) {
+      const colors = { admin: '#6366f1', comercial: '#3b82f6', trafego: '#a855f7', financeiro: '#22c55e' };
+      await window.drSupabase.from('profiles').upsert({
+        id: data.user.id,
+        name,
+        role,
+        avatar_color: colors[role] || '#6366f1',
+      }, { onConflict: 'id' });
+    }
+
+    return { error: null };
+  },
+
   async logout() {
     if (window.drSupabase) await window.drSupabase.auth.signOut().catch(() => {});
     this.clearSession();
