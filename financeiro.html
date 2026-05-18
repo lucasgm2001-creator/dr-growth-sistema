@@ -704,7 +704,7 @@ function renderDespesasUI() {
   const rows = filtered.map(d => {
     const ti = TIPO_INFO[d.tipo] || TIPO_INFO.outro;
     return `<tr>
-      <td><div class="td-main">${d.desc}</div></td>
+      <td><div class="td-main">${d.descricao}</div></td>
       <td><span class="badge ${ti.cls}">${ti.label}</span></td>
       <td style="font-weight:700;color:var(--red)">${fmt.currency(d.valor)}</td>
       <td>${fmt.date(d.data)}</td>
