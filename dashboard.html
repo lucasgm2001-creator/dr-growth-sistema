@@ -267,6 +267,7 @@ async function loadData() {
       if (!c.error && c.data?.length) clients  = c.data;
       if (!p.error && p.data?.length) payments = p.data;
       window.DRCache?.set('dashboard', { leads, tasks, clients, payments });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
     } catch(e) { /* usa demo data */ }
   }
 
