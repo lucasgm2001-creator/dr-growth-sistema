@@ -696,11 +696,13 @@ async function deleteCampaign() {
   if (!id || !confirm('Excluir campanha?')) return;
   if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
   const camp = campaigns.find(c=>c.id==id);
+  window.DRCache?.clear('trafego');
   await window.drSupabase.from('campaigns').delete().eq('id', id);
+  campaigns = campaigns.filter(c => c.id != id);
   closeCampaignModal();
   showToast('Campanha excluída.', 'info');
   if (camp) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
-  loadData();
+  updateKPIs(); renderCampaigns();
 }
 
 // ---- Modal Conteúdo ----
