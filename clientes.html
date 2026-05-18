@@ -890,7 +890,7 @@ async function saveClient() {
     showToast('Cliente criado!', 'success');
     logActivity({ icon:'🤝', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
   }
-  save(); closeClientModal(); closeProfile(); refresh();
+  closeClientModal(); closeProfile(); refresh();
 }
 
 async function deleteClient() {
@@ -898,7 +898,7 @@ async function deleteClient() {
   if (!id || !confirm('Excluir este cliente?')) return;
   allClients = allClients.filter(c => c.id !== id);
   if (window.drSupabase) window.drSupabase.from('clients').delete().eq('id', id).then(()=>{});
-  save(); closeClientModal(); closeProfile(); refresh();
+  closeClientModal(); closeProfile(); refresh();
   showToast('Cliente excluído.', 'info');
 }
 
