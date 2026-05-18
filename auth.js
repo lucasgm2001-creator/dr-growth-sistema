@@ -273,6 +273,7 @@ function renderElevator(currentPage) {
     const isActive = currentPage === ADMIN_SECTION.page;
     html += `
       <div class="elevator-floor admin-floor ${isActive ? 'active' : ''}"
+        data-tip="${ADMIN_SECTION.label}"
         onclick="location.href='${ADMIN_SECTION.page}'" title="${ADMIN_SECTION.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${ADMIN_SECTION.color}` : ''}">
           <span class="floor-number" style="color:${isActive ? ADMIN_SECTION.color : ''}">${ADMIN_SECTION.floor}</span>
