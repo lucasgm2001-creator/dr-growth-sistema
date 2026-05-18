@@ -1417,7 +1417,6 @@ async function deleteLead() {
   const lead = leads.find(l => l.id == id);
   if (window.drSupabase) { try { await window.drSupabase.from('leads').delete().eq('id', id); } catch {} }
   leads = leads.filter(l => l.id != id);
-  saveLeadsLocal();
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
   showToast('Lead excluído.', 'info');
   if (lead) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Lead ${lead.name} removido do funil`, sector:'comercial' });
