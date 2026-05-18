@@ -182,9 +182,16 @@ const PRIORITY = { high:{ label:'Alta', cls:'priority-high' }, medium:{ label:'M
 const STATUS   = { pending:{ label:'Pendente', cls:'badge-yellow' }, in_progress:{ label:'Em andamento', cls:'badge-accent' }, done:{ label:'Concluído', cls:'badge-green' } };
 
 async function loadTasks() {
+  const cached = window.DRCache?.get('tarefas');
+  if (cached) {
+    allTasks = cached || [];
+    updateKPIs(); renderTasks(allTasks);
+    return;
+  }
   if (!window.drSupabase) { renderTasks([]); return; }
   const { data } = await window.drSupabase.from('tasks').select('*').order('due_date');
   allTasks = data || [];
+  window.DRCache?.set('tarefas', allTasks);
   updateKPIs();
   renderTasks(allTasks);
 }
