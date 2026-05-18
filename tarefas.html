@@ -361,6 +361,7 @@ async function saveTask() {
     status:       document.getElementById('task-status').value,
   };
 
+  window.DRCache?.clear('tarefas');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id', id);
     const idx = allTasks.findIndex(t => t.id == id);
