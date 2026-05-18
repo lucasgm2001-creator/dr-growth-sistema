@@ -296,6 +296,7 @@ async function loadData() {
       allClients = c.data || [];
       allTasks   = t.data || [];
       window.DRCache?.set('administrativo', { clients: allClients, tasks: allTasks });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
     } catch { allClients=[]; allTasks=[]; }
   }
   updateClientKPIs(); renderClientsGrid(allClients);
