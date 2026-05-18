@@ -470,6 +470,7 @@ async function toggleTask(id, e) {
     return;
   }
   t.status = t.status==='done'?'pending':'done';
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:t.status}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   showToast(t.status==='done'?'Tarefa concluída! ✓':'Tarefa reaberta.','success');
