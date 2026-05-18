@@ -759,7 +759,7 @@ async function saveDespesa() {
     const { data: ins } = await window.drSupabase.from('expenses').insert(data).select().single();
     allDespesas.unshift(ins || { ...data, id: Date.now() });
     showToast('Despesa criada!', 'success');
-    logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${desc}" · ${fmt.currency(valor)}`, sector:'financeiro' });
+    logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${descricao}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
   closeDespesaModal();
   renderDespesasUI();
