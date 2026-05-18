@@ -287,8 +287,6 @@ async function loadData() {
   if (cached) {
     allClients = cached.clients || [];
     allTasks   = cached.tasks   || [];
-    updateClientKPIs(); renderClientsGrid(allClients);
-    updateTaskKPIs();  renderTasksList(allTasks);
   } else if (window.drSupabase) {
     try {
       const [c,t] = await Promise.all([
@@ -299,8 +297,6 @@ async function loadData() {
       allTasks   = t.data || [];
       window.DRCache?.set('administrativo', { clients: allClients, tasks: allTasks });
     } catch { allClients=[]; allTasks=[]; }
-    updateClientKPIs(); renderClientsGrid(allClients);
-    updateTaskKPIs();  renderTasksList(allTasks);
   }
   updateClientKPIs(); renderClientsGrid(allClients);
   updateTaskKPIs();  renderTasksList(allTasks);
