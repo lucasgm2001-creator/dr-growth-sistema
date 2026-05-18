@@ -603,17 +603,14 @@ function closeCommissionModal() {
   pendingCommissionLeadId = null;
 }
 
-function saveCommission() {
+async function saveCommission() {
   const amount = parseFloat(document.getElementById('commission-amount').value) || 0;
   const notes = document.getElementById('commission-notes').value.trim();
   const leadId = pendingCommissionLeadId;
   if (!leadId) return;
   const lead = leads.find(l => l.id == leadId);
   if (!lead) return;
-  const all = getCommissions();
-  const idx = all.findIndex(c => c.lead_id == leadId);
   const entry = {
-    id: idx >= 0 ? all[idx].id : Date.now(),
     lead_id: leadId,
     lead_name: lead.name,
     lead_company: lead.company || '',
@@ -621,11 +618,18 @@ function saveCommission() {
     seller: lead.responsible,
     commission_amount: amount,
     notes,
-    created_at: idx >= 0 ? all[idx].created_at : new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
   };
-  if (idx >= 0) all[idx] = entry; else all.push(entry);
-  saveCommissionsLocal(all);
+  if (window.drSupabase) {
+    const existing = _commissions.find(c => c.lead_id == leadId);
+    if (existing) {
+      await window.drSupabase.from('commissions').update({ commission_amount: amount, notes }).eq('id', existing.id);
+      Object.assign(existing, { commission_amount: amount, notes });
+    } else {
+      const { data: ins } = await window.drSupabase.from('commissions').insert(entry).select().single();
+      if (ins) _commissions.push(ins);
+    }
+  }
   closeCommissionModal();
   showToast('Comissão registrada!', 'success');
 }
