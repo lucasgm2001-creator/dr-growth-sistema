@@ -396,15 +396,18 @@ function populateSellersSelect() {
   if (current) sel.value = current;
 }
 
-function addSeller() {
+async function addSeller() {
   if (session.role !== 'admin') return;
   const name = prompt('Nome completo do vendedor:');
   if (!name || !name.trim()) return;
   const short = name.trim().split(' ')[0];
-  const sellers = getSellers();
-  if (sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
-  sellers.push({ name: name.trim(), short });
-  saveSellers(sellers);
+  if (_sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
+  if (window.drSupabase) {
+    const { data: ins } = await window.drSupabase.from('sellers').insert({ name: name.trim(), short }).select().single();
+    if (ins) _sellers.push(ins);
+  } else {
+    _sellers.push({ name: name.trim(), short, id: Date.now() });
+  }
   populateSellersSelect();
   renderSellersAdmin();
   renderPipeline();
