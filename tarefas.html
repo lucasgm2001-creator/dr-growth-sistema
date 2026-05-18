@@ -306,7 +306,7 @@ async function toggleStatus(id, event) {
 
   const next = task.status === 'done' ? 'pending' : 'done';
   task.status = next;
-
+  window.DRCache?.clear('tarefas');
   if (window.drSupabase) {
     await window.drSupabase.from('tasks').update({ status: next }).eq('id', id);
   }
