@@ -795,28 +795,33 @@ function logActivity(opts) {
 }
 
 // ============================================================
-//  Supabase Realtime helper (com debounce de 1 s)
-//  Múltiplas tabelas por canal → menos conexões abertas
+//  Cache local de dados — evita requisições repetidas
+//  TTL padrão: 5 min. Invalidar em qualquer escrita.
 // ============================================================
-function subscribeRealtime(channelName, tables, callback) {
-  if (!window.drSupabase) return null;
+const DRCache = {
+  _ttl: 5 * 60 * 1000,
+  set(key, data, ttlMs) {
+    try {
+      const ttl = ttlMs || this._ttl;
+      localStorage.setItem('drg_cache_' + key, JSON.stringify({ ts: Date.now(), ttl, data }));
+    } catch (e) {}
+  },
+  get(key) {
+    try {
+      const raw = localStorage.getItem('drg_cache_' + key);
+      if (!raw) return null;
+      const { ts, ttl, data } = JSON.parse(raw);
+      if (Date.now() - ts > (ttl || this._ttl)) { this.clear(key); return null; }
+      return data;
+    } catch (e) { return null; }
+  },
+  clear(key) {
+    localStorage.removeItem('drg_cache_' + key);
+  },
+};
 
-  // Aceita string ou array de tabelas
-  const tableList = Array.isArray(tables) ? tables : [tables];
-
-  // Debounce: evita chamar callback várias vezes em sequência rápida
-  let _timer;
-  const debounced = () => {
-    clearTimeout(_timer);
-    _timer = setTimeout(callback, 1000);
-  };
-
-  let ch = window.drSupabase.channel(channelName);
-  tableList.forEach(table => {
-    ch = ch.on('postgres_changes', { event: '*', schema: 'public', table }, debounced);
-  });
-  return ch.subscribe();
-}
+// Realtime desativado — usa cache local + carregamento único por página
+function subscribeRealtime() { return null; }
 
 // ============================================================
 //  Role-based data filter
