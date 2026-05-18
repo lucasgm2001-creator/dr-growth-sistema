@@ -743,10 +743,10 @@ function closeDespesaModal() { document.getElementById('despesa-modal').classLis
 
 async function saveDespesa() {
   const id    = document.getElementById('desp-id').value;
-  const desc  = document.getElementById('desp-desc').value.trim();
+  const descricao = document.getElementById('desp-desc').value.trim();
   const valor = Number(document.getElementById('desp-valor').value);
-  if (!desc || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
-  const data = { desc, tipo: document.getElementById('desp-tipo').value, valor, data: document.getElementById('desp-data').value || null, status: document.getElementById('desp-status').value };
+  if (!descricao || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
+  const data = { descricao, tipo: document.getElementById('desp-tipo').value, valor, data: document.getElementById('desp-data').value || null, status: document.getElementById('desp-status').value };
   if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
   window.DRCache?.clear('financeiro');
   if (id) {
