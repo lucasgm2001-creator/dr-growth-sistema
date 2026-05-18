@@ -608,6 +608,7 @@ async function saveTask() {
 async function deleteTask() {
   const id=document.getElementById('task-id').value;
   if (!id||!confirm('Excluir tarefa?')) return;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').delete().eq('id',id);
   allTasks=allTasks.filter(t=>t.id!=id);
   closeTaskModal(); updateTaskKPIs(); filterTasks();
