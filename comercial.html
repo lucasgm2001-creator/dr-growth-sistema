@@ -474,7 +474,6 @@ function addPhoneToLead(id) {
   const phone = prompt(`Cadastrar telefone para ${lead.name}:\n(Ex: +55 11 99999-9999 ou +1 305 555-0000)`);
   if (!phone || !phone.trim()) return;
   lead.phone = phone.trim();
-  saveLeadsLocal();
   renderLeadsTable(leads);
   renderKanban();
   if (selectedLeadId === id) selectLead(id);
