@@ -496,6 +496,14 @@ const DEMO_DOCS    = [];
 
 // ---- Persistence ----
 async function loadData() {
+  const cached = window.DRCache?.get('clientes');
+  if (cached) {
+    allClients = cached.clients || [];
+    allJobs    = cached.jobs    || [];
+    allDocs    = cached.docs    || [];
+    refresh();
+    return;
+  }
   if (!window.drSupabase) return;
   const [c, j, d] = await Promise.all([
     window.drSupabase.from('clients').select('*').order('name'),
@@ -505,8 +513,8 @@ async function loadData() {
   allClients = (c.data || []);
   allJobs    = (j.data || []);
   allDocs    = (d.data || []);
-  // Role filter for clients country
   if (window.applyRoleFilter) allClients = applyRoleFilter(allClients, 'clients');
+  window.DRCache?.set('clientes', { clients: allClients, jobs: allJobs, docs: allDocs });
   refresh();
 }
 
