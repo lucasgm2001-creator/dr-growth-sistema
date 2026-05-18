@@ -289,10 +289,10 @@ async function loadData() {
         window.drSupabase.from('clients').select('*').order('name'),
         window.drSupabase.from('tasks').select('*').order('due_date'),
       ]);
-      allClients = (!c.error && c.data?.length) ? c.data : DEMO_CLIENTS;
-      allTasks   = (!t.error && t.data?.length) ? t.data : DEMO_TASKS;
-    } catch { allClients=DEMO_CLIENTS; allTasks=DEMO_TASKS; }
-  } else { allClients=DEMO_CLIENTS; allTasks=DEMO_TASKS; }
+      allClients = c.data || [];
+      allTasks   = t.data || [];
+    } catch { allClients=[]; allTasks=[]; }
+  }
   updateClientKPIs(); renderClientsGrid(allClients);
   updateTaskKPIs();  renderTasksList(allTasks);
   document.getElementById('adm-subtitle').textContent =
