@@ -6,6 +6,108 @@
   <title>DR Growth Sistema — Login</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .demo-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted, #94a3b8);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 10px;
+    }
+    .demo-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .demo-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, transform 0.1s;
+      user-select: none;
+    }
+    .demo-card:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(255,255,255,0.18);
+      transform: translateY(-1px);
+    }
+    .demo-card:active { transform: translateY(0); opacity: .85; }
+    .demo-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 12px; color: #fff;
+      flex-shrink: 0;
+    }
+    .demo-info { min-width: 0; }
+    .demo-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary, #f1f5f9);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .demo-role { font-size: 11px; color: var(--text-muted, #94a3b8); }
+
+    .login-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 4px 0 16px;
+      color: var(--text-muted, #64748b); font-size: 12px;
+    }
+    .login-divider::before, .login-divider::after {
+      content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
+    }
+
+    .create-link {
+      display: block; text-align: center; margin-top: 16px;
+      color: #6366f1; font-size: 14px; cursor: pointer;
+      background: none; border: none; width: 100%; padding: 0;
+    }
+    .create-link:hover { text-decoration: underline; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+      z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 28px;
+      width: 100%; max-width: 400px; margin: 20px;
+      animation: _slideUp 0.2s ease;
+    }
+    @keyframes _slideUp {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 700; color: #f1f5f9; margin: 0; }
+    .modal-close {
+      background: none; border: none; color: #94a3b8;
+      font-size: 20px; cursor: pointer; padding: 4px; line-height: 1;
+    }
+    .modal-close:hover { color: #f1f5f9; }
+    .modal-msg {
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 13px; margin-bottom: 14px; display: none;
+    }
+    .modal-msg.show { display: block; }
+    .modal-msg.error  { background: rgba(239,68,68,.15); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+    .modal-msg.success{ background: rgba(34,197,94,.15);  color: #86efac; border: 1px solid rgba(34,197,94,.3);  }
+
+    .form-control option { background: #1e293b; color: #f1f5f9; }
+  </style>
 </head>
 <body class="login-page">
 
@@ -23,6 +125,41 @@
       <h2>Bem-vindo de volta</h2>
       <p>Entre para acessar o sistema da equipe</p>
     </div>
+
+    <!-- Acesso rápido -->
+    <div class="demo-section-label">Acesso rápido</div>
+    <div class="demo-cards">
+      <div class="demo-card" onclick="quickLogin('daniel@drgrowth.com','daniel123')">
+        <div class="demo-avatar" style="background:#6366f1">DR</div>
+        <div class="demo-info">
+          <div class="demo-name">Daniel Ramos</div>
+          <div class="demo-role">Admin</div>
+        </div>
+      </div>
+      <div class="demo-card" onclick="quickLogin('lucas@drgrowth.com','lucas123')">
+        <div class="demo-avatar" style="background:#3b82f6">LM</div>
+        <div class="demo-info">
+          <div class="demo-name">Lucas Moraes</div>
+          <div class="demo-role">Comercial</div>
+        </div>
+      </div>
+      <div class="demo-card" onclick="quickLogin('gabriel@drgrowth.com','gabriel123')">
+        <div class="demo-avatar" style="background:#a855f7">GR</div>
+        <div class="demo-info">
+          <div class="demo-name">Gabriel Ramos</div>
+          <div class="demo-role">Tráfego</div>
+        </div>
+      </div>
+      <div class="demo-card" onclick="quickLogin('thamyris@drgrowth.com','thamyris123')">
+        <div class="demo-avatar" style="background:#22c55e">TL</div>
+        <div class="demo-info">
+          <div class="demo-name">Thamyris Lages</div>
+          <div class="demo-role">Financeiro</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-divider">ou entre com sua conta</div>
 
     <div class="login-error" id="login-error"></div>
 
@@ -42,23 +179,81 @@
       </button>
     </form>
 
+    <button class="create-link" onclick="openCreateModal()">+ Criar nova conta</button>
 
+  </div>
+
+  <!-- Modal: Criar Conta -->
+  <div class="modal-overlay" id="create-modal" onclick="if(event.target===this)closeCreateModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Criar Conta</h3>
+        <button class="modal-close" onclick="closeCreateModal()">✕</button>
+      </div>
+      <div class="modal-msg error"   id="create-error"></div>
+      <div class="modal-msg success" id="create-success"></div>
+      <form id="create-form" autocomplete="off">
+        <div class="form-group">
+          <label for="c-name">Nome completo</label>
+          <input type="text" id="c-name" class="form-control" placeholder="Seu nome" required>
+        </div>
+        <div class="form-group">
+          <label for="c-email">E-mail</label>
+          <input type="email" id="c-email" class="form-control" placeholder="seu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="c-password">Senha</label>
+          <input type="password" id="c-password" class="form-control"
+            placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+        <div class="form-group" style="margin-bottom:24px">
+          <label for="c-role">Função</label>
+          <select id="c-role" class="form-control" required>
+            <option value="">Selecione…</option>
+            <option value="admin">Admin</option>
+            <option value="comercial">Comercial</option>
+            <option value="trafego">Tráfego</option>
+            <option value="financeiro">Administrativo / Financeiro</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="create-btn">
+          Criar Conta
+        </button>
+      </form>
+    </div>
   </div>
 
   <script src="supabase-config.js"></script>
   <script src="auth.js"></script>
   <script>
     // Já logado → vai direto pro Hall
-    if (AUTH.getSession()) {
-      window.location.href = 'hall.html';
+    if (AUTH.getSession()) window.location.href = 'hall.html';
+
+    // Garante usuários demo no Supabase (silencioso, uma vez)
+    window.addEventListener('load', () => AUTH.ensureDemoUsers());
+
+    // Login rápido via card
+    async function quickLogin(email, password) {
+      const btn   = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      errEl.classList.remove('show');
+      btn.disabled    = true;
+      btn.textContent = 'Entrando…';
+
+      const { user, error } = await AUTH.login(email, password);
+
+      if (error || !user) {
+        errEl.textContent = error || 'Falha no acesso rápido.';
+        errEl.classList.add('show');
+        btn.disabled    = false;
+        btn.textContent = 'Entrar no Sistema';
+        return;
+      }
+      btn.textContent = '✓ Bem-vindo, ' + user.name.split(' ')[0] + '!';
+      setTimeout(() => { window.location.href = 'hall.html'; }, 400);
     }
 
-    function fillDemo(email, password) {
-      document.getElementById('email').value    = email;
-      document.getElementById('password').value = password;
-      document.getElementById('login-form').dispatchEvent(new Event('submit'));
-    }
-
+    // Login manual
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn   = document.getElementById('login-btn');
@@ -79,9 +274,51 @@
         btn.textContent = 'Entrar no Sistema';
         return;
       }
-
       btn.textContent = '✓ Bem-vindo, ' + user.name.split(' ')[0] + '!';
       setTimeout(() => { window.location.href = 'hall.html'; }, 400);
+    });
+
+    // Modal criar conta
+    function openCreateModal() {
+      document.getElementById('create-modal').classList.add('show');
+    }
+    function closeCreateModal() {
+      document.getElementById('create-modal').classList.remove('show');
+      document.getElementById('create-form').reset();
+      document.getElementById('create-error').classList.remove('show');
+      document.getElementById('create-success').classList.remove('show');
+      document.getElementById('create-btn').textContent = 'Criar Conta';
+    }
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn    = document.getElementById('create-btn');
+      const errEl  = document.getElementById('create-error');
+      const succEl = document.getElementById('create-success');
+      const name     = document.getElementById('c-name').value.trim();
+      const email    = document.getElementById('c-email').value.trim();
+      const password = document.getElementById('c-password').value;
+      const role     = document.getElementById('c-role').value;
+
+      btn.disabled    = true;
+      btn.textContent = 'Criando…';
+      errEl.classList.remove('show');
+      succEl.classList.remove('show');
+
+      const result = await AUTH.createUser({ name, email, password, role });
+
+      if (result.error) {
+        errEl.textContent = result.error;
+        errEl.classList.add('show');
+        btn.disabled    = false;
+        btn.textContent = 'Criar Conta';
+        return;
+      }
+
+      succEl.textContent = 'Conta criada! Verifique seu e-mail para confirmar o acesso.';
+      succEl.classList.add('show');
+      btn.textContent = '✓ Conta criada!';
+      setTimeout(closeCreateModal, 3500);
     });
   </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
