@@ -589,7 +589,7 @@ function openCommissionModal(leadId) {
   const lead = leads.find(l => l.id === leadId);
   if (!lead) return;
   pendingCommissionLeadId = leadId;
-  const existing = getCommissions().find(c => c.lead_id == leadId);
+  const existing = _commissions.find(c => c.lead_id == leadId);
   document.getElementById('commission-lead-info').innerHTML =
     `<strong>${lead.name}</strong>${lead.company ? ' · ' + lead.company : ''}<br>Valor fechado: <strong style="color:var(--green)">${lead.value ? fmt.currency(lead.value) : '—'}</strong>`;
   document.getElementById('commission-lead-id').value = leadId;
