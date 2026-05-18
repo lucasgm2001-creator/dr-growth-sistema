@@ -325,6 +325,13 @@ let campaigns = [];
 let contents  = [];
 
 async function loadData() {
+  const cached = window.DRCache?.get('trafego');
+  if (cached) {
+    campaigns = cached.campaigns || [];
+    contents  = cached.contents  || [];
+    updateKPIs(); renderCampaigns(); filterContent();
+    return;
+  }
   if (!window.drSupabase) return;
   const [c, p] = await Promise.all([
     window.drSupabase.from('campaigns').select('*').order('created_at', { ascending: false }),
@@ -332,9 +339,8 @@ async function loadData() {
   ]);
   campaigns = c.data || [];
   contents  = p.data || [];
-  updateKPIs();
-  renderCampaigns();
-  filterContent();
+  window.DRCache?.set('trafego', { campaigns, contents });
+  updateKPIs(); renderCampaigns(); filterContent();
 }
 
 const PLATFORM_INFO = {
