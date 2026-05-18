@@ -258,6 +258,7 @@ async function loadLeads() {
       history  = {};
       (hr.data || []).forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
       window.DRCache?.set('leads', { leads: allLeads, history });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
     } catch { allLeads = DEMO_LEADS; history = DEMO_HISTORY; }
   } else {
     allLeads = DEMO_LEADS;
