@@ -954,7 +954,7 @@ async function saveJob() {
     showToast('Job criado!', 'success');
     logActivity({ icon:'⚡', color:'#3b82f6', msg:`Novo job: ${title} (${cName})`, sector:'clientes' });
   }
-  save(); closeJobModal(); refresh();
+  closeJobModal(); refresh();
 }
 
 async function deleteJob() {
@@ -962,7 +962,7 @@ async function deleteJob() {
   if (!id || !confirm('Excluir este job?')) return;
   allJobs = allJobs.filter(j => j.id !== id);
   if (window.drSupabase) window.drSupabase.from('jobs').delete().eq('id', id).then(()=>{});
-  save(); closeJobModal(); refresh();
+  closeJobModal(); refresh();
   showToast('Job excluído.', 'info');
 }
 
