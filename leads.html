@@ -447,6 +447,7 @@ async function saveLead() {
 async function deleteLead() {
   const id = document.getElementById('lead-id').value;
   if (!id || !confirm('Excluir este lead?')) return;
+  window.DRCache?.clear('leads');
   if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
   allLeads = allLeads.filter(l => l.id != id);
   closeModal();
