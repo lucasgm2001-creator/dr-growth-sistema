@@ -324,6 +324,19 @@ if (!session) throw new Error('Not authenticated');
 let campaigns = [];
 let contents  = [];
 
+async function loadData() {
+  if (!window.drSupabase) return;
+  const [c, p] = await Promise.all([
+    window.drSupabase.from('campaigns').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('content_pieces').select('*').order('created_at', { ascending: false }),
+  ]);
+  campaigns = c.data || [];
+  contents  = p.data || [];
+  updateKPIs();
+  renderCampaigns();
+  filterContent();
+}
+
 const PLATFORM_INFO = {
   google:   { name:'Google Ads',  icon:'🔍', color:'#ea4335' },
   meta:     { name:'Meta Ads',    icon:'📘', color:'#1877f2' },
