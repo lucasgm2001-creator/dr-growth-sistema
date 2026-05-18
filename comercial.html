@@ -414,10 +414,10 @@ async function addSeller() {
   showToast(`${name.trim()} adicionado como vendedor.`, 'success');
 }
 
-function removeSeller(short) {
+async function removeSeller(short) {
   if (session.role !== 'admin') return;
-  const sellers = getSellers().filter(s => s.short !== short);
-  saveSellers(sellers);
+  if (window.drSupabase) await window.drSupabase.from('sellers').delete().eq('short', short);
+  _sellers = _sellers.filter(s => s.short !== short);
   populateSellersSelect();
   renderSellersAdmin();
   renderPipeline();
