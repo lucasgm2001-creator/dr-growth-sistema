@@ -1432,6 +1432,7 @@ function saveLead() {
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
       logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
+      window.DRCache?.clear('comercial');
       if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado') openCommissionModal(data.id);
     }
