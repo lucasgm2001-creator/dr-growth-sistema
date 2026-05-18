@@ -1041,7 +1041,7 @@ window.migrateLeadToClient = function(lead) {
     created_at:   new Date().toISOString(),
   };
   allClients.push(newC);
-  save();
+  if (window.drSupabase) window.drSupabase.from('clients').insert(newC).then(()=>{});
   logActivity({ icon:'🤝', color:'#10B981', msg:`Lead migrado para Clientes: ${newC.name}`, sector:'clientes' });
 };
 
