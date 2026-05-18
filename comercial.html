@@ -1389,7 +1389,6 @@ function saveLead() {
       const idx = leads.findIndex(l => l.id == id);
       const oldStage = idx >= 0 ? leads[idx].stage : null;
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
-      saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
       logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
