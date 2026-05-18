@@ -430,6 +430,7 @@ async function addSeller() {
   if (!name || !name.trim()) return;
   const short = name.trim().split(' ')[0];
   if (_sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) {
     const { data: ins } = await window.drSupabase.from('sellers').insert({ name: name.trim(), short }).select().single();
     if (ins) _sellers.push(ins);
