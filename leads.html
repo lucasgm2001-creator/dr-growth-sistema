@@ -216,10 +216,6 @@ if (!session) throw new Error('Not authenticated');
 let allLeads = [], selectedLeadId = null;
 let history = {};
 
-function saveLeadsLocal() { try { localStorage.setItem('drg_leads', JSON.stringify(allLeads)); } catch {} }
-function loadLeadsLocal() { try { return JSON.parse(localStorage.getItem('drg_leads') || '[]'); } catch { return []; } }
-
-
 const STAGE_INFO = {
   novo:     { label:'Novo Lead',        cls:'badge-accent' },
   contato:  { label:'Contato Feito',    cls:'badge-blue' },
