@@ -358,7 +358,6 @@ async function saveTask() {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id', id);
     const idx = allTasks.findIndex(t => t.id == id);
     if (idx >= 0) allTasks[idx] = { ...allTasks[idx], ...data };
-    saveTasksLocal();
     showToast('Tarefa atualizada!', 'success');
     logActivity({ icon:'✏️', color:'#6366f1', msg:`Tarefa "${title}" atualizada`, sector:'tarefas' });
   } else {
