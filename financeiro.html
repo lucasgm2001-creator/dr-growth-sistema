@@ -764,9 +764,11 @@ async function saveDespesa() {
 async function deleteDespesa() {
   const id = document.getElementById('desp-id').value;
   if (!id || !confirm('Excluir despesa?')) return;
+  window.DRCache?.clear('financeiro');
   if (window.drSupabase) await window.drSupabase.from('expenses').delete().eq('id', id);
+  allDespesas = allDespesas.filter(d => d.id != id);
   closeDespesaModal();
-  loadData();
+  renderDespesasUI();
 }
 
 // ---- BALANÇO PATRIMONIAL ----
