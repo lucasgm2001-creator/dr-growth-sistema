@@ -438,29 +438,21 @@ function switchTab(name, btn) {
   if (name === 'contratos') renderContracts();
 }
 
-function savePaymentsLocal() { try { localStorage.setItem('drg_payments', JSON.stringify(allPayments)); } catch {} }
-function loadPaymentsLocal() { try { return JSON.parse(localStorage.getItem('drg_payments') || '[]'); } catch { return []; } }
-function saveClientsLocal()  { try { localStorage.setItem('drg_clients',  JSON.stringify(allClients));  } catch {} }
-function loadClientsLocal()  { try { return JSON.parse(localStorage.getItem('drg_clients')  || '[]'); } catch { return []; } }
-
 async function loadData() {
-  let paymentsFromRemote = false, clientsFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const [p, c] = await Promise.all([
-        window.drSupabase.from('payments').select('*').order('due_date', { ascending:false }),
-        window.drSupabase.from('clients').select('*').eq('active', true),
-      ]);
-      if (!p.error && p.data?.length) { allPayments = p.data; paymentsFromRemote = true; savePaymentsLocal(); }
-      if (!c.error && c.data?.length) { allClients  = c.data; clientsFromRemote  = true; saveClientsLocal(); }
-    } catch {}
-  }
-  if (!paymentsFromRemote) { const local = loadPaymentsLocal(); allPayments = local.length ? local : DEMO_PAYMENTS; }
-  if (!clientsFromRemote)  { const local = loadClientsLocal();  allClients  = local.length ? local : DEMO_CLIENTS;  }
+  if (!window.drSupabase) return;
+  const [p, c, e] = await Promise.all([
+    window.drSupabase.from('payments').select('*').order('due_date', { ascending: false }),
+    window.drSupabase.from('clients').select('*').eq('active', true),
+    window.drSupabase.from('expenses').select('*').order('created_at', { ascending: false }),
+  ]);
+  allPayments  = p.data || [];
+  allClients   = c.data || [];
+  allDespesas  = e.data || [];
   updateKPIs();
   renderMRR();
   renderPaymentsTable(allPayments);
   renderContracts();
+  renderDespesasUI();
 }
 
 function getFilteredPayments() { return window.filterByCountry ? window.filterByCountry(allPayments) : allPayments; }
