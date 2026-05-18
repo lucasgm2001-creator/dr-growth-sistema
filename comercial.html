@@ -1446,6 +1446,7 @@ async function deleteLead() {
   const id = document.getElementById('lead-id').value;
   if (!id || !confirm('Excluir este lead?')) return;
   const lead = leads.find(l => l.id == id);
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) { try { await window.drSupabase.from('leads').delete().eq('id', id); } catch {} }
   leads = leads.filter(l => l.id != id);
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
