@@ -488,6 +488,91 @@ const fmt = {
 };
 
 // ============================================================
+//  Banner de status do Supabase
+// ============================================================
+(function injectSupabaseBannerStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    #supabase-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+      background: #7f1d1d; color: #fecaca;
+      font-size: 13px; font-weight: 500;
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
+      animation: _sbSlideDown .25s ease;
+    }
+    #supabase-banner.warn {
+      background: #78350f; color: #fde68a;
+    }
+    #supabase-banner.ok {
+      background: #14532d; color: #bbf7d0;
+    }
+    @keyframes _sbSlideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    #supabase-banner .sb-close {
+      margin-left: auto; background: none; border: none;
+      color: inherit; opacity: .7; cursor: pointer; font-size: 16px; padding: 0 4px;
+    }
+    #supabase-banner .sb-close:hover { opacity: 1; }
+    body.has-sb-banner .main-content,
+    body.has-sb-banner .sidebar { padding-top: 42px; }
+  `;
+  document.head.appendChild(style);
+})();
+
+function showSupabaseBanner(type, msg) {
+  let el = document.getElementById('supabase-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'supabase-banner';
+    el.innerHTML = `<span id="sb-msg"></span><button class="sb-close" onclick="dismissSupabaseBanner()">✕</button>`;
+    document.body.prepend(el);
+  }
+  el.className = type;
+  document.getElementById('sb-msg').textContent = msg;
+  document.body.classList.add('has-sb-banner');
+}
+
+function dismissSupabaseBanner() {
+  const el = document.getElementById('supabase-banner');
+  if (el) el.remove();
+  document.body.classList.remove('has-sb-banner');
+}
+
+async function checkSupabaseStatus() {
+  if (!window.drSupabase) {
+    showSupabaseBanner('warn', '⚠️ Supabase não inicializado — verifique a chave em supabase-config.js. Navegação funciona, dados não carregam.');
+    return;
+  }
+  try {
+    // Teste leve: busca 0 linhas de uma tabela que sempre existe
+    const { error } = await window.drSupabase.from('profiles').select('id').limit(0);
+    if (!error) {
+      // OK — remove banner se estava visível
+      const el = document.getElementById('supabase-banner');
+      if (el?.classList.contains('ok') || el?.classList.contains('warn') || el?.classList.contains('')) {
+        dismissSupabaseBanner();
+      }
+      return;
+    }
+    const msg = error.message || error.code || JSON.stringify(error);
+    if (msg.includes('usage_exceeded') || msg.includes('Usage exceeded')) {
+      showSupabaseBanner('',
+        '🚫 Limite do plano Supabase excedido. Dados não carregam até o reset mensal ou upgrade. ' +
+        'Login e navegação continuam funcionando.'
+      );
+    } else {
+      showSupabaseBanner('warn', `⚠️ Supabase indisponível: ${msg.slice(0, 120)}`);
+    }
+  } catch (e) {
+    showSupabaseBanner('warn', '⚠️ Sem conexão com Supabase. Verifique sua internet ou o status do projeto.');
+  }
+}
+
+// ============================================================
 //  Inicialização comum
 // ============================================================
 function initPage(currentPage) {
@@ -499,6 +584,8 @@ function initPage(currentPage) {
   initMobileSidebar();
   initElevatorTooltips();
   startClocks();
+  // Checa Supabase em background — não bloqueia a página
+  setTimeout(checkSupabaseStatus, 800);
 
   return session;
 }
