@@ -253,6 +253,7 @@ function renderElevator(currentPage) {
 
     html += `
       <div class="elevator-floor ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}"
+        data-tip="${section.label}"
         onclick="${isLocked ? `showAccessDenied('${section.label}')` : `location.href='${section.page}'`}"
         title="${section.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${section.color}` : ''}">
