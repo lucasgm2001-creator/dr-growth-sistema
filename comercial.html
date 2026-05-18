@@ -381,6 +381,34 @@ async function loadSellers() {
   _sellers = data || [];
   return _sellers;
 }
+
+async function loadAll() {
+  const cached = window.DRCache?.get('comercial');
+  if (cached) {
+    leads        = cached.leads        || [];
+    history      = cached.history      || {};
+    _sellers     = cached.sellers      || [];
+    _commissions = cached.commissions  || [];
+    updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+    populateSellersSelect(); renderSellersAdmin(); renderCommissions();
+    return;
+  }
+  if (!window.drSupabase) return;
+  const [lr, hr, sr, cr] = await Promise.all([
+    window.drSupabase.from('leads').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('lead_history').select('*').order('created_at'),
+    window.drSupabase.from('sellers').select('*').order('name'),
+    window.drSupabase.from('commissions').select('*').order('created_at', { ascending: false }),
+  ]);
+  leads        = lr.data || [];
+  history      = {};
+  (hr.data || []).forEach(h => { if (!history[h.lead_id]) history[h.lead_id] = []; history[h.lead_id].push(h); });
+  _sellers     = sr.data || [];
+  _commissions = cr.data || [];
+  window.DRCache?.set('comercial', { leads, history, sellers: _sellers, commissions: _commissions });
+  updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+  populateSellersSelect(); renderSellersAdmin(); renderCommissions();
+}
 function getSellers() { return _sellers; }
 async function saveSellersDB(arr) { /* managed via addSeller/removeSeller */ }
 
