@@ -730,7 +730,7 @@ function openEditDespesa(id) {
   if (!d) return;
   document.getElementById('despesa-modal-title').textContent = 'Editar Despesa';
   document.getElementById('desp-id').value = d.id;
-  document.getElementById('desp-desc').value = d.desc||'';
+  document.getElementById('desp-desc').value = d.descricao||'';
   document.getElementById('desp-tipo').value = d.tipo||'outro';
   document.getElementById('desp-valor').value = d.valor||'';
   document.getElementById('desp-data').value = d.data||'';
