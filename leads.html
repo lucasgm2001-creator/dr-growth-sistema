@@ -226,18 +226,18 @@ const STAGE_INFO = {
 };
 
 async function loadLeads() {
-  let loadedFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
-      if (!error && data?.length) { allLeads = data; loadedFromRemote = true; saveLeadsLocal(); }
-      const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
-      if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
-    } catch {}
-  }
-  if (!loadedFromRemote) {
-    allLeads = loadLeadsLocal();
-  }
+  if (!window.drSupabase) { renderTable([]); return; }
+  const [leadsRes, histRes] = await Promise.all([
+    window.drSupabase.from('leads').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('lead_history').select('*').order('created_at'),
+  ]);
+  allLeads = leadsRes.data || [];
+  history  = {};
+  (histRes.data || []).forEach(h => {
+    if (!history[h.lead_id]) history[h.lead_id] = [];
+    history[h.lead_id].push(h);
+  });
+  allLeads = (window.applyRoleFilter || (x=>x))(allLeads, 'leads');
   updateSubtitle();
   renderTable(allLeads);
 }
