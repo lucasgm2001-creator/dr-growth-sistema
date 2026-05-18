@@ -674,17 +674,21 @@ async function saveCampaign() {
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
   const data = { name, client:document.getElementById('camp-client').value.trim(), platform:document.getElementById('camp-platform').value, status:document.getElementById('camp-status').value, budget:Number(document.getElementById('camp-budget').value)||0, objective:document.getElementById('camp-objective').value, notes:document.getElementById('camp-notes').value.trim(), country:document.getElementById('camp-country').value };
   if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
+  window.DRCache?.clear('trafego');
   if (id) {
     await window.drSupabase.from('campaigns').update(data).eq('id', id);
+    const idx = campaigns.findIndex(c => c.id == id);
+    if (idx >= 0) campaigns[idx] = { ...campaigns[idx], ...data };
     showToast('Campanha atualizada!', 'success');
     logActivity({ icon:'📊', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
   } else {
-    await window.drSupabase.from('campaigns').insert({ ...data, spend:0, impressions:0, clicks:0, leads:0 });
+    const { data: ins } = await window.drSupabase.from('campaigns').insert({ ...data, spend:0, impressions:0, clicks:0, leads:0 }).select().single();
+    campaigns.unshift(ins || { ...data, id: Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
     showToast('Campanha criada!', 'success');
     logActivity({ icon:'📣', color:'#a855f7', msg:`Nova campanha criada — "${name}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
   }
   closeCampaignModal();
-  loadData();
+  updateKPIs(); renderCampaigns();
 }
 
 async function deleteCampaign() {
