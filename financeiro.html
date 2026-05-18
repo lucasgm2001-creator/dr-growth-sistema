@@ -664,6 +664,7 @@ async function savePayment() {
 async function deletePayment() {
   const id = document.getElementById('pay-id').value;
   if (!id || !confirm('Excluir este lançamento?')) return;
+  window.DRCache?.clear('financeiro');
   if (window.drSupabase) await window.drSupabase.from('payments').delete().eq('id', id);
   allPayments = allPayments.filter(p => p.id!=id);
   closeModal(); updateKPIs(); filterPayments();
