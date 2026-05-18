@@ -497,6 +497,7 @@ function initPage(currentPage) {
   renderElevator(currentPage || window.location.pathname.split('/').pop());
   renderUserProfile(session);
   initMobileSidebar();
+  initElevatorTooltips();
   startClocks();
 
   return session;
