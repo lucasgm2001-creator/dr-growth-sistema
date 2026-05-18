@@ -649,6 +649,7 @@ async function saveCommission() {
     notes,
     created_at: new Date().toISOString(),
   };
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) {
     const existing = _commissions.find(c => c.lead_id == leadId);
     if (existing) {
