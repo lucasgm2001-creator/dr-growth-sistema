@@ -953,6 +953,7 @@ async function saveJob() {
     updated_at:  new Date().toISOString(),
   };
 
+  window.DRCache?.clear('clientes');
   if (id) {
     const idx = allJobs.findIndex(j => j.id === id);
     if (idx >= 0) allJobs[idx] = { ...allJobs[idx], ...data };
