@@ -340,6 +340,7 @@ async function loadData() {
   campaigns = c.data || [];
   contents  = p.data || [];
   window.DRCache?.set('trafego', { campaigns, contents });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   updateKPIs(); renderCampaigns(); filterContent();
 }
 
