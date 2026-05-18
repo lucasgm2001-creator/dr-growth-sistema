@@ -972,6 +972,7 @@ async function saveJob() {
 async function deleteJob() {
   const id = document.getElementById('jm-id').value;
   if (!id || !confirm('Excluir este job?')) return;
+  window.DRCache?.clear('clientes');
   allJobs = allJobs.filter(j => j.id !== id);
   if (window.drSupabase) window.drSupabase.from('jobs').delete().eq('id', id).then(()=>{});
   closeJobModal(); refresh();
