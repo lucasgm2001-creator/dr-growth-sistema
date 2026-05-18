@@ -457,6 +457,7 @@ async function loadData() {
   allClients  = c.data || [];
   allDespesas = e.data || [];
   window.DRCache?.set('financeiro', { payments: allPayments, clients: allClients, despesas: allDespesas });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   updateKPIs(); renderMRR(); renderPaymentsTable(allPayments); renderContracts(); renderDespesasUI();
 }
 
