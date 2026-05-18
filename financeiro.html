@@ -642,7 +642,6 @@ async function savePayment() {
     if (window.drSupabase) await window.drSupabase.from('payments').update(data).eq('id', id);
     const idx = allPayments.findIndex(p => p.id==id);
     if (idx>=0) allPayments[idx] = { ...allPayments[idx], ...data };
-    savePaymentsLocal();
     showToast('Lançamento atualizado!', 'success');
     logActivity({ icon:'💰', color:'#22c55e', msg:`Lançamento de ${client} atualizado`, sector:'financeiro' });
   } else {
