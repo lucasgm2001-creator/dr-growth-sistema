@@ -575,8 +575,13 @@ function renderAgendaGrid(data) {
 }
 
 // ---- Comissões ----
-function getCommissions() { try { return JSON.parse(localStorage.getItem('drg_commissions') || '[]'); } catch { return []; } }
-function saveCommissionsLocal(arr) { localStorage.setItem('drg_commissions', JSON.stringify(arr)); }
+let _commissions = [];
+async function loadCommissions() {
+  if (!window.drSupabase) return;
+  const { data } = await window.drSupabase.from('commissions').select('*').order('created_at', { ascending: false });
+  _commissions = data || [];
+}
+function getCommissions() { return _commissions; }
 
 let pendingCommissionLeadId = null;
 
