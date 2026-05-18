@@ -439,20 +439,25 @@ function switchTab(name, btn) {
 }
 
 async function loadData() {
+  const cached = window.DRCache?.get('financeiro');
+  if (cached) {
+    allPayments = cached.payments || [];
+    allClients  = cached.clients  || [];
+    allDespesas = cached.despesas || [];
+    updateKPIs(); renderMRR(); renderPaymentsTable(allPayments); renderContracts(); renderDespesasUI();
+    return;
+  }
   if (!window.drSupabase) return;
   const [p, c, e] = await Promise.all([
     window.drSupabase.from('payments').select('*').order('due_date', { ascending: false }),
     window.drSupabase.from('clients').select('*').eq('active', true),
     window.drSupabase.from('expenses').select('*').order('created_at', { ascending: false }),
   ]);
-  allPayments  = p.data || [];
-  allClients   = c.data || [];
-  allDespesas  = e.data || [];
-  updateKPIs();
-  renderMRR();
-  renderPaymentsTable(allPayments);
-  renderContracts();
-  renderDespesasUI();
+  allPayments = p.data || [];
+  allClients  = c.data || [];
+  allDespesas = e.data || [];
+  window.DRCache?.set('financeiro', { payments: allPayments, clients: allClients, despesas: allDespesas });
+  updateKPIs(); renderMRR(); renderPaymentsTable(allPayments); renderContracts(); renderDespesasUI();
 }
 
 function getFilteredPayments() { return window.filterByCountry ? window.filterByCountry(allPayments) : allPayments; }
