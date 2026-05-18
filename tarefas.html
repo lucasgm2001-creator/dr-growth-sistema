@@ -192,6 +192,7 @@ async function loadTasks() {
   const { data } = await window.drSupabase.from('tasks').select('*').order('due_date');
   allTasks = data || [];
   window.DRCache?.set('tarefas', allTasks);
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   updateKPIs();
   renderTasks(allTasks);
 }
