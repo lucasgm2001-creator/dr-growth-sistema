@@ -237,8 +237,6 @@ const DEMO = {
   ],
 };
 
-function _loadLocal(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
-
 async function loadData() {
   const cached = window.DRCache?.get('dashboard');
   if (cached) {
