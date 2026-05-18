@@ -423,6 +423,7 @@ async function saveLead() {
     responsible: document.getElementById('lead-responsible').value,
   };
 
+  window.DRCache?.clear('leads');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = allLeads.findIndex(l => l.id == id);
