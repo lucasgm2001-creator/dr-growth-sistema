@@ -368,7 +368,6 @@ async function saveTask() {
       if (ins) allTasks.unshift(ins);
       else allTasks.unshift({ ...data, id: newId });
     } else { allTasks.unshift({ ...data, id: newId }); }
-    saveTasksLocal();
     showToast('Tarefa criada!', 'success');
     logActivity({ icon:'📋', color:'#6366f1', msg:`Nova tarefa criada — "${title}" (resp: ${data.responsible})`, sector:'tarefas' });
   }
