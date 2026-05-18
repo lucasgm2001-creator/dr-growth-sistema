@@ -993,7 +993,7 @@ async function saveDoc() {
   };
   allDocs.push({ ...data, id: 'd'+Date.now() });
   if (window.drSupabase) window.drSupabase.from('documents').insert(data).then(()=>{});
-  save(); closeDocModal(); renderDocumentos();
+  closeDocModal(); renderDocumentos();
   showToast('Documento adicionado!', 'success');
 }
 
