@@ -543,19 +543,18 @@ function dismissSupabaseBanner() {
 }
 
 async function checkSupabaseStatus() {
+  // Pula verificação se status OK foi confirmado nos últimos 10 min
+  if (DRCache.get('_sb_ok')) return;
+
   if (!window.drSupabase) {
     showSupabaseBanner('warn', '⚠️ Supabase não inicializado — verifique a chave em supabase-config.js. Navegação funciona, dados não carregam.');
     return;
   }
   try {
-    // Teste leve: busca 0 linhas de uma tabela que sempre existe
     const { error } = await window.drSupabase.from('profiles').select('id').limit(0);
     if (!error) {
-      // OK — remove banner se estava visível
-      const el = document.getElementById('supabase-banner');
-      if (el?.classList.contains('ok') || el?.classList.contains('warn') || el?.classList.contains('')) {
-        dismissSupabaseBanner();
-      }
+      DRCache.set('_sb_ok', true, 10 * 60 * 1000);
+      dismissSupabaseBanner();
       return;
     }
     const msg = error.message || error.code || JSON.stringify(error);
