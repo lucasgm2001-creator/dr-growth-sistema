@@ -129,7 +129,7 @@ CREATE TABLE commissions (
 -- Despesas
 CREATE TABLE expenses (
   id         BIGSERIAL PRIMARY KEY,
-  desc       TEXT NOT NULL,
+  descricao  TEXT NOT NULL,
   tipo       TEXT DEFAULT 'outro',
   valor      NUMERIC(12,2),
   data       DATE,
