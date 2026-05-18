@@ -495,6 +495,11 @@ async function deleteLead() {
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
 loadLeads();
+
+// Supabase Realtime
+if (window.subscribeRealtime) {
+  subscribeRealtime('leads-realtime', 'leads', loadLeads);
+}
 </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
