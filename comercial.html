@@ -445,6 +445,7 @@ async function addSeller() {
 
 async function removeSeller(short) {
   if (session.role !== 'admin') return;
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) await window.drSupabase.from('sellers').delete().eq('short', short);
   _sellers = _sellers.filter(s => s.short !== short);
   populateSellersSelect();
