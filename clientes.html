@@ -1046,22 +1046,13 @@ window.migrateLeadToClient = function(lead) {
 };
 
 // ---- Init ----
-load();
+loadData();
 
-// Processa fila de migração do funil
-(function processMigrateQueue() {
-  try {
-    const queue = JSON.parse(localStorage.getItem('drg_migrate_queue') || '[]');
-    if (queue.length) {
-      queue.forEach(lead => window.migrateLeadToClient(lead));
-      localStorage.removeItem('drg_migrate_queue');
-      save();
-    }
-  } catch {}
-})();
-
-renderOverview();
-syncSupabase();
+if (window.subscribeRealtime) {
+  subscribeRealtime('clients-rt',   'clients',   loadData);
+  subscribeRealtime('jobs-rt',      'jobs',       loadData);
+  subscribeRealtime('documents-rt', 'documents',  loadData);
+}
 </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
