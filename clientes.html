@@ -515,6 +515,7 @@ async function loadData() {
   allDocs    = (d.data || []);
   if (window.applyRoleFilter) allClients = applyRoleFilter(allClients, 'clients');
   window.DRCache?.set('clientes', { clients: allClients, jobs: allJobs, docs: allDocs });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   refresh();
 }
 
