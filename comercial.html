@@ -1421,7 +1421,8 @@ function saveLead() {
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
       logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
-      if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
+      window.DRCache?.clear('comercial');
+    if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado' && oldStage !== 'fechado') openCommissionModal(Number(id));
     } else {
       data.created_at = new Date().toISOString();
