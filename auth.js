@@ -707,6 +707,33 @@ function logActivity(opts) {
   }
 }
 
+// ============================================================
+//  Supabase Realtime helper
+// ============================================================
+function subscribeRealtime(channelName, table, callback) {
+  if (!window.drSupabase) return null;
+  return window.drSupabase
+    .channel(channelName)
+    .on('postgres_changes', { event: '*', schema: 'public', table }, callback)
+    .subscribe();
+}
+
+// ============================================================
+//  Role-based data filter
+// ============================================================
+function applyRoleFilter(items, resource) {
+  const s = AUTH.getSession();
+  if (!s || s.role === 'admin') return items;
+  if (resource === 'clients') {
+    if (s.role === 'comercial') return items.filter(i => i.country === 'us');
+    if (s.role === 'trafego')   return items.filter(i => i.country === 'br' || !i.country);
+  }
+  if (resource === 'leads') {
+    if (s.role === 'trafego') return items.filter(i => i.country === 'br' || !i.country);
+  }
+  return items;
+}
+
 // Expõe globalmente
 window.AUTH       = AUTH;
 window.logActivity = logActivity;
@@ -717,3 +744,5 @@ window.showToast  = showToast;
 window.renderElevator = renderElevator;
 window.initCountrySelector = initCountrySelector;
 window.SFX        = SFX;
+window.subscribeRealtime = subscribeRealtime;
+window.applyRoleFilter   = applyRoleFilter;
