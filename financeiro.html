@@ -732,34 +732,32 @@ function openEditDespesa(id) {
 
 function closeDespesaModal() { document.getElementById('despesa-modal').classList.remove('show'); }
 
-function saveDespesa() {
-  const id = document.getElementById('desp-id').value;
-  const desc = document.getElementById('desp-desc').value.trim();
+async function saveDespesa() {
+  const id    = document.getElementById('desp-id').value;
+  const desc  = document.getElementById('desp-desc').value.trim();
   const valor = Number(document.getElementById('desp-valor').value);
   if (!desc || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
-  const data = { desc, tipo:document.getElementById('desp-tipo').value, valor, data:document.getElementById('desp-data').value||null, status:document.getElementById('desp-status').value };
+  const data = { desc, tipo: document.getElementById('desp-tipo').value, valor, data: document.getElementById('desp-data').value || null, status: document.getElementById('desp-status').value };
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
   if (id) {
-    const idx = allDespesas.findIndex(d=>d.id==id);
-    if (idx>=0) allDespesas[idx]={...allDespesas[idx],...data};
-    saveDespesasLocal();
-    showToast('Despesa atualizada!','success');
+    await window.drSupabase.from('expenses').update(data).eq('id', id);
+    showToast('Despesa atualizada!', 'success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${desc}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
   } else {
-    allDespesas.unshift({...data,id:Date.now()});
-    saveDespesasLocal();
-    showToast('Despesa criada!','success');
+    await window.drSupabase.from('expenses').insert(data);
+    showToast('Despesa criada!', 'success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${desc}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
-  closeDespesaModal(); renderDespesasUI();
+  closeDespesaModal();
+  loadData();
 }
 
-function deleteDespesa() {
+async function deleteDespesa() {
   const id = document.getElementById('desp-id').value;
-  if (!id||!confirm('Excluir despesa?')) return;
-  allDespesas = allDespesas.filter(d=>d.id!=id);
-  saveDespesasLocal();
-  closeDespesaModal(); renderDespesasUI();
-  showToast('Despesa excluída.','info');
+  if (!id || !confirm('Excluir despesa?')) return;
+  if (window.drSupabase) await window.drSupabase.from('expenses').delete().eq('id', id);
+  closeDespesaModal();
+  loadData();
 }
 
 // ---- BALANÇO PATRIMONIAL ----
