@@ -1398,7 +1398,6 @@ function saveLead() {
       data.created_at = new Date().toISOString();
       data.id = Date.now();
       leads.unshift(data);
-      saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
