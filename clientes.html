@@ -495,29 +495,19 @@ const DEMO_JOBS    = [];
 const DEMO_DOCS    = [];
 
 // ---- Persistence ----
-function save() {
-  localStorage.setItem('drg_clientes_v2', JSON.stringify(allClients));
-  localStorage.setItem('drg_jobs_v2',     JSON.stringify(allJobs));
-  localStorage.setItem('drg_docs_v2',     JSON.stringify(allDocs));
-}
-function load() {
-  try { allClients = JSON.parse(localStorage.getItem('drg_clientes_v2') || 'null') || DEMO_CLIENTS; } catch { allClients = DEMO_CLIENTS; }
-  try { allJobs    = JSON.parse(localStorage.getItem('drg_jobs_v2')     || 'null') || DEMO_JOBS; }    catch { allJobs = DEMO_JOBS; }
-  try { allDocs    = JSON.parse(localStorage.getItem('drg_docs_v2')     || 'null') || DEMO_DOCS; }    catch { allDocs = DEMO_DOCS; }
-}
-
-async function syncSupabase() {
+async function loadData() {
   if (!window.drSupabase) return;
-  try {
-    const { data: c } = await window.drSupabase.from('clients').select('*');
-    if (c?.length) allClients = c;
-    const { data: j } = await window.drSupabase.from('jobs').select('*');
-    if (j?.length) allJobs = j;
-    const { data: d } = await window.drSupabase.from('documents').select('*');
-    if (d?.length) allDocs = d;
-    save();
-    refresh();
-  } catch {}
+  const [c, j, d] = await Promise.all([
+    window.drSupabase.from('clients').select('*').order('name'),
+    window.drSupabase.from('jobs').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('documents').select('*').order('created_at', { ascending: false }),
+  ]);
+  allClients = (c.data || []);
+  allJobs    = (j.data || []);
+  allDocs    = (d.data || []);
+  // Role filter for clients country
+  if (window.applyRoleFilter) allClients = applyRoleFilter(allClients, 'clients');
+  refresh();
 }
 
 // ---- Tab switching ----
