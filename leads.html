@@ -486,7 +486,6 @@ async function deleteLead() {
   const lead = allLeads.find(l => l.id == id);
   if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
   allLeads = allLeads.filter(l => l.id != id);
-  saveLeadsLocal();
   closeModal();
   updateSubtitle();
   renderTable(allLeads);
