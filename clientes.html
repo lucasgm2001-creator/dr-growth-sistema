@@ -1004,6 +1004,7 @@ async function saveDoc() {
     uploaded_by: firstName,
     created_at:  new Date().toISOString(),
   };
+  window.DRCache?.clear('clientes');
   allDocs.push({ ...data, id: 'd'+Date.now() });
   if (window.drSupabase) window.drSupabase.from('documents').insert(data).then(()=>{});
   closeDocModal(); renderDocumentos();
