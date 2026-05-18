@@ -681,14 +681,16 @@ async function saveCampaign() {
   loadData();
 }
 
-function deleteCampaign() {
+async function deleteCampaign() {
   const id = document.getElementById('camp-id').value;
   if (!id || !confirm('Excluir campanha?')) return;
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
   const camp = campaigns.find(c=>c.id==id);
-  campaigns = campaigns.filter(c=>c.id!=id);
-  closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
+  await window.drSupabase.from('campaigns').delete().eq('id', id);
+  closeCampaignModal();
   showToast('Campanha excluída.', 'info');
   if (camp) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
+  loadData();
 }
 
 // ---- Modal Conteúdo ----
