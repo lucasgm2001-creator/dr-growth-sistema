@@ -1446,34 +1446,14 @@ loadLeads().then(() => {
   });
 });
 
-// ---- Auto-refresh: detecta novos leads do Magnetic Funnels a cada 30s ----
-if (window.drSupabase) {
-  let lastCheck = new Date().toISOString();
-  setInterval(async () => {
-    try {
-      const { data, error } = await window.drSupabase
-        .from('leads')
-        .select('*')
-        .gt('created_at', lastCheck)
-        .order('created_at', { ascending: false });
+// ---- Init: load sellers, commissions + Realtime ----
+loadSellers().then(() => { populateSellersSelect(); renderSellersAdmin(); });
+loadCommissions();
 
-      if (!error && data && data.length > 0) {
-        lastCheck = new Date().toISOString();
-        data.forEach(newLead => {
-          if (!leads.find(l => l.id === newLead.id)) {
-            leads.unshift(newLead);
-            saveLeadsLocal();
-            SFX.newLead();
-            showToast(`🧲 Novo lead do Magnetic Funnels: ${newLead.name}`, 'success');
-            logActivity({ icon:'🧲', color:'#a855f7', msg:`Lead automático via Magnetic Funnels — ${newLead.name}${newLead.phone ? ' ('+newLead.phone+')' : ''}`, sector:'comercial' });
-          }
-        });
-        renderKanban();
-        renderLeadsTable(leads);
-        updateSubtitle();
-      }
-    } catch (_) {}
-  }, 30000);
+if (window.subscribeRealtime) {
+  subscribeRealtime('comercial-leads',       'leads',       loadLeads);
+  subscribeRealtime('comercial-sellers',     'sellers',     () => loadSellers().then(() => { populateSellersSelect(); renderSellersAdmin(); }));
+  subscribeRealtime('comercial-commissions', 'commissions', () => { loadCommissions().then(() => renderCommissions()); });
 }
 </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
