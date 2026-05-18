@@ -406,6 +406,7 @@ async function loadAll() {
   _sellers     = sr.data || [];
   _commissions = cr.data || [];
   window.DRCache?.set('comercial', { leads, history, sellers: _sellers, commissions: _commissions });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
   populateSellersSelect(); renderSellersAdmin(); renderCommissions();
 }
