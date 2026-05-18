@@ -374,8 +374,15 @@ const session = initPage('comercial.html');
 if (!session) throw new Error('Not authenticated');
 
 // ---- Gestão de Vendedores ----
-function getSellers()           { try { return JSON.parse(localStorage.getItem('drg_sellers') || '[]'); } catch { return []; } }
-function saveSellers(arr)       { localStorage.setItem('drg_sellers', JSON.stringify(arr)); }
+let _sellers = [];
+async function loadSellers() {
+  if (!window.drSupabase) return [];
+  const { data } = await window.drSupabase.from('sellers').select('*').order('name');
+  _sellers = data || [];
+  return _sellers;
+}
+function getSellers() { return _sellers; }
+async function saveSellersDB(arr) { /* managed via addSeller/removeSeller */ }
 
 function populateSellersSelect() {
   const sel = document.getElementById('lead-responsible');
