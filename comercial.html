@@ -1047,6 +1047,7 @@ async function onDrop(e, stage) {
   if (!lead || lead.stage === stage) return;
   const oldStage = lead.stage;
   lead.stage = stage;
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) { try { await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId); } catch {} }
   renderKanban(); renderLeadsTable(leads); renderPipeline(); updateSubtitle();
   showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
