@@ -4097,3 +4097,129 @@ body.hall-page { background: transparent; }
   /* ---- Greeting ---- */
   .hall-greeting { padding: 14px 0 12px; }
 }
+
+/* ============================================================
+   ELEVATOR SIDEBAR — 3 ESTADOS
+   closed (16 px) | semi (64 px, padrão) | full (240 px)
+   ============================================================ */
+
+:root {
+  --sb-closed: 16px;
+  --sb-semi:   64px;
+}
+
+/* ── Desktop: sidebar sempre visível, width controlada por estado ── */
+@media (min-width: 769px) {
+
+  body[data-sidebar] .sidebar {
+    transform: none !important;
+    transition: width 0.22s cubic-bezier(.4,0,.2,1) !important;
+    overflow: hidden;
+  }
+
+  body[data-sidebar] .main-content {
+    transition: margin-left 0.22s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ─── CLOSED ─── */
+  body[data-sidebar="closed"] .sidebar {
+    width: var(--sb-closed) !important;
+    cursor: pointer;
+  }
+  body[data-sidebar="closed"] .main-content {
+    margin-left: var(--sb-closed);
+  }
+  body[data-sidebar="closed"] .sidebar > * {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  body[data-sidebar="closed"] .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, #6366f1, #a855f7, #3b82f6);
+  }
+
+  /* ─── SEMI ─── */
+  body[data-sidebar="semi"] .sidebar {
+    width: var(--sb-semi) !important;
+  }
+  body[data-sidebar="semi"] .main-content {
+    margin-left: var(--sb-semi);
+  }
+  body[data-sidebar="semi"] .sidebar-header {
+    justify-content: center;
+    padding: 14px 6px;
+    gap: 0;
+  }
+  body[data-sidebar="semi"] .sidebar-brand,
+  body[data-sidebar="semi"] .elevator-label { display: none !important; }
+  body[data-sidebar="semi"] .sidebar-logo   { width: 34px; max-width: 34px; min-width: 0; }
+  body[data-sidebar="semi"] .elevator-nav   { padding: 4px 5px 12px; gap: 2px; }
+  body[data-sidebar="semi"] .elevator-floor {
+    padding: 6px 5px;
+    gap: 4px;
+    overflow: hidden;
+  }
+  body[data-sidebar="semi"] .floor-btn    { width: 28px; height: 28px; flex-shrink: 0; }
+  body[data-sidebar="semi"] .floor-number { font-size: 10px; }
+  body[data-sidebar="semi"] .floor-label  { font-size: 11px; white-space: nowrap; overflow: hidden; }
+  body[data-sidebar="semi"] .floor-desc,
+  body[data-sidebar="semi"] .floor-lock,
+  body[data-sidebar="semi"] .floor-indicator { display: none !important; }
+  body[data-sidebar="semi"] .user-profile { justify-content: center; padding: 8px 5px; gap: 0; }
+  body[data-sidebar="semi"] .user-info,
+  body[data-sidebar="semi"] .logout-btn   { display: none !important; }
+
+  /* ─── FULL ─── */
+  body[data-sidebar="full"] .sidebar {
+    width: var(--sidebar-width) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  body[data-sidebar="full"] .main-content  { margin-left: var(--sidebar-width); }
+  body[data-sidebar="full"] .elevator-nav  { padding: 4px 10px 12px; gap: 3px; }
+  body[data-sidebar="full"] .elevator-floor { padding: 9px 10px; gap: 11px; }
+}
+
+/* ── Mobile: mantém comportamento de overlay ── */
+@media (max-width: 768px) {
+  body[data-sidebar] .sidebar {
+    width: var(--sidebar-width) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.22s ease !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  body[data-sidebar] .sidebar.open {
+    transform: translateX(0) !important;
+  }
+  body[data-sidebar] .main-content {
+    margin-left: 0 !important;
+    transition: none !important;
+  }
+  body[data-sidebar] .sidebar-brand,
+  body[data-sidebar] .elevator-label,
+  body[data-sidebar] .floor-desc        { display: block !important; }
+  body[data-sidebar] .floor-indicator   { display: block !important; }
+  body[data-sidebar] .user-info         { display: block !important; }
+  body[data-sidebar] .logout-btn        { display: flex !important; }
+  body[data-sidebar] .sidebar-header    {
+    justify-content: flex-start !important;
+    padding: 20px 16px 16px !important;
+    gap: 10px !important;
+  }
+  body[data-sidebar] .sidebar-logo      { width: auto !important; max-width: 144px !important; }
+  body[data-sidebar] .user-profile      { justify-content: flex-start !important; padding: 10px !important; gap: 10px !important; }
+  body[data-sidebar] .elevator-nav      { padding: 4px 10px 12px !important; gap: 3px !important; }
+  body[data-sidebar] .elevator-floor    {
+    padding: 9px 10px !important;
+    gap: 11px !important;
+    overflow: visible !important;
+  }
+  body[data-sidebar] .floor-btn    { width: 34px !important; height: 34px !important; }
+  body[data-sidebar] .floor-number { font-size: 12px !important; }
+  body[data-sidebar] .floor-label  { font-size: 13px !important; white-space: normal !important; }
+}
