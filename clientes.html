@@ -887,6 +887,7 @@ async function saveClient() {
     observations:  document.getElementById('cm-obs').value.trim(),
   };
 
+  window.DRCache?.clear('clientes');
   if (id) {
     const idx = allClients.findIndex(c => c.id === id);
     if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
