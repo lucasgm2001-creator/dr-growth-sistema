@@ -1013,6 +1013,7 @@ async function saveDoc() {
 
 function deleteDoc(id) {
   if (!confirm('Remover documento?')) return;
+  window.DRCache?.clear('clientes');
   allDocs = allDocs.filter(d => d.id !== id);
   if (window.drSupabase) window.drSupabase.from('documents').delete().eq('id', id).then(()=>{});
   renderDocumentos();
