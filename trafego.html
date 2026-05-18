@@ -714,7 +714,7 @@ async function saveContent() {
   const title = document.getElementById('cont-title').value.trim();
   if (!title) { showToast('Título é obrigatório.', 'error'); return; }
   if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
-  const data = { title, client:document.getElementById('cont-client').value, platform:document.getElementById('cont-platform').value, format:document.getElementById('cont-format').value, date:document.getElementById('cont-date').value||null, status:document.getElementById('cont-status').value, desc:document.getElementById('cont-desc').value.trim() };
+  const data = { title, client:document.getElementById('cont-client').value, platform:document.getElementById('cont-platform').value, format:document.getElementById('cont-format').value, date:document.getElementById('cont-date').value||null, status:document.getElementById('cont-status').value, descricao:document.getElementById('cont-desc').value.trim() };
   window.DRCache?.clear('trafego');
   const { data: ins } = await window.drSupabase.from('content_pieces').insert(data).select().single();
   contents.unshift(ins || { ...data, id: Date.now() });
