@@ -528,6 +528,7 @@ async function saveClient() {
   const name=document.getElementById('client-name').value.trim();
   if (!name) { showToast('Nome é obrigatório.','error'); return; }
   const data={name,service:document.getElementById('client-service').value.trim(),responsible:document.getElementById('client-resp').value,monthly_value:Number(document.getElementById('client-value').value)||null,start_date:document.getElementById('client-start').value||null,renewal_date:document.getElementById('client-renewal').value||null,health:document.getElementById('client-health').value,active:true};
+  window.DRCache?.clear('administrativo');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('clients').update(data).eq('id',id);
     const idx=allClients.findIndex(c=>c.id==id);
