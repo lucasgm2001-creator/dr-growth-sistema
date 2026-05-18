@@ -547,6 +547,7 @@ async function saveClient() {
 async function deleteClient() {
   const id=document.getElementById('client-id').value;
   if (!id||!confirm('Excluir cliente?')) return;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('clients').delete().eq('id',id);
   allClients=allClients.filter(c=>c.id!=id);
   closeClientModal(); updateClientKPIs(); filterClients();
