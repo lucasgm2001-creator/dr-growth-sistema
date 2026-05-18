@@ -629,7 +629,7 @@ function renderContent(items) {
         </div>
         <div style="font-size:13px;font-weight:700;margin-bottom:4px">${c.title}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${c.client}</div>
-        ${c.desc ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.desc}</div>` : ''}
+        ${c.descricao ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.descricao}</div>` : ''}
         <div style="font-size:11px;color:${isOverdue?'var(--red)':'var(--text-muted)'}">
           📅 ${fmt.date(c.date)} ${fmt.relative(c.date) ? '· '+fmt.relative(c.date) : ''} ${isOverdue?'⚠️ Atrasado':''}
         </div>
