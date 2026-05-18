@@ -1472,8 +1472,7 @@ if (session.role === 'admin') {
   if (vendBtn) vendBtn.style.display = '';
 }
 
-loadLeads().then(() => {
-  populateSellersSelect();
+loadAll().then(() => {
   initCountrySelector('comercial', () => {
     renderKanban();
     filterLeads();
@@ -1481,19 +1480,6 @@ loadLeads().then(() => {
     renderMetrics();
   });
 });
-
-// ---- Init: load sellers, commissions + Realtime ----
-loadSellers().then(() => { populateSellersSelect(); renderSellersAdmin(); });
-loadCommissions();
-
-// 1 canal único para todas as tabelas do comercial
-if (window.subscribeRealtime) {
-  subscribeRealtime('comercial-rt', ['leads', 'sellers', 'commissions'], () => {
-    loadLeads();
-    loadSellers().then(() => { populateSellersSelect(); renderSellersAdmin(); });
-    loadCommissions().then(() => renderCommissions());
-  });
-}
 </script>
 <script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
