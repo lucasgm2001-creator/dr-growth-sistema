@@ -602,7 +602,6 @@ async function markPaid(id) {
   p.status = 'paid';
   p.paid_date = new Date().toISOString().split('T')[0];
   if (window.drSupabase) await window.drSupabase.from('payments').update({ status:'paid', paid_date:p.paid_date }).eq('id', id);
-  savePaymentsLocal();
   updateKPIs(); filterPayments();
   showToast(`Pagamento de ${p.client_name} confirmado!`, 'success');
 }
