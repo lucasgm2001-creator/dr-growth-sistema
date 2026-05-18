@@ -471,7 +471,6 @@ async function saveLead() {
       if (ins) allLeads.unshift(ins);
       else allLeads.unshift({ ...data, id: newId });
     } else { allLeads.unshift({ ...data, id: newId }); }
-    saveLeadsLocal();
     showToast('Lead criado!', 'success');
     logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${data.company ? ' ('+data.company+')' : ''}`, sector:'comercial' });
   }
