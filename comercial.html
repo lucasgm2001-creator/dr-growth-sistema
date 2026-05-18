@@ -1020,7 +1020,6 @@ async function onDrop(e, stage) {
   const oldStage = lead.stage;
   lead.stage = stage;
   if (window.drSupabase) { try { await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId); } catch {} }
-  saveLeadsLocal();
   renderKanban(); renderLeadsTable(leads); renderPipeline(); updateSubtitle();
   showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
   const sa = STAGE_ACTIVITY[stage];
