@@ -906,6 +906,7 @@ async function saveClient() {
 async function deleteClient() {
   const id = document.getElementById('cm-id').value;
   if (!id || !confirm('Excluir este cliente?')) return;
+  window.DRCache?.clear('clientes');
   allClients = allClients.filter(c => c.id !== id);
   if (window.drSupabase) window.drSupabase.from('clients').delete().eq('id', id).then(()=>{});
   closeClientModal(); closeProfile(); refresh();
