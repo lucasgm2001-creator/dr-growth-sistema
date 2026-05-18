@@ -850,3 +850,4 @@ window.initCountrySelector = initCountrySelector;
 window.SFX        = SFX;
 window.subscribeRealtime = subscribeRealtime;
 window.applyRoleFilter   = applyRoleFilter;
+window.DRCache           = DRCache;
