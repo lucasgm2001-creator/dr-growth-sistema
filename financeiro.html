@@ -744,17 +744,21 @@ async function saveDespesa() {
   if (!desc || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
   const data = { desc, tipo: document.getElementById('desp-tipo').value, valor, data: document.getElementById('desp-data').value || null, status: document.getElementById('desp-status').value };
   if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
+  window.DRCache?.clear('financeiro');
   if (id) {
     await window.drSupabase.from('expenses').update(data).eq('id', id);
+    const idx = allDespesas.findIndex(d => d.id == id);
+    if (idx >= 0) allDespesas[idx] = { ...allDespesas[idx], ...data };
     showToast('Despesa atualizada!', 'success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${desc}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
   } else {
-    await window.drSupabase.from('expenses').insert(data);
+    const { data: ins } = await window.drSupabase.from('expenses').insert(data).select().single();
+    allDespesas.unshift(ins || { ...data, id: Date.now() });
     showToast('Despesa criada!', 'success');
     logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${desc}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
   closeDespesaModal();
-  loadData();
+  renderDespesasUI();
 }
 
 async function deleteDespesa() {
