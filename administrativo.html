@@ -485,6 +485,7 @@ async function updateTaskStatus(id, newStatus, e) {
     return;
   }
   t.status = newStatus;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   const labels = { pending:'Pendente', in_progress:'Em andamento', done:'Concluído' };
