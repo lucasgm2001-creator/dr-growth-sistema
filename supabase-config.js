@@ -164,7 +164,7 @@ CREATE TABLE content_pieces (
   format     TEXT,
   date       DATE,
   status     TEXT DEFAULT 'draft',
-  desc       TEXT,
+  descricao  TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
