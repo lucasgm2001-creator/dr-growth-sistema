@@ -461,7 +461,6 @@ async function saveLead() {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = allLeads.findIndex(l => l.id == id);
     if (idx >= 0) allLeads[idx] = { ...allLeads[idx], ...data };
-    saveLeadsLocal();
     showToast('Lead atualizado!', 'success');
     logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
   } else {
