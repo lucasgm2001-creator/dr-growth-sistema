@@ -283,7 +283,13 @@ function switchTab(name, btn) {
 }
 
 async function loadData() {
-  if (window.drSupabase) {
+  const cached = window.DRCache?.get('administrativo');
+  if (cached) {
+    allClients = cached.clients || [];
+    allTasks   = cached.tasks   || [];
+    updateClientKPIs(); renderClientsGrid(allClients);
+    updateTaskKPIs();  renderTasksList(allTasks);
+  } else if (window.drSupabase) {
     try {
       const [c,t] = await Promise.all([
         window.drSupabase.from('clients').select('*').order('name'),
@@ -291,7 +297,10 @@ async function loadData() {
       ]);
       allClients = c.data || [];
       allTasks   = t.data || [];
+      window.DRCache?.set('administrativo', { clients: allClients, tasks: allTasks });
     } catch { allClients=[]; allTasks=[]; }
+    updateClientKPIs(); renderClientsGrid(allClients);
+    updateTaskKPIs();  renderTasksList(allTasks);
   }
   updateClientKPIs(); renderClientsGrid(allClients);
   updateTaskKPIs();  renderTasksList(allTasks);
