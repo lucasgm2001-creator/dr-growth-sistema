@@ -360,6 +360,7 @@ async function addInteraction() {
   if (!history[selectedLeadId]) history[selectedLeadId] = [];
   history[selectedLeadId].push(entry);
 
+  window.DRCache?.clear('leads');
   if (window.drSupabase) {
     await window.drSupabase.from('lead_history').insert(entry);
   }
