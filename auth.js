@@ -708,14 +708,27 @@ function logActivity(opts) {
 }
 
 // ============================================================
-//  Supabase Realtime helper
+//  Supabase Realtime helper (com debounce de 1 s)
+//  Múltiplas tabelas por canal → menos conexões abertas
 // ============================================================
-function subscribeRealtime(channelName, table, callback) {
+function subscribeRealtime(channelName, tables, callback) {
   if (!window.drSupabase) return null;
-  return window.drSupabase
-    .channel(channelName)
-    .on('postgres_changes', { event: '*', schema: 'public', table }, callback)
-    .subscribe();
+
+  // Aceita string ou array de tabelas
+  const tableList = Array.isArray(tables) ? tables : [tables];
+
+  // Debounce: evita chamar callback várias vezes em sequência rápida
+  let _timer;
+  const debounced = () => {
+    clearTimeout(_timer);
+    _timer = setTimeout(callback, 1000);
+  };
+
+  let ch = window.drSupabase.channel(channelName);
+  tableList.forEach(table => {
+    ch = ch.on('postgres_changes', { event: '*', schema: 'public', table }, debounced);
+  });
+  return ch.subscribe();
 }
 
 // ============================================================
