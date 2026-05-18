@@ -332,20 +332,100 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-//  Mobile sidebar
+//  Sidebar — 3 estados (desktop) + overlay (mobile)
+//  closed (16 px) | semi (64 px, padrão) | full (240 px)
 // ============================================================
 function initMobileSidebar() {
   const toggle  = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   if (!toggle || !sidebar) return;
+
+  const hasElevator = !!document.getElementById('elevator-nav');
+
+  // Páginas sem elevator usam o overlay original
+  if (!hasElevator) {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('show');
+    });
+    if (overlay) overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+    return;
+  }
+
+  const isMobile = () => window.innerWidth <= 768;
+  const KEY      = 'drg_sidebar_state';
+  const CYCLE    = ['semi', 'full', 'closed'];
+
+  function getState() {
+    return document.body.getAttribute('data-sidebar') || 'semi';
+  }
+  function setState(state) {
+    document.body.setAttribute('data-sidebar', state);
+    if (!isMobile()) localStorage.setItem(KEY, state);
+  }
+
+  // Aplica estado salvo (ou padrão semi)
+  setState(isMobile() ? 'semi' : (localStorage.getItem(KEY) || 'semi'));
+
+  // Toggle: cicla pelos 3 estados no desktop, overlay no mobile
   toggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('show');
+    if (isMobile()) {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('show');
+      return;
+    }
+    const cur = getState();
+    setState(CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length]);
   });
+
+  // Clique na faixa fechada → abre semi
+  sidebar.addEventListener('click', () => {
+    if (!isMobile() && getState() === 'closed') setState('semi');
+  });
+
   if (overlay) overlay.addEventListener('click', () => {
     sidebar.classList.remove('open');
     overlay.classList.remove('show');
+  });
+}
+
+// ============================================================
+//  Tooltip para estado semi (JS — evita clip do overflow)
+// ============================================================
+function initElevatorTooltips() {
+  if (!document.getElementById('elevator-nav')) return;
+
+  const tip = document.createElement('div');
+  tip.id = 'elev-tip';
+  tip.style.cssText = [
+    'position:fixed', 'z-index:9999', 'pointer-events:none',
+    'background:#1a2744', 'color:#f1f5f9', 'font-size:12px',
+    'font-weight:600', 'white-space:nowrap', 'padding:5px 10px',
+    'border-radius:6px', 'border:1px solid rgba(255,255,255,.15)',
+    'box-shadow:0 4px 14px rgba(0,0,0,.45)', 'opacity:0',
+    'transition:opacity .15s', 'top:0', 'left:0',
+  ].join(';');
+  document.body.appendChild(tip);
+
+  let hideTimer;
+
+  document.getElementById('elevator-nav').addEventListener('mouseover', e => {
+    const floor = e.target.closest('.elevator-floor[data-tip]');
+    if (!floor || document.body.getAttribute('data-sidebar') !== 'semi') return;
+    clearTimeout(hideTimer);
+    const r = floor.getBoundingClientRect();
+    tip.textContent = floor.dataset.tip;
+    tip.style.left   = (r.right + 8) + 'px';
+    tip.style.top    = (r.top + r.height / 2 - tip.offsetHeight / 2) + 'px';
+    tip.style.opacity = '1';
+  });
+
+  document.getElementById('elevator-nav').addEventListener('mouseout', () => {
+    hideTimer = setTimeout(() => { tip.style.opacity = '0'; }, 80);
   });
 }
 
