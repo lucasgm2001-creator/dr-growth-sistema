@@ -1057,8 +1057,35 @@ async function onDrop(e, stage) {
   showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
   const sa = STAGE_ACTIVITY[stage];
   if (sa) logActivity({ icon: sa.icon, color: sa.color, msg: sa.msg(lead.name), sector: 'comercial' });
-  if (stage === 'fechado' && oldStage !== 'fechado') openCommissionModal(draggedId);
+  if (stage === 'fechado' && oldStage !== 'fechado') {
+    autoCreateClient(lead);
+    openCommissionModal(draggedId);
+  }
   draggedId = null;
+}
+
+async function autoCreateClient(lead) {
+  const name = lead.company || lead.name;
+  if (!name) return;
+  if (window.drSupabase) {
+    const { data: existing } = await window.drSupabase.from('clients').select('id').ilike('name', name).limit(1);
+    if (existing && existing.length > 0) {
+      showToast(`Cliente "${name}" já existe na aba Clientes.`, 'info'); return;
+    }
+    const clientData = {
+      name,
+      status:        'ativo',
+      responsible:   lead.responsible || '',
+      monthly_value: lead.value || null,
+      start_date:    new Date().toISOString().split('T')[0],
+      country:       lead.country || 'us',
+      nicho:         lead.nicho || '',
+      observations:  `Migrado do funil. Lead: ${lead.name}`,
+    };
+    await window.drSupabase.from('clients').insert(clientData);
+  }
+  showToast(`🎉 "${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
+  logActivity({ icon:'🤝', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
 }
 
 // ---- Tabela de leads ----
@@ -1428,7 +1455,7 @@ function saveLead() {
       logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
       window.DRCache?.clear('comercial');
     if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
-      if (data.stage === 'fechado' && oldStage !== 'fechado') openCommissionModal(Number(id));
+      if (data.stage === 'fechado' && oldStage !== 'fechado') { autoCreateClient(leads.find(l=>l.id==id)||data); openCommissionModal(Number(id)); }
     } else {
       data.created_at = new Date().toISOString();
       data.id = Date.now();

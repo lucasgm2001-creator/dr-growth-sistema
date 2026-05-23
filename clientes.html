@@ -25,6 +25,7 @@
     .client-table tr:hover td { background:var(--bg-hover); cursor:pointer; }
     .status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:700; }
     .status-ativo    { background:rgba(16,185,129,.12); color:#059669; }
+    .status-inativo  { background:rgba(107,114,128,.12); color:#4b5563; }
     .status-pausado  { background:rgba(245,158,11,.12);  color:#b45309; }
     .status-risco    { background:rgba(239,68,68,.12);   color:#dc2626; }
     .status-encerrado{ background:rgba(107,114,128,.12); color:#4b5563; }
@@ -298,8 +299,8 @@
         </div>
         <div class="form-group"><label>Status</label>
           <select class="form-control" id="cm-status">
-            <option value="ativo">Ativo</option>
-            <option value="pausado">Pausado</option>
+            <option value="ativo">Contrato Ativo</option>
+            <option value="inativo">Contrato Inativo</option>
             <option value="risco">Em Risco</option>
             <option value="encerrado">Encerrado</option>
           </select>
@@ -1023,7 +1024,7 @@ function deleteDoc(id) {
 
 // ---- Helpers ----
 function statusLabel(s) {
-  return { ativo:'Ativo', pausado:'Pausado', risco:'Em Risco', encerrado:'Encerrado' }[s] || s;
+  return { ativo:'Contrato Ativo', inativo:'Contrato Inativo', pausado:'Pausado', risco:'Em Risco', encerrado:'Encerrado' }[s] || s;
 }
 function clientColor(name) {
   const colors = ['#1e3a6f','#244c9c','#10B981','#f97316','#a855f7','#3b82f6','#ef4444'];
