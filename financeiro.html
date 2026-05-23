@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financeiro — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <img src="imgs/logo.png" alt="DR Growth" class="sidebar-logo">
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
   </div>
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
@@ -438,29 +438,27 @@ function switchTab(name, btn) {
   if (name === 'contratos') renderContracts();
 }
 
-function savePaymentsLocal() { try { localStorage.setItem('drg_payments', JSON.stringify(allPayments)); } catch {} }
-function loadPaymentsLocal() { try { return JSON.parse(localStorage.getItem('drg_payments') || '[]'); } catch { return []; } }
-function saveClientsLocal()  { try { localStorage.setItem('drg_clients',  JSON.stringify(allClients));  } catch {} }
-function loadClientsLocal()  { try { return JSON.parse(localStorage.getItem('drg_clients')  || '[]'); } catch { return []; } }
-
 async function loadData() {
-  let paymentsFromRemote = false, clientsFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const [p, c] = await Promise.all([
-        window.drSupabase.from('payments').select('*').order('due_date', { ascending:false }),
-        window.drSupabase.from('clients').select('*').eq('active', true),
-      ]);
-      if (!p.error && p.data?.length) { allPayments = p.data; paymentsFromRemote = true; savePaymentsLocal(); }
-      if (!c.error && c.data?.length) { allClients  = c.data; clientsFromRemote  = true; saveClientsLocal(); }
-    } catch {}
+  const cached = window.DRCache?.get('financeiro');
+  if (cached) {
+    allPayments = cached.payments || [];
+    allClients  = cached.clients  || [];
+    allDespesas = cached.despesas || [];
+    updateKPIs(); renderMRR(); renderPaymentsTable(allPayments); renderContracts(); renderDespesasUI();
+    return;
   }
-  if (!paymentsFromRemote) { const local = loadPaymentsLocal(); allPayments = local.length ? local : DEMO_PAYMENTS; }
-  if (!clientsFromRemote)  { const local = loadClientsLocal();  allClients  = local.length ? local : DEMO_CLIENTS;  }
-  updateKPIs();
-  renderMRR();
-  renderPaymentsTable(allPayments);
-  renderContracts();
+  if (!window.drSupabase) return;
+  const [p, c, e] = await Promise.all([
+    window.drSupabase.from('payments').select('*').order('due_date', { ascending: false }),
+    window.drSupabase.from('clients').select('*').eq('active', true),
+    window.drSupabase.from('expenses').select('*').order('created_at', { ascending: false }),
+  ]);
+  allPayments = p.data || [];
+  allClients  = c.data || [];
+  allDespesas = e.data || [];
+  window.DRCache?.set('financeiro', { payments: allPayments, clients: allClients, despesas: allDespesas });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+  updateKPIs(); renderMRR(); renderPaymentsTable(allPayments); renderContracts(); renderDespesasUI();
 }
 
 function getFilteredPayments() { return window.filterByCountry ? window.filterByCountry(allPayments) : allPayments; }
@@ -609,8 +607,8 @@ async function markPaid(id) {
   if (!p) return;
   p.status = 'paid';
   p.paid_date = new Date().toISOString().split('T')[0];
+  window.DRCache?.clear('financeiro');
   if (window.drSupabase) await window.drSupabase.from('payments').update({ status:'paid', paid_date:p.paid_date }).eq('id', id);
-  savePaymentsLocal();
   updateKPIs(); filterPayments();
   showToast(`Pagamento de ${p.client_name} confirmado!`, 'success');
 }
@@ -647,18 +645,17 @@ async function savePayment() {
   const amount = Number(document.getElementById('pay-amount').value);
   if (!client || !amount) { showToast('Cliente e valor são obrigatórios.', 'error'); return; }
   const data = { client_name:client, amount, description:document.getElementById('pay-desc').value.trim(), due_date:document.getElementById('pay-due').value||null, paid_date:document.getElementById('pay-paid').value||null, status:document.getElementById('pay-status').value };
+  window.DRCache?.clear('financeiro');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('payments').update(data).eq('id', id);
     const idx = allPayments.findIndex(p => p.id==id);
     if (idx>=0) allPayments[idx] = { ...allPayments[idx], ...data };
-    savePaymentsLocal();
     showToast('Lançamento atualizado!', 'success');
     logActivity({ icon:'💰', color:'#22c55e', msg:`Lançamento de ${client} atualizado`, sector:'financeiro' });
   } else {
     data.created_at = new Date().toISOString();
     if (window.drSupabase) { const { data:ins } = await window.drSupabase.from('payments').insert(data).select().single(); if (ins) allPayments.unshift(ins); else allPayments.unshift({ ...data, id:Date.now() }); }
     else allPayments.unshift({ ...data, id:Date.now() });
-    savePaymentsLocal();
     showToast('Lançamento criado!', 'success');
     logActivity({ icon:'💰', color:'#22c55e', msg:`Recebimento registrado — ${client} · ${fmt.currency(amount)}`, sector:'financeiro' });
   }
@@ -668,9 +665,9 @@ async function savePayment() {
 async function deletePayment() {
   const id = document.getElementById('pay-id').value;
   if (!id || !confirm('Excluir este lançamento?')) return;
+  window.DRCache?.clear('financeiro');
   if (window.drSupabase) await window.drSupabase.from('payments').delete().eq('id', id);
   allPayments = allPayments.filter(p => p.id!=id);
-  savePaymentsLocal();
   closeModal(); updateKPIs(); filterPayments();
   showToast('Excluído.', 'info');
 }
@@ -681,10 +678,6 @@ document.getElementById('despesa-modal').addEventListener('click', e => { if (e.
 // ---- DESPESAS ----
 const DEMO_DESPESAS = [];
 let allDespesas = [];
-
-function saveDespesasLocal() { try { localStorage.setItem('drg_despesas', JSON.stringify(allDespesas)); } catch {} }
-function loadDespesasLocal() { try { return JSON.parse(localStorage.getItem('drg_despesas') || '[]'); } catch { return []; } }
-allDespesas = loadDespesasLocal();
 
 const TIPO_INFO = {
   salario:     { label:'Salários',       color:'var(--yellow)', cls:'badge-yellow' },
@@ -711,7 +704,7 @@ function renderDespesasUI() {
   const rows = filtered.map(d => {
     const ti = TIPO_INFO[d.tipo] || TIPO_INFO.outro;
     return `<tr>
-      <td><div class="td-main">${d.desc}</div></td>
+      <td><div class="td-main">${d.descricao}</div></td>
       <td><span class="badge ${ti.cls}">${ti.label}</span></td>
       <td style="font-weight:700;color:var(--red)">${fmt.currency(d.valor)}</td>
       <td>${fmt.date(d.data)}</td>
@@ -737,7 +730,7 @@ function openEditDespesa(id) {
   if (!d) return;
   document.getElementById('despesa-modal-title').textContent = 'Editar Despesa';
   document.getElementById('desp-id').value = d.id;
-  document.getElementById('desp-desc').value = d.desc||'';
+  document.getElementById('desp-desc').value = d.descricao||'';
   document.getElementById('desp-tipo').value = d.tipo||'outro';
   document.getElementById('desp-valor').value = d.valor||'';
   document.getElementById('desp-data').value = d.data||'';
@@ -748,34 +741,38 @@ function openEditDespesa(id) {
 
 function closeDespesaModal() { document.getElementById('despesa-modal').classList.remove('show'); }
 
-function saveDespesa() {
-  const id = document.getElementById('desp-id').value;
-  const desc = document.getElementById('desp-desc').value.trim();
+async function saveDespesa() {
+  const id    = document.getElementById('desp-id').value;
+  const descricao = document.getElementById('desp-desc').value.trim();
   const valor = Number(document.getElementById('desp-valor').value);
-  if (!desc || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
-  const data = { desc, tipo:document.getElementById('desp-tipo').value, valor, data:document.getElementById('desp-data').value||null, status:document.getElementById('desp-status').value };
+  if (!descricao || !valor) { showToast('Descrição e valor são obrigatórios.','error'); return; }
+  const data = { descricao, tipo: document.getElementById('desp-tipo').value, valor, data: document.getElementById('desp-data').value || null, status: document.getElementById('desp-status').value };
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
+  window.DRCache?.clear('financeiro');
   if (id) {
-    const idx = allDespesas.findIndex(d=>d.id==id);
-    if (idx>=0) allDespesas[idx]={...allDespesas[idx],...data};
-    saveDespesasLocal();
-    showToast('Despesa atualizada!','success');
-    logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${desc}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
+    await window.drSupabase.from('expenses').update(data).eq('id', id);
+    const idx = allDespesas.findIndex(d => d.id == id);
+    if (idx >= 0) allDespesas[idx] = { ...allDespesas[idx], ...data };
+    showToast('Despesa atualizada!', 'success');
+    logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${descricao}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
   } else {
-    allDespesas.unshift({...data,id:Date.now()});
-    saveDespesasLocal();
-    showToast('Despesa criada!','success');
-    logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${desc}" · ${fmt.currency(valor)}`, sector:'financeiro' });
+    const { data: ins } = await window.drSupabase.from('expenses').insert(data).select().single();
+    allDespesas.unshift(ins || { ...data, id: Date.now() });
+    showToast('Despesa criada!', 'success');
+    logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${descricao}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
-  closeDespesaModal(); renderDespesasUI();
+  closeDespesaModal();
+  renderDespesasUI();
 }
 
-function deleteDespesa() {
+async function deleteDespesa() {
   const id = document.getElementById('desp-id').value;
-  if (!id||!confirm('Excluir despesa?')) return;
-  allDespesas = allDespesas.filter(d=>d.id!=id);
-  saveDespesasLocal();
-  closeDespesaModal(); renderDespesasUI();
-  showToast('Despesa excluída.','info');
+  if (!id || !confirm('Excluir despesa?')) return;
+  window.DRCache?.clear('financeiro');
+  if (window.drSupabase) await window.drSupabase.from('expenses').delete().eq('id', id);
+  allDespesas = allDespesas.filter(d => d.id != id);
+  closeDespesaModal();
+  renderDespesasUI();
 }
 
 // ---- BALANÇO PATRIMONIAL ----
@@ -875,6 +872,8 @@ loadData().then(() => {
     filterPayments();
   });
 });
+
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

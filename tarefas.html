@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tarefas — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div><img src="imgs/logo-white.png" alt="Logo da empresa"></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">
@@ -178,35 +178,21 @@ if (!session) throw new Error('Not authenticated');
 
 let allTasks = [];
 
-const DEMO_TASKS = [
-  { id:1, title:'Enviar proposta para MedTech Brasil', description:'Incluir pacote social + tráfego', responsible:'Lucas', due_date:'2026-05-18', priority:'high', status:'pending', created_at:'2026-05-10' },
-  { id:2, title:'Configurar campanhas de Google Ads', description:'Conta US Digital LLC', responsible:'Gabriel', due_date:'2026-05-15', priority:'high', status:'in_progress', created_at:'2026-05-12' },
-  { id:3, title:'Reunião de onboarding — GrowthX', description:'', responsible:'Daniel', due_date:'2026-05-16', priority:'medium', status:'pending', created_at:'2026-05-10' },
-  { id:4, title:'Emitir NFs de maio', description:'Todos os clientes ativos', responsible:'Thamyris', due_date:'2026-05-20', priority:'medium', status:'pending', created_at:'2026-05-13' },
-  { id:5, title:'Revisar relatório mensal de clientes', description:'', responsible:'Daniel', due_date:'2026-05-22', priority:'low', status:'pending', created_at:'2026-05-11' },
-  { id:6, title:'Ajustar landing page US Digital', description:'Correções solicitadas pelo cliente', responsible:'Gabriel', due_date:'2026-05-17', priority:'high', status:'in_progress', created_at:'2026-05-13' },
-  { id:7, title:'Follow-up Sarah Johnson', description:'Confirmar reunião de 20/05', responsible:'Lucas', due_date:'2026-05-14', priority:'high', status:'done', created_at:'2026-05-10' },
-  { id:8, title:'Cobrar pagamento US Digital', description:'Boleto em atraso desde 12/05', responsible:'Thamyris', due_date:'2026-05-10', priority:'high', status:'pending', created_at:'2026-05-12' },
-];
-
 const PRIORITY = { high:{ label:'Alta', cls:'priority-high' }, medium:{ label:'Média', cls:'priority-medium' }, low:{ label:'Baixa', cls:'priority-low' } };
 const STATUS   = { pending:{ label:'Pendente', cls:'badge-yellow' }, in_progress:{ label:'Em andamento', cls:'badge-accent' }, done:{ label:'Concluído', cls:'badge-green' } };
 
-function saveTasksLocal() { try { localStorage.setItem('drg_tasks', JSON.stringify(allTasks)); } catch {} }
-function loadTasksLocal() { try { return JSON.parse(localStorage.getItem('drg_tasks') || '[]'); } catch { return []; } }
-
 async function loadTasks() {
-  let loadedFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const { data, error } = await window.drSupabase.from('tasks').select('*').order('due_date');
-      if (!error && data?.length) { allTasks = data; loadedFromRemote = true; saveTasksLocal(); }
-    } catch {}
+  const cached = window.DRCache?.get('tarefas');
+  if (cached) {
+    allTasks = cached || [];
+    updateKPIs(); renderTasks(allTasks);
+    return;
   }
-  if (!loadedFromRemote) {
-    const local = loadTasksLocal();
-    allTasks = local.length ? local : DEMO_TASKS;
-  }
+  if (!window.drSupabase) { renderTasks([]); return; }
+  const { data } = await window.drSupabase.from('tasks').select('*').order('due_date');
+  allTasks = data || [];
+  window.DRCache?.set('tarefas', allTasks);
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
   updateKPIs();
   renderTasks(allTasks);
 }
@@ -321,11 +307,10 @@ async function toggleStatus(id, event) {
 
   const next = task.status === 'done' ? 'pending' : 'done';
   task.status = next;
-
+  window.DRCache?.clear('tarefas');
   if (window.drSupabase) {
     await window.drSupabase.from('tasks').update({ status: next }).eq('id', id);
   }
-  saveTasksLocal();
 
   updateKPIs();
   filterTasks();
@@ -377,11 +362,11 @@ async function saveTask() {
     status:       document.getElementById('task-status').value,
   };
 
+  window.DRCache?.clear('tarefas');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id', id);
     const idx = allTasks.findIndex(t => t.id == id);
     if (idx >= 0) allTasks[idx] = { ...allTasks[idx], ...data };
-    saveTasksLocal();
     showToast('Tarefa atualizada!', 'success');
     logActivity({ icon:'✏️', color:'#6366f1', msg:`Tarefa "${title}" atualizada`, sector:'tarefas' });
   } else {
@@ -392,7 +377,6 @@ async function saveTask() {
       if (ins) allTasks.unshift(ins);
       else allTasks.unshift({ ...data, id: newId });
     } else { allTasks.unshift({ ...data, id: newId }); }
-    saveTasksLocal();
     showToast('Tarefa criada!', 'success');
     logActivity({ icon:'📋', color:'#6366f1', msg:`Nova tarefa criada — "${title}" (resp: ${data.responsible})`, sector:'tarefas' });
   }
@@ -406,9 +390,9 @@ async function deleteTask() {
   const id = document.getElementById('task-id').value;
   if (!id || !confirm('Excluir esta tarefa?')) return;
   const task = allTasks.find(t => t.id == id);
+  window.DRCache?.clear('tarefas');
   if (window.drSupabase) await window.drSupabase.from('tasks').delete().eq('id', id);
   allTasks = allTasks.filter(t => t.id != id);
-  saveTasksLocal();
   closeModal();
   updateKPIs();
   filterTasks();
@@ -418,6 +402,8 @@ async function deleteTask() {
 
 document.getElementById('task-modal').addEventListener('click', e => { if (e.target === document.getElementById('task-modal')) closeModal(); });
 loadTasks();
+
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

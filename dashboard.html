@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -237,17 +237,22 @@ const DEMO = {
   ],
 };
 
-function _loadLocal(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } }
-
 async function loadData() {
-  let leads    = _loadLocal('drg_leads')    || DEMO.leads;
-  let tasks    = _loadLocal('drg_tasks')    || DEMO.tasks;
-  let clients  = _loadLocal('drg_clients')  || DEMO.clients;
-  let payments = _loadLocal('drg_payments') || DEMO.payments;
-  if (!leads.length)    leads    = DEMO.leads;
-  if (!tasks.length)    tasks    = DEMO.tasks;
-  if (!clients.length)  clients  = DEMO.clients;
-  if (!payments.length) payments = DEMO.payments;
+  const cached = window.DRCache?.get('dashboard');
+  if (cached) {
+    renderKPIs(cached.leads, cached.tasks, cached.clients);
+    renderFunnel(cached.leads);
+    renderPriorityTasks(cached.tasks);
+    renderPayments(cached.payments);
+    renderClientsHealth(cached.clients);
+    updateBadges(cached.leads, cached.tasks, cached.payments);
+    return;
+  }
+
+  let leads    = DEMO.leads;
+  let tasks    = DEMO.tasks;
+  let clients  = DEMO.clients;
+  let payments = DEMO.payments;
 
   if (window.drSupabase) {
     try {
@@ -257,11 +262,13 @@ async function loadData() {
         window.drSupabase.from('clients').select('*').eq('active', true),
         window.drSupabase.from('payments').select('*').order('due_date'),
       ]);
-      if (!l.error && l.data?.length) { leads    = l.data; localStorage.setItem('drg_leads',    JSON.stringify(leads));    }
-      if (!t.error && t.data?.length) { tasks    = t.data; localStorage.setItem('drg_tasks',    JSON.stringify(tasks));    }
-      if (!c.error && c.data?.length) { clients  = c.data; localStorage.setItem('drg_clients',  JSON.stringify(clients));  }
-      if (!p.error && p.data?.length) { payments = p.data; localStorage.setItem('drg_payments', JSON.stringify(payments)); }
-    } catch(e) { /* usa cache local */ }
+      if (!l.error && l.data?.length) leads    = l.data;
+      if (!t.error && t.data?.length) tasks    = t.data;
+      if (!c.error && c.data?.length) clients  = c.data;
+      if (!p.error && p.data?.length) payments = p.data;
+      window.DRCache?.set('dashboard', { leads, tasks, clients, payments });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+    } catch(e) { /* usa demo data */ }
   }
 
   renderKPIs(leads, tasks, clients);

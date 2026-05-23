@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tráfego — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <img src="imgs/logo.png" alt="DR Growth" class="sidebar-logo">
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
     <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
   </div>
   <div class="elevator-label">Elevador</div>
@@ -324,6 +324,26 @@ if (!session) throw new Error('Not authenticated');
 let campaigns = [];
 let contents  = [];
 
+async function loadData() {
+  const cached = window.DRCache?.get('trafego');
+  if (cached) {
+    campaigns = cached.campaigns || [];
+    contents  = cached.contents  || [];
+    updateKPIs(); renderCampaigns(); filterContent();
+    return;
+  }
+  if (!window.drSupabase) return;
+  const [c, p] = await Promise.all([
+    window.drSupabase.from('campaigns').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('content_pieces').select('*').order('created_at', { ascending: false }),
+  ]);
+  campaigns = c.data || [];
+  contents  = p.data || [];
+  window.DRCache?.set('trafego', { campaigns, contents });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+  updateKPIs(); renderCampaigns(); filterContent();
+}
+
 const PLATFORM_INFO = {
   google:   { name:'Google Ads',  icon:'🔍', color:'#ea4335' },
   meta:     { name:'Meta Ads',    icon:'📘', color:'#1877f2' },
@@ -609,7 +629,7 @@ function renderContent(items) {
         </div>
         <div style="font-size:13px;font-weight:700;margin-bottom:4px">${c.title}</div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${c.client}</div>
-        ${c.desc ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.desc}</div>` : ''}
+        ${c.descricao ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.descricao}</div>` : ''}
         <div style="font-size:11px;color:${isOverdue?'var(--red)':'var(--text-muted)'}">
           📅 ${fmt.date(c.date)} ${fmt.relative(c.date) ? '· '+fmt.relative(c.date) : ''} ${isOverdue?'⚠️ Atrasado':''}
         </div>
@@ -649,47 +669,59 @@ function openEditCampaign(id) {
 
 function closeCampaignModal() { document.getElementById('campaign-modal').classList.remove('show'); }
 
-function saveCampaign() {
+async function saveCampaign() {
   const id   = document.getElementById('camp-id').value;
   const name = document.getElementById('camp-name').value.trim();
   if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
   const data = { name, client:document.getElementById('camp-client').value.trim(), platform:document.getElementById('camp-platform').value, status:document.getElementById('camp-status').value, budget:Number(document.getElementById('camp-budget').value)||0, objective:document.getElementById('camp-objective').value, notes:document.getElementById('camp-notes').value.trim(), country:document.getElementById('camp-country').value };
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
+  window.DRCache?.clear('trafego');
   if (id) {
-    const idx = campaigns.findIndex(c=>c.id==id);
-    if (idx>=0) campaigns[idx] = { ...campaigns[idx], ...data };
+    await window.drSupabase.from('campaigns').update(data).eq('id', id);
+    const idx = campaigns.findIndex(c => c.id == id);
+    if (idx >= 0) campaigns[idx] = { ...campaigns[idx], ...data };
     showToast('Campanha atualizada!', 'success');
     logActivity({ icon:'📊', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
   } else {
-    campaigns.unshift({ ...data, id:Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
+    const { data: ins } = await window.drSupabase.from('campaigns').insert({ ...data, spend:0, impressions:0, clicks:0, leads:0 }).select().single();
+    campaigns.unshift(ins || { ...data, id: Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
     showToast('Campanha criada!', 'success');
     logActivity({ icon:'📣', color:'#a855f7', msg:`Nova campanha criada — "${name}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
   }
-  closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
+  closeCampaignModal();
+  updateKPIs(); renderCampaigns();
 }
 
-function deleteCampaign() {
+async function deleteCampaign() {
   const id = document.getElementById('camp-id').value;
   if (!id || !confirm('Excluir campanha?')) return;
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
   const camp = campaigns.find(c=>c.id==id);
-  campaigns = campaigns.filter(c=>c.id!=id);
-  closeCampaignModal(); updateKPIs(); renderCampaigns(); renderMetrics();
+  window.DRCache?.clear('trafego');
+  await window.drSupabase.from('campaigns').delete().eq('id', id);
+  campaigns = campaigns.filter(c => c.id != id);
+  closeCampaignModal();
   showToast('Campanha excluída.', 'info');
   if (camp) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
+  updateKPIs(); renderCampaigns();
 }
 
 // ---- Modal Conteúdo ----
 function openContentModal() { document.getElementById('content-modal').classList.add('show'); }
 function closeContentModal() { document.getElementById('content-modal').classList.remove('show'); }
 
-function saveContent() {
+async function saveContent() {
   const title = document.getElementById('cont-title').value.trim();
   if (!title) { showToast('Título é obrigatório.', 'error'); return; }
-  const data = { id:Date.now(), title, client:document.getElementById('cont-client').value, platform:document.getElementById('cont-platform').value, format:document.getElementById('cont-format').value, date:document.getElementById('cont-date').value, status:document.getElementById('cont-status').value, desc:document.getElementById('cont-desc').value.trim() };
-  contents.unshift(data);
+  if (!window.drSupabase) { showToast('Supabase não disponível.', 'error'); return; }
+  const data = { title, client:document.getElementById('cont-client').value, platform:document.getElementById('cont-platform').value, format:document.getElementById('cont-format').value, date:document.getElementById('cont-date').value||null, status:document.getElementById('cont-status').value, descricao:document.getElementById('cont-desc').value.trim() };
+  window.DRCache?.clear('trafego');
+  const { data: ins } = await window.drSupabase.from('content_pieces').insert(data).select().single();
+  contents.unshift(ins || { ...data, id: Date.now() });
   closeContentModal();
-  filterContent();
   showToast('Conteúdo adicionado!', 'success');
   logActivity({ icon:'🎬', color:'#a855f7', msg:`Novo conteúdo programado — "${title}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
+  filterContent();
 }
 
 document.getElementById('campaign-modal').addEventListener('click', e => { if (e.target===document.getElementById('campaign-modal')) closeCampaignModal(); });
@@ -862,10 +894,8 @@ initCountrySelector('trafego', () => {
   renderMetrics();
   if (document.getElementById('tab-porcliente').classList.contains('active')) renderPorCliente();
 });
-updateKPIs();
-renderCampaigns();
-renderMetrics();
-renderContent(contents);
+loadData();
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

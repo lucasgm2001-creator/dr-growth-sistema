@@ -5,149 +5,406 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clientes — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <style>
+    /* ---- Tabs ---- */
+    .clients-tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px solid var(--border); padding-bottom:0; }
+    .clients-tab  { padding:10px 18px; font-size:13px; font-weight:600; color:var(--text-muted); border-radius:8px 8px 0 0; cursor:pointer; border:none; background:none; font-family:inherit; transition:all .18s; border-bottom:2px solid transparent; margin-bottom:-2px; }
+    .clients-tab:hover { color:var(--text-primary); background:var(--bg-hover); }
+    .clients-tab.active { color:var(--accent); border-bottom-color:var(--accent); background:var(--accent-dim); }
+    .tab-pane { display:none; } .tab-pane.active { display:block; }
+
+    /* ---- KPI grid ---- */
+    .cli-kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+    @media(max-width:900px){ .cli-kpi{ grid-template-columns:1fr 1fr; } }
+
+    /* ---- Carteira table ---- */
+    .client-table { width:100%; border-collapse:collapse; }
+    .client-table th { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; padding:8px 12px; text-align:left; border-bottom:2px solid var(--border); }
+    .client-table td { padding:11px 12px; border-bottom:1px solid var(--border-light); font-size:13px; vertical-align:middle; }
+    .client-table tr:hover td { background:var(--bg-hover); cursor:pointer; }
+    .status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:700; }
+    .status-ativo    { background:rgba(16,185,129,.12); color:#059669; }
+    .status-pausado  { background:rgba(245,158,11,.12);  color:#b45309; }
+    .status-risco    { background:rgba(239,68,68,.12);   color:#dc2626; }
+    .status-encerrado{ background:rgba(107,114,128,.12); color:#4b5563; }
+
+    /* ---- Profile panel ---- */
+    .profile-panel { position:fixed; top:0; right:0; width:480px; max-width:100vw; height:100vh; background:var(--bg-card); box-shadow:-4px 0 32px rgba(30,58,111,.18); z-index:200; transform:translateX(105%); transition:transform .28s cubic-bezier(.4,0,.2,1); overflow-y:auto; display:flex; flex-direction:column; }
+    .profile-panel.open { transform:translateX(0); }
+    .pp-header { padding:20px 20px 0; display:flex; align-items:flex-start; gap:14px; border-bottom:1px solid var(--border); padding-bottom:16px; }
+    .pp-avatar { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; flex-shrink:0; }
+    .pp-title h2 { font-size:17px; font-weight:800; color:var(--text-primary); margin-bottom:2px; }
+    .pp-title p  { font-size:12px; color:var(--text-muted); }
+    .pp-close { margin-left:auto; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted); padding:4px 8px; border-radius:6px; }
+    .pp-close:hover { background:var(--bg-hover); }
+    .pp-body  { padding:20px; flex:1; }
+    .pp-section { margin-bottom:22px; }
+    .pp-section-title { font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+    .pp-grid  { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .pp-field label { font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:2px; }
+    .pp-field span  { font-size:13px; font-weight:600; color:var(--text-primary); }
+    .pp-job   { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--border-light); border-radius:10px; margin-bottom:8px; }
+    .pp-job-status { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .pp-note  { background:var(--bg-tertiary); border-radius:10px; padding:12px; margin-bottom:8px; font-size:13px; color:var(--text-secondary); }
+    .pp-note-meta { font-size:10px; color:var(--text-muted); margin-top:4px; }
+    .pp-actions { display:flex; gap:8px; padding:16px 20px; border-top:1px solid var(--border); flex-shrink:0; }
+
+    /* ---- Jobs kanban ---- */
+    .jobs-kanban { display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; }
+    .job-col { background:var(--bg-tertiary); border-radius:14px; padding:12px; min-width:220px; flex:1; }
+    .job-col-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+    .job-col-dot { width:8px; height:8px; border-radius:50%; }
+    .job-col-title { font-size:12px; font-weight:700; color:var(--text-primary); flex:1; }
+    .job-col-count { font-size:11px; color:var(--text-muted); background:var(--bg-card); border-radius:99px; padding:1px 7px; }
+    .job-card { background:var(--bg-card); border:1px solid var(--border-light); border-radius:10px; padding:12px; margin-bottom:8px; cursor:pointer; transition:all .18s; }
+    .job-card:hover { box-shadow:var(--shadow-md); transform:translateY(-1px); }
+    .job-card-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+    .job-card-client { font-size:11px; color:var(--text-muted); margin-bottom:8px; }
+    .job-card-footer { display:flex; align-items:center; gap:6px; }
+    .job-deadline { font-size:10px; padding:2px 7px; border-radius:99px; font-weight:600; }
+    .job-deadline.ok     { background:rgba(16,185,129,.12); color:#059669; }
+    .job-deadline.warn   { background:rgba(245,158,11,.12);  color:#b45309; }
+    .job-deadline.late   { background:rgba(239,68,68,.12);   color:#dc2626; }
+    .job-kanban-drop { min-height:60px; border-radius:8px; transition:background .15s; }
+    .job-kanban-drop.drag-over { background:var(--accent-dim); }
+
+    /* ---- Documentos ---- */
+    .doc-folder { border:1px solid var(--border-light); border-radius:12px; margin-bottom:12px; overflow:hidden; }
+    .doc-folder-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--bg-tertiary); cursor:pointer; font-weight:600; font-size:13px; }
+    .doc-folder-header:hover { background:var(--bg-hover); }
+    .doc-list { padding:8px 16px; display:none; }
+    .doc-folder.open .doc-list { display:block; }
+    .doc-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border-light); font-size:13px; }
+    .doc-item:last-child { border-bottom:none; }
+    .doc-icon { font-size:20px; flex-shrink:0; }
+    .doc-info { flex:1; min-width:0; }
+    .doc-info .doc-name  { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .doc-info .doc-meta  { font-size:11px; color:var(--text-muted); }
+
+    /* ---- Alertas ---- */
+    .alert-item { display:flex; align-items:flex-start; gap:12px; padding:14px; border:1px solid var(--border-light); border-radius:12px; margin-bottom:10px; }
+    .alert-icon { font-size:20px; flex-shrink:0; }
+    .alert-body { flex:1; }
+    .alert-title { font-size:13px; font-weight:700; margin-bottom:2px; }
+    .alert-desc  { font-size:12px; color:var(--text-muted); }
+    .alert-item.urgent { border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.04); }
+    .alert-item.warn   { border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.04); }
+    .alert-item.info   { border-color:rgba(36,76,156,.2);   background:rgba(36,76,156,.04); }
+
+    /* ---- Panel overlay ---- */
+    .panel-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:199; }
+    .panel-overlay.show { display:block; }
+  </style>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
+    <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-label">Principal</div>
-      <a href="dashboard.html" class="nav-item" data-page="dashboard.html"><span class="nav-icon">⬛</span> Dashboard</a>
-      <a href="funil.html" class="nav-item" data-page="funil.html"><span class="nav-icon">◈</span> Funil de Vendas</a>
-      <a href="leads.html" class="nav-item" data-page="leads.html"><span class="nav-icon">◉</span> Gestão de Leads</a>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-label">Operações</div>
-      <a href="tarefas.html" class="nav-item" data-page="tarefas.html"><span class="nav-icon">✓</span> Tarefas</a>
-      <a href="clientes.html" class="nav-item" data-page="clientes.html"><span class="nav-icon">★</span> Clientes</a>
-      <a href="financeiro.html" class="nav-item" data-page="financeiro.html"><span class="nav-icon">$</span> Financeiro</a>
-    </div>
-  </nav>
+  <div class="elevator-label">Elevador</div>
+  <nav class="elevator-nav" id="elevator-nav"></nav>
   <div class="sidebar-footer"><div class="user-profile" id="user-profile"></div></div>
 </aside>
+
+<div class="panel-overlay" id="panel-overlay" onclick="closeProfile()"></div>
+
+<!-- Profile panel -->
+<div class="profile-panel" id="profile-panel">
+  <div class="pp-header" id="pp-header"></div>
+  <div class="pp-body"   id="pp-body"></div>
+  <div class="pp-actions" id="pp-actions"></div>
+</div>
 
 <div class="main-content">
   <header class="topbar">
     <button class="menu-toggle" id="menu-toggle">☰</button>
     <div class="topbar-title">
       <h1>Clientes</h1>
-      <p id="clients-subtitle">Carregando…</p>
+      <p id="page-subtitle">Pós-venda · DR Growth</p>
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 Brasil</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item">
+          <span class="clock-tz"><span class="tz-full">🇧🇷 São Paulo</span><span class="tz-short">🇧🇷 <small>SP</small></span></span>
+          <span class="clock-time" id="clock-br">--:--:--</span>
+        </div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 EUA</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item">
+          <span class="clock-tz"><span class="tz-full">🇺🇸 Orlando, FL</span><span class="tz-short">🇺🇸 <small>FL</small></span></span>
+          <span class="clock-time" id="clock-us">--:--:--</span>
+        </div>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="openModal()">+ Novo Cliente</button>
+      <button class="btn btn-primary btn-sm" id="btn-new" onclick="openClientModal()">+ Novo Cliente</button>
     </div>
   </header>
 
   <main class="page-content">
+    <!-- Tabs -->
+    <div class="clients-tabs animate-in" id="tab-nav">
+      <button class="clients-tab active" onclick="switchTab('overview')">Visão Geral</button>
+      <button class="clients-tab" onclick="switchTab('carteira')">Carteira</button>
+      <button class="clients-tab" onclick="switchTab('jobs')">Jobs</button>
+      <button class="clients-tab" id="tab-docs-btn" onclick="switchTab('documentos')">Documentos</button>
+      <button class="clients-tab" onclick="switchTab('alertas')">Alertas</button>
+    </div>
 
-    <!-- KPIs -->
-    <div class="kpi-grid animate-in" style="margin-bottom:20px">
-      <div class="kpi-card green">
-        <div class="kpi-top"><span class="kpi-label">Clientes Ativos</span><div class="kpi-icon green">★</div></div>
-        <div class="kpi-value" id="kpi-active">—</div>
-        <div class="kpi-change neutral">contratos vigentes</div>
+    <!-- VISÃO GERAL -->
+    <div class="tab-pane active" id="tab-overview">
+      <div class="cli-kpi animate-in">
+        <div class="kpi-card green">
+          <div class="kpi-top"><span class="kpi-label">Clientes Ativos</span><div class="kpi-icon green">🤝</div></div>
+          <div class="kpi-value" id="kpi-ativos">—</div>
+          <div class="kpi-change neutral">contratos vigentes</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-top"><span class="kpi-label">Jobs em Andamento</span><div class="kpi-icon accent">⚡</div></div>
+          <div class="kpi-value" id="kpi-jobs-doing">—</div>
+          <div class="kpi-change neutral">em execução</div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-top"><span class="kpi-label">Jobs Atrasados</span><div class="kpi-icon yellow">⏰</div></div>
+          <div class="kpi-value" id="kpi-jobs-late">—</div>
+          <div class="kpi-change down">prazo vencido</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-top"><span class="kpi-label">Clientes em Risco</span><div class="kpi-icon red">⚠</div></div>
+          <div class="kpi-value" id="kpi-risco">—</div>
+          <div class="kpi-change down">atenção necessária</div>
+        </div>
       </div>
-      <div class="kpi-card yellow">
-        <div class="kpi-top"><span class="kpi-label">MRR</span><div class="kpi-icon yellow">$</div></div>
-        <div class="kpi-value" id="kpi-mrr">—</div>
-        <div class="kpi-change neutral">receita mensal</div>
-      </div>
-      <div class="kpi-card accent">
-        <div class="kpi-top"><span class="kpi-label">Saudáveis</span><div class="kpi-icon accent">●</div></div>
-        <div class="kpi-value" id="kpi-green">—</div>
-        <div class="kpi-change up">saúde verde</div>
-      </div>
-      <div class="kpi-card red">
-        <div class="kpi-top"><span class="kpi-label">Em Risco</span><div class="kpi-icon red">⚠</div></div>
-        <div class="kpi-value" id="kpi-risk">—</div>
-        <div class="kpi-change down">atenção necessária</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="animate-in">
+        <!-- Últimos clientes -->
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Clientes Recentes</h3></div>
+          <div class="card-body" id="recent-clients-list" style="padding-top:0"></div>
+        </div>
+        <!-- Jobs urgentes -->
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Jobs Urgentes</h3></div>
+          <div class="card-body" id="urgent-jobs-list" style="padding-top:0"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="filter-bar animate-in" style="animation-delay:0.1s">
-      <div class="search-input-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="search" placeholder="Buscar cliente ou serviço…" oninput="filterClients()">
+    <!-- CARTEIRA -->
+    <div class="tab-pane" id="tab-carteira">
+      <div class="filter-bar animate-in" style="margin-bottom:16px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-carteira" placeholder="Buscar cliente…" oninput="renderCarteira()">
+        </div>
+        <select class="filter-select" id="filter-status" onchange="renderCarteira()">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="pausado">Pausado</option>
+          <option value="risco">Em Risco</option>
+          <option value="encerrado">Encerrado</option>
+        </select>
+        <select class="filter-select" id="filter-pais" onchange="renderCarteira()">
+          <option value="">Brasil + EUA</option>
+          <option value="br">Brasil</option>
+          <option value="us">EUA</option>
+        </select>
+        <select class="filter-select" id="filter-resp-cart" onchange="renderCarteira()">
+          <option value="">Todos responsáveis</option>
+          <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+        </select>
       </div>
-      <select class="filter-select" id="filter-resp" onchange="filterClients()">
-        <option value="">Todos os responsáveis</option>
-        <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
-      </select>
-      <select class="filter-select" id="filter-health" onchange="filterClients()">
-        <option value="">Toda saúde</option>
-        <option value="green">Saudável</option>
-        <option value="yellow">Atenção</option>
-        <option value="red">Em risco</option>
-      </select>
+      <div class="card animate-in">
+        <div class="card-body" style="padding:0;overflow-x:auto">
+          <table class="client-table" id="carteira-table">
+            <thead>
+              <tr>
+                <th>Cliente</th><th>Nicho</th><th>País</th><th>Início</th>
+                <th>Responsável</th><th>Status</th><th>Renovação</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="carteira-tbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Grid de Cards de clientes -->
-    <div id="clients-grid" class="animate-in" style="animation-delay:0.15s;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
-      <div class="empty-state"><div class="empty-icon">★</div><p>Carregando…</p></div>
+    <!-- JOBS -->
+    <div class="tab-pane" id="tab-jobs">
+      <div class="filter-bar animate-in" style="margin-bottom:16px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-jobs" placeholder="Buscar job…" oninput="renderJobs()">
+        </div>
+        <select class="filter-select" id="filter-job-client" onchange="renderJobs()">
+          <option value="">Todos os clientes</option>
+        </select>
+        <select class="filter-select" id="filter-job-resp" onchange="renderJobs()">
+          <option value="">Todos responsáveis</option>
+          <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openJobModal()">+ Novo Job</button>
+      </div>
+      <div class="jobs-kanban animate-in" id="jobs-kanban"></div>
+    </div>
+
+    <!-- DOCUMENTOS -->
+    <div class="tab-pane" id="tab-documentos">
+      <div class="filter-bar animate-in" style="margin-bottom:16px">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-docs" placeholder="Buscar documento…" oninput="renderDocumentos()">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openDocModal()">+ Adicionar Documento</button>
+      </div>
+      <div id="docs-list" class="animate-in"></div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="tab-pane" id="tab-alertas">
+      <div id="alertas-list" class="animate-in"></div>
     </div>
 
   </main>
 </div>
 
-<!-- MODAL Cliente -->
+<!-- Modal: Novo/Editar Cliente -->
 <div class="modal-overlay" id="client-modal">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="modal-title">Novo Cliente</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h3 id="cm-title">Novo Cliente</h3>
+      <button class="modal-close" onclick="closeClientModal()">✕</button>
     </div>
     <div class="modal-body">
-      <input type="hidden" id="client-id">
+      <input type="hidden" id="cm-id">
       <div class="grid-2">
-        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="client-name" placeholder="Nome do cliente"></div>
-        <div class="form-group"><label>Serviço</label><input type="text" class="form-control" id="client-service" placeholder="Ex: Gestão de Tráfego"></div>
+        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="cm-name" placeholder="Nome ou empresa"></div>
+        <div class="form-group"><label>Nicho *</label>
+          <select class="form-control" id="cm-nicho">
+            <option value="">Selecione</option>
+            <option>Saúde</option><option>Educação</option><option>E-commerce</option>
+            <option>Jurídico</option><option>Imóveis</option><option>Alimentação</option>
+            <option>Tecnologia</option><option>Serviços</option><option>Outros</option>
+          </select>
+        </div>
       </div>
       <div class="grid-2">
-        <div class="form-group">
-          <label>Responsável</label>
-          <select class="form-control" id="client-resp">
+        <div class="form-group"><label>País</label>
+          <select class="form-control" id="cm-pais">
+            <option value="br">🇧🇷 Brasil</option>
+            <option value="us">🇺🇸 EUA</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select class="form-control" id="cm-status">
+            <option value="ativo">Ativo</option>
+            <option value="pausado">Pausado</option>
+            <option value="risco">Em Risco</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Responsável</label>
+          <select class="form-control" id="cm-resp">
             <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
           </select>
         </div>
-        <div class="form-group"><label>Valor Mensal (R$)</label><input type="number" class="form-control" id="client-value" placeholder="0"></div>
+        <div class="form-group"><label>Valor Mensal (R$)</label>
+          <input type="number" class="form-control" id="cm-valor" placeholder="0">
+        </div>
       </div>
       <div class="grid-2">
-        <div class="form-group"><label>Data de Início</label><input type="date" class="form-control" id="client-start"></div>
-        <div class="form-group"><label>Próxima Renovação</label><input type="date" class="form-control" id="client-renewal"></div>
+        <div class="form-group"><label>Data de Início</label><input type="date" class="form-control" id="cm-inicio"></div>
+        <div class="form-group"><label>Próxima Renovação</label><input type="date" class="form-control" id="cm-renovacao"></div>
       </div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Saúde do Cliente</label>
-          <select class="form-control" id="client-health">
-            <option value="green">Saudável</option>
-            <option value="yellow">Atenção</option>
-            <option value="red">Em risco</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select class="form-control" id="client-active">
-            <option value="true">Ativo</option>
-            <option value="false">Inativo</option>
-          </select>
-        </div>
+      <div class="form-group"><label>Observações internas</label>
+        <textarea class="form-control" id="cm-obs" rows="3" placeholder="Notas sobre o cliente…"></textarea>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-danger btn-sm" id="delete-btn" onclick="deleteClient()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-secondary" onclick="closeClientModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="cm-delete" onclick="deleteClient()" style="display:none;margin-right:auto">Excluir</button>
       <button class="btn btn-primary" onclick="saveClient()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo/Editar Job -->
+<div class="modal-overlay" id="job-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="jm-title">Novo Job</h3>
+      <button class="modal-close" onclick="closeJobModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="jm-id">
+      <div class="form-group"><label>Título *</label><input type="text" class="form-control" id="jm-title-input" placeholder="Ex: Criação de campanha Google Ads"></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Cliente *</label>
+          <select class="form-control" id="jm-client"></select>
+        </div>
+        <div class="form-group"><label>Responsável</label>
+          <select class="form-control" id="jm-resp">
+            <option>Daniel</option><option>Lucas</option><option>Gabriel</option><option>Thamyris</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Status</label>
+          <select class="form-control" id="jm-status">
+            <option value="todo">A Fazer</option>
+            <option value="doing">Em Andamento</option>
+            <option value="review">Em Revisão</option>
+            <option value="done">Concluído</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Prazo</label><input type="date" class="form-control" id="jm-prazo"></div>
+      </div>
+      <div class="form-group"><label>Descrição</label>
+        <textarea class="form-control" id="jm-desc" rows="3" placeholder="Detalhes do job…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeJobModal()">Cancelar</button>
+      <button class="btn btn-danger btn-sm" id="jm-delete" onclick="deleteJob()" style="display:none;margin-right:auto">Excluir</button>
+      <button class="btn btn-primary" onclick="saveJob()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Documento -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Adicionar Documento</h3>
+      <button class="modal-close" onclick="closeDocModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="dm-id">
+      <div class="grid-2">
+        <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="dm-name" placeholder="Ex: Contrato Inicial"></div>
+        <div class="form-group"><label>Tipo</label>
+          <select class="form-control" id="dm-tipo">
+            <option value="contrato">Contrato</option>
+            <option value="briefing">Briefing</option>
+            <option value="relatorio">Relatório</option>
+            <option value="proposta">Proposta</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Cliente</label>
+        <select class="form-control" id="dm-client"></select>
+      </div>
+      <div class="form-group"><label>Link do documento (Google Drive, Dropbox…)</label>
+        <input type="url" class="form-control" id="dm-url" placeholder="https://drive.google.com/…">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeDocModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDoc()">Salvar</button>
     </div>
   </div>
 </div>
@@ -155,251 +412,660 @@
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
-const session = initPage();
+/*
+  SUPABASE TABLES (execute no SQL Editor do Supabase):
+
+  create table clients (
+    id uuid primary key default gen_random_uuid(),
+    name text not null,
+    nicho text,
+    pais text default 'br',
+    status text default 'ativo',
+    responsible text,
+    monthly_value numeric,
+    start_date date,
+    renewal_date date,
+    observations text,
+    lead_id text,
+    created_at timestamptz default now()
+  );
+
+  create table jobs (
+    id uuid primary key default gen_random_uuid(),
+    title text not null,
+    client_id text,
+    client_name text,
+    responsible text,
+    status text default 'todo',
+    deadline date,
+    description text,
+    created_at timestamptz default now(),
+    updated_at timestamptz default now()
+  );
+
+  create table documents (
+    id uuid primary key default gen_random_uuid(),
+    name text not null,
+    tipo text default 'outro',
+    client_id text,
+    client_name text,
+    url text,
+    uploaded_by text,
+    created_at timestamptz default now()
+  );
+*/
+
+const session = initPage('clientes.html');
 if (!session) throw new Error('Not authenticated');
 
-let allClients = [];
+// ---- Permission filter ----
+const role = session.role;
+const firstName = session.name.split(' ')[0];
 
-const DEMO_CLIENTS = [
-  { id:1, name:'GrowthX Agency',    service:'Gestão de Tráfego',   responsible:'Gabriel', start_date:'2025-11-01', renewal_date:'2026-11-01', monthly_value:12000, health:'green', active:true },
-  { id:2, name:'MedTech Brasil',    service:'Social Media + Ads',  responsible:'Gabriel', start_date:'2026-01-10', renewal_date:'2026-07-10', monthly_value:4500,  health:'green', active:true },
-  { id:3, name:'US Digital LLC',    service:'Full Marketing',      responsible:'Lucas',   start_date:'2026-02-01', renewal_date:'2026-08-01', monthly_value:8200,  health:'yellow', active:true },
-  { id:4, name:'Restaurante Sabor', service:'Instagram + Stories', responsible:'Gabriel', start_date:'2025-09-15', renewal_date:'2026-09-15', monthly_value:1800,  health:'red', active:true },
-  { id:5, name:'Academia Fit',      service:'Google Ads',          responsible:'Gabriel', start_date:'2026-03-01', renewal_date:'2026-09-01', monthly_value:2400,  health:'green', active:true },
-];
-
-const HEALTH_INFO = {
-  green:  { label:'Saudável',  cls:'badge-green',  dot:'green',  icon:'●' },
-  yellow: { label:'Atenção',   cls:'badge-yellow', dot:'yellow', icon:'◐' },
-  red:    { label:'Em risco',  cls:'badge-red',    dot:'red',    icon:'⚠' },
-};
-
-function saveClientsLocal() { try { localStorage.setItem('drg_clients', JSON.stringify(allClients)); } catch {} }
-function loadClientsLocal() { try { return JSON.parse(localStorage.getItem('drg_clients') || '[]'); } catch { return []; } }
-
-async function loadClients() {
-  let loadedFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const { data, error } = await window.drSupabase.from('clients').select('*').order('name');
-      if (!error && data?.length) { allClients = data; loadedFromRemote = true; saveClientsLocal(); }
-    } catch {}
-  }
-  if (!loadedFromRemote) {
-    const local = loadClientsLocal();
-    allClients = local.length ? local : DEMO_CLIENTS;
-  }
-  updateKPIs();
-  renderGrid(allClients);
+function canSeeClient(c) {
+  if (role === 'admin') return true;
+  if (role === 'comercial') return c.pais === 'us' || !c.pais; // Lucas: EUA
+  if (role === 'trafego')   return c.pais === 'br'; // Gabriel: Brasil
+  if (role === 'financeiro') return true; // Thamyris: tudo
+  return false;
+}
+function canSeeFinancialDocs() {
+  return role === 'admin' || role === 'financeiro';
+}
+function canEditClient() {
+  return role === 'admin' || role === 'financeiro';
 }
 
-function updateKPIs() {
-  const active = allClients.filter(c => c.active !== false);
-  const mrr    = active.reduce((s,c) => s + (Number(c.monthly_value)||0), 0);
-  const green  = active.filter(c => c.health === 'green').length;
-  const risk   = active.filter(c => c.health === 'yellow' || c.health === 'red').length;
-
-  document.getElementById('kpi-active').textContent = active.length;
-  document.getElementById('kpi-mrr').textContent    = fmt.currency(mrr);
-  document.getElementById('kpi-green').textContent  = green;
-  document.getElementById('kpi-risk').textContent   = risk;
-  document.getElementById('clients-subtitle').textContent = `${active.length} clientes ativos · MRR ${fmt.currency(mrr)}`;
+// Hide add button for non-admins
+if (role !== 'admin' && role !== 'financeiro') {
+  document.getElementById('btn-new').style.display = 'none';
+}
+// Hide docs tab for Lucas (no financial docs)
+if (role === 'comercial') {
+  document.getElementById('tab-docs-btn').style.display = 'none';
 }
 
-function filterClients() {
-  const q    = document.getElementById('search').value.toLowerCase();
-  const resp = document.getElementById('filter-resp').value;
-  const health = document.getElementById('filter-health').value;
+// ---- Data ----
+let allClients = [], allJobs = [], allDocs = [];
+let activeTab = 'overview';
+let selectedClientId = null;
 
-  const filtered = allClients.filter(c => {
-    if (q && !(c.name||'').toLowerCase().includes(q) && !(c.service||'').toLowerCase().includes(q)) return false;
-    if (resp && c.responsible !== resp) return false;
-    if (health && c.health !== health) return false;
+const DEMO_CLIENTS = [];
+const DEMO_JOBS    = [];
+const DEMO_DOCS    = [];
+
+// ---- Persistence ----
+async function loadData() {
+  const cached = window.DRCache?.get('clientes');
+  if (cached) {
+    allClients = cached.clients || [];
+    allJobs    = cached.jobs    || [];
+    allDocs    = cached.docs    || [];
+    refresh();
+    return;
+  }
+  if (!window.drSupabase) return;
+  const [c, j, d] = await Promise.all([
+    window.drSupabase.from('clients').select('*').order('name'),
+    window.drSupabase.from('jobs').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('documents').select('*').order('created_at', { ascending: false }),
+  ]);
+  allClients = (c.data || []);
+  allJobs    = (j.data || []);
+  allDocs    = (d.data || []);
+  if (window.applyRoleFilter) allClients = applyRoleFilter(allClients, 'clients');
+  window.DRCache?.set('clientes', { clients: allClients, jobs: allJobs, docs: allDocs });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+  refresh();
+}
+
+// ---- Tab switching ----
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.clients-tab').forEach((btn,i) => {
+    const tabs = ['overview','carteira','jobs','documentos','alertas'];
+    btn.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  renderTab(tab);
+}
+
+function renderTab(tab) {
+  if (tab === 'overview')   renderOverview();
+  if (tab === 'carteira')   renderCarteira();
+  if (tab === 'jobs')       { populateJobFilters(); renderJobs(); }
+  if (tab === 'documentos') renderDocumentos();
+  if (tab === 'alertas')    renderAlertas();
+}
+
+function refresh() {
+  renderTab(activeTab);
+  renderOverview();
+}
+
+// ---- Visão Geral ----
+function renderOverview() {
+  const visible = allClients.filter(canSeeClient);
+  const ativos  = visible.filter(c => c.status === 'ativo').length;
+  const risco   = visible.filter(c => c.status === 'risco').length;
+  const myJobs  = allJobs.filter(j => role === 'admin' ? true : j.responsible === firstName);
+  const doing   = myJobs.filter(j => j.status === 'doing').length;
+  const late    = myJobs.filter(j => j.status !== 'done' && j.deadline && new Date(j.deadline) < new Date()).length;
+
+  document.getElementById('kpi-ativos').textContent    = ativos;
+  document.getElementById('kpi-jobs-doing').textContent = doing;
+  document.getElementById('kpi-jobs-late').textContent  = late;
+  document.getElementById('kpi-risco').textContent      = risco;
+  document.getElementById('page-subtitle').textContent  = `${ativos} clientes ativos · ${doing} jobs em andamento`;
+
+  // Recent clients
+  const recent = [...visible].sort((a,b) => (b.start_date||'') > (a.start_date||'') ? 1 : -1).slice(0,5);
+  document.getElementById('recent-clients-list').innerHTML = recent.length ? recent.map(c => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer" onclick="openProfile('${c.id}')">
+      <div class="avatar avatar-sm" style="background:${clientColor(c.name)};color:#fff;font-weight:700;font-size:11px">${fmt.initials(c.name)}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${c.name}</div><div style="font-size:11px;color:var(--text-muted)">${c.nicho||'—'} · ${c.pais==='us'?'🇺🇸 EUA':'🇧🇷 Brasil'}</div></div>
+      <span class="status-pill status-${c.status}">${statusLabel(c.status)}</span>
+    </div>`).join('') : '<p style="color:var(--text-muted);font-size:13px">Nenhum cliente.</p>';
+
+  // Urgent jobs
+  const urgent = allJobs.filter(j => j.status !== 'done' && j.deadline).sort((a,b) => a.deadline > b.deadline ? 1 : -1).slice(0,5);
+  document.getElementById('urgent-jobs-list').innerHTML = urgent.length ? urgent.map(j => {
+    const days = Math.ceil((new Date(j.deadline) - new Date()) / 86400000);
+    const cls  = days < 0 ? 'late' : days <= 2 ? 'warn' : 'ok';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)">
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${j.title}</div><div style="font-size:11px;color:var(--text-muted)">${j.client_name}</div></div>
+      <span class="job-deadline ${cls}">${days < 0 ? `${Math.abs(days)}d atraso` : days === 0 ? 'Hoje' : `${days}d`}</span>
+    </div>`;
+  }).join('') : '<p style="color:var(--text-muted);font-size:13px">Nenhum job urgente.</p>';
+}
+
+// ---- Carteira ----
+function renderCarteira() {
+  const q      = (document.getElementById('search-carteira')?.value||'').toLowerCase();
+  const status = document.getElementById('filter-status')?.value || '';
+  const pais   = document.getElementById('filter-pais')?.value   || '';
+  const resp   = document.getElementById('filter-resp-cart')?.value || '';
+
+  const rows = allClients.filter(canSeeClient).filter(c => {
+    if (q && !(c.name||'').toLowerCase().includes(q)) return false;
+    if (status && c.status !== status) return false;
+    if (pais   && c.pais   !== pais)   return false;
+    if (resp   && c.responsible !== resp) return false;
     return true;
   });
 
-  renderGrid(filtered);
-}
-
-function daysUntilRenewal(date) {
-  if (!date) return null;
-  return Math.ceil((new Date(date + 'T12:00:00') - new Date()) / 86400000);
-}
-
-function renderGrid(clients) {
-  if (!clients.length) {
-    document.getElementById('clients-grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">★</div><h3>Nenhum cliente encontrado</h3><p>Ajuste os filtros ou adicione um novo cliente.</p></div>`;
+  const tbody = document.getElementById('carteira-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum cliente encontrado.</td></tr>`;
     return;
   }
+  tbody.innerHTML = rows.map(c => `
+    <tr onclick="openProfile('${c.id}')">
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar avatar-sm" style="background:${clientColor(c.name)};color:#fff;font-weight:700;font-size:11px">${fmt.initials(c.name)}</div>
+        <span style="font-weight:600">${c.name}</span>
+      </div></td>
+      <td>${c.nicho||'—'}</td>
+      <td>${c.pais==='us'?'🇺🇸 EUA':'🇧🇷 Brasil'}</td>
+      <td>${fmt.date(c.start_date)}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(c.responsible)}">${fmt.initials(c.responsible)}</div>${c.responsible||'—'}</div></td>
+      <td><span class="status-pill status-${c.status}">${statusLabel(c.status)}</span></td>
+      <td>${fmt.date(c.renewal_date)}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfile('${c.id}')">Ver perfil</button></td>
+    </tr>`).join('');
+}
 
-  document.getElementById('clients-grid').innerHTML = clients.map(c => {
-    const hi      = HEALTH_INFO[c.health] || HEALTH_INFO.green;
-    const days    = daysUntilRenewal(c.renewal_date);
-    const renewBadge = days !== null
-      ? (days < 0
-          ? `<span class="badge badge-red">Vencido há ${Math.abs(days)}d</span>`
-          : days <= 30
-          ? `<span class="badge badge-yellow">Renova em ${days}d</span>`
-          : `<span class="badge badge-muted">Renova em ${days}d</span>`)
-      : '';
+// ---- Jobs Kanban ----
+const JOB_COLS = [
+  { key:'todo',   label:'A Fazer',      color:'#6366f1' },
+  { key:'doing',  label:'Em Andamento', color:'#3b82f6' },
+  { key:'review', label:'Em Revisão',   color:'#f59e0b' },
+  { key:'done',   label:'Concluído',    color:'#10B981' },
+];
 
-    const cardBorder = c.health === 'red' ? 'border-color:rgba(239,68,68,0.35)'
-                     : c.health === 'yellow' ? 'border-color:rgba(234,179,8,0.3)'
-                     : '';
+let dragJobId = null;
 
-    return `
-      <div class="card" style="cursor:pointer;transition:all 0.18s;${cardBorder}" onclick="openEditModal(${c.id})"
-        onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='var(--shadow-md)'"
-        onmouseleave="this.style.transform='';this.style.boxShadow=''">
-        <div class="card-body">
-          <!-- Header do card -->
-          <div class="flex items-center justify-between mb-3">
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="avatar avatar-lg" style="background:linear-gradient(135deg,${getClientColor(c.name)});flex-shrink:0">
-                ${fmt.initials(c.name)}
-              </div>
-              <div>
-                <div style="font-size:14px;font-weight:700">${c.name}</div>
-                <div style="font-size:11px;color:var(--text-muted)">${c.service || '—'}</div>
-              </div>
-            </div>
-            <span class="badge ${hi.cls}">${hi.label}</span>
-          </div>
+function populateJobFilters() {
+  const sel = document.getElementById('filter-job-client');
+  if (!sel) return;
+  const visible = allClients.filter(canSeeClient);
+  sel.innerHTML = '<option value="">Todos os clientes</option>' +
+    visible.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+}
 
-          <!-- Barra de saúde -->
-          <div class="health-bar ${c.health}" style="margin-bottom:14px">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-          </div>
+function renderJobs() {
+  const q      = (document.getElementById('search-jobs')?.value||'').toLowerCase();
+  const cliId  = document.getElementById('filter-job-client')?.value || '';
+  const resp   = document.getElementById('filter-job-resp')?.value   || '';
+  const visibleClientIds = new Set(allClients.filter(canSeeClient).map(c => c.id));
 
-          <!-- Info -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-            <div>
-              <div class="text-muted" style="margin-bottom:2px">Valor mensal</div>
-              <div style="font-size:15px;font-weight:700;color:var(--green)">${fmt.currency(c.monthly_value)}</div>
-            </div>
-            <div>
-              <div class="text-muted" style="margin-bottom:2px">Responsável</div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600">
-                <div class="avatar avatar-sm avatar-${fmt.avatarClass(c.responsible)}">${fmt.initials(c.responsible)}</div>
-                ${c.responsible}
-              </div>
-            </div>
-            <div>
-              <div class="text-muted" style="margin-bottom:2px">Início</div>
-              <div style="font-size:12px">${fmt.date(c.start_date)}</div>
-            </div>
-            <div>
-              <div class="text-muted" style="margin-bottom:2px">Renovação</div>
-              <div style="font-size:12px">${fmt.date(c.renewal_date)}</div>
-            </div>
-          </div>
+  const filtered = allJobs.filter(j => {
+    if (!visibleClientIds.has(j.client_id)) return false;
+    if (role === 'trafego' && j.responsible !== firstName) return false;
+    if (q && !(j.title||'').toLowerCase().includes(q)) return false;
+    if (cliId && j.client_id !== cliId) return false;
+    if (resp  && j.responsible !== resp)  return false;
+    return true;
+  });
 
-          ${renewBadge}
-          ${!c.active ? '<span class="badge badge-muted" style="margin-left:6px">Inativo</span>' : ''}
-        </div>
-      </div>`;
+  const kanban = document.getElementById('jobs-kanban');
+  kanban.innerHTML = JOB_COLS.map(col => {
+    const cards = filtered.filter(j => j.status === col.key);
+    return `<div class="job-col">
+      <div class="job-col-header">
+        <div class="job-col-dot" style="background:${col.color}"></div>
+        <span class="job-col-title">${col.label}</span>
+        <span class="job-col-count">${cards.length}</span>
+      </div>
+      <div class="job-kanban-drop" id="jcol-${col.key}"
+        ondragover="event.preventDefault();this.classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over')"
+        ondrop="dropJob(event,'${col.key}')">
+        ${cards.map(j => buildJobCard(j)).join('')}
+        ${!cards.length ? `<div style="padding:8px;text-align:center;font-size:11px;color:var(--text-muted);opacity:.5">Arraste aqui</div>` : ''}
+      </div>
+    </div>`;
   }).join('');
 }
 
-function getClientColor(name) {
-  const colors = [
-    '#6366f1,#8b5cf6', '#3b82f6,#06b6d4', '#22c55e,#16a34a',
-    '#f97316,#eab308', '#ec4899,#be185d', '#a855f7,#7c3aed',
-  ];
-  let hash = 0;
-  for (const ch of name) hash = ch.charCodeAt(0) + ((hash < 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+function buildJobCard(j) {
+  const days = j.deadline ? Math.ceil((new Date(j.deadline) - new Date()) / 86400000) : null;
+  const dlCls = days === null ? '' : days < 0 ? 'late' : days <= 2 ? 'warn' : 'ok';
+  const dlTxt = days === null ? '' : days < 0 ? `${Math.abs(days)}d atraso` : days === 0 ? 'Hoje' : `${days}d`;
+  return `<div class="job-card" draggable="true"
+    ondragstart="dragJobId='${j.id}';setTimeout(()=>this.style.opacity='.5',0)"
+    ondragend="this.style.opacity=''"
+    onclick="openJobModal('${j.id}')">
+    <div class="job-card-title">${j.title}</div>
+    <div class="job-card-client">${j.client_name}</div>
+    <div class="job-card-footer">
+      <div class="avatar avatar-sm avatar-${fmt.avatarClass(j.responsible)}" style="font-size:10px">${fmt.initials(j.responsible)}</div>
+      ${dlTxt ? `<span class="job-deadline ${dlCls}" style="margin-left:auto">${dlTxt}</span>` : ''}
+    </div>
+  </div>`;
 }
 
-// ---- Modal ----
-function openModal() {
-  document.getElementById('modal-title').textContent = 'Novo Cliente';
-  document.getElementById('client-id').value = '';
-  ['client-name','client-service','client-value'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('client-resp').value = 'Gabriel';
-  document.getElementById('client-start').value = '';
-  document.getElementById('client-renewal').value = '';
-  document.getElementById('client-health').value = 'green';
-  document.getElementById('client-active').value = 'true';
-  document.getElementById('delete-btn').style.display = 'none';
-  document.getElementById('client-modal').classList.add('show');
+function dropJob(e, status) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragJobId) return;
+  const job = allJobs.find(j => j.id === dragJobId);
+  if (!job || job.status === status) return;
+  job.status = status;
+  window.DRCache?.clear('clientes');
+  if (window.drSupabase) window.drSupabase.from('jobs').update({ status, updated_at: new Date().toISOString() }).eq('id', dragJobId).then(()=>{});
+  renderJobs();
+  dragJobId = null;
 }
 
-function openEditModal(id) {
-  const c = allClients.find(x => x.id === id);
+// ---- Documentos ----
+function renderDocumentos() {
+  const q = (document.getElementById('search-docs')?.value||'').toLowerCase();
+  const TYPE_ICON = { contrato:'📄', briefing:'📋', relatorio:'📊', proposta:'💼', outro:'📁' };
+
+  const docs = allDocs.filter(d => {
+    if (!canSeeFinancialDocs() && d.tipo === 'contrato') return false;
+    if (q && !(d.name||'').toLowerCase().includes(q) && !(d.client_name||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // Group by client
+  const groups = {};
+  docs.forEach(d => {
+    const key = d.client_name || 'Sem cliente';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(d);
+  });
+
+  const container = document.getElementById('docs-list');
+  if (!Object.keys(groups).length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><h3>Nenhum documento</h3><p>Adicione contratos, briefings e relatórios.</p></div>`;
+    return;
+  }
+  container.innerHTML = Object.entries(groups).map(([client, items]) => `
+    <div class="doc-folder open">
+      <div class="doc-folder-header" onclick="this.parentElement.classList.toggle('open')">
+        <span>📁</span> ${client} <span style="margin-left:auto;font-size:11px;color:var(--text-muted)">${items.length} arquivo${items.length!==1?'s':''}</span>
+      </div>
+      <div class="doc-list">
+        ${items.map(d => `<div class="doc-item">
+          <span class="doc-icon">${TYPE_ICON[d.tipo]||'📄'}</span>
+          <div class="doc-info">
+            <div class="doc-name">${d.name}</div>
+            <div class="doc-meta">${d.tipo} · ${fmt.date(d.created_at?.split('T')[0])} · ${d.uploaded_by||'—'}</div>
+          </div>
+          ${d.url && d.url !== '#' ? `<a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">Abrir</a>` : ''}
+          ${canEditClient() ? `<button class="btn btn-ghost btn-sm" onclick="deleteDoc('${d.id}')">✕</button>` : ''}
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ---- Alertas ----
+function renderAlertas() {
+  const now = new Date();
+  const alertas = [];
+  const visible = allClients.filter(canSeeClient);
+
+  // Jobs vencendo em 48h
+  allJobs.filter(j => j.status !== 'done' && j.deadline).forEach(j => {
+    if (!visible.find(c => c.id === j.client_id)) return;
+    const days = Math.ceil((new Date(j.deadline) - now) / 86400000);
+    if (days <= 2 && days >= 0) alertas.push({ type:'urgent', icon:'⏰', title:`Job vencendo: ${j.title}`, desc:`${j.client_name} · Prazo: ${fmt.date(j.deadline)} (${days===0?'hoje':`${days}d`})` });
+    if (days < 0)               alertas.push({ type:'urgent', icon:'🔴', title:`Job atrasado: ${j.title}`,  desc:`${j.client_name} · Venceu há ${Math.abs(days)} dia${Math.abs(days)!==1?'s':''}` });
+  });
+
+  // Renovações em 30 dias
+  visible.filter(c => c.renewal_date && c.status === 'ativo').forEach(c => {
+    const days = Math.ceil((new Date(c.renewal_date) - now) / 86400000);
+    if (days <= 30 && days >= 0) alertas.push({ type:'warn', icon:'📅', title:`Renovação chegando: ${c.name}`, desc:`Renova em ${days} dia${days!==1?'s':''} · ${fmt.date(c.renewal_date)}` });
+  });
+
+  // Clientes sem jobs há 15 dias
+  visible.filter(c => c.status === 'ativo').forEach(c => {
+    const cJobs = allJobs.filter(j => j.client_id === c.id && j.status !== 'done');
+    if (!cJobs.length) alertas.push({ type:'info', icon:'💤', title:`Sem jobs ativos: ${c.name}`, desc:`Nenhum job em aberto para este cliente.` });
+  });
+
+  // Clientes em risco
+  visible.filter(c => c.status === 'risco').forEach(c => {
+    alertas.push({ type:'urgent', icon:'⚠️', title:`Cliente em risco: ${c.name}`, desc:`Verifique o histórico e agende uma reunião.` });
+  });
+
+  const el = document.getElementById('alertas-list');
+  if (!alertas.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><h3>Tudo em ordem</h3><p>Nenhum alerta no momento.</p></div>`;
+    return;
+  }
+  el.innerHTML = alertas.map(a => `
+    <div class="alert-item ${a.type}">
+      <span class="alert-icon">${a.icon}</span>
+      <div class="alert-body">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-desc">${a.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ---- Profile panel ----
+function openProfile(clientId) {
+  selectedClientId = clientId;
+  const c = allClients.find(x => x.id === clientId);
   if (!c) return;
-  document.getElementById('modal-title').textContent = 'Editar Cliente';
-  document.getElementById('client-id').value = c.id;
-  document.getElementById('client-name').value = c.name || '';
-  document.getElementById('client-service').value = c.service || '';
-  document.getElementById('client-resp').value = c.responsible || 'Gabriel';
-  document.getElementById('client-value').value = c.monthly_value || '';
-  document.getElementById('client-start').value = c.start_date || '';
-  document.getElementById('client-renewal').value = c.renewal_date || '';
-  document.getElementById('client-health').value = c.health || 'green';
-  document.getElementById('client-active').value = c.active !== false ? 'true' : 'false';
-  document.getElementById('delete-btn').style.display = 'inline-flex';
-  document.getElementById('client-modal').classList.add('show');
+  const jobs = allJobs.filter(j => j.client_id === clientId);
+
+  const JOB_STATUS = { todo:'#6366f1', doing:'#3b82f6', review:'#f59e0b', done:'#10B981' };
+  const JOB_LABEL  = { todo:'A Fazer', doing:'Em Andamento', review:'Em Revisão', done:'Concluído' };
+
+  document.getElementById('pp-header').innerHTML = `
+    <div class="pp-avatar" style="background:${clientColor(c.name)}">${fmt.initials(c.name)}</div>
+    <div class="pp-title">
+      <h2>${c.name}</h2>
+      <p>${c.nicho||'—'} · ${c.pais==='us'?'🇺🇸 EUA':'🇧🇷 Brasil'}</p>
+    </div>
+    <button class="pp-close" onclick="closeProfile()">✕</button>`;
+
+  document.getElementById('pp-body').innerHTML = `
+    <div class="pp-section">
+      <div class="pp-section-title">Dados Gerais</div>
+      <div class="pp-grid">
+        <div class="pp-field"><label>Status</label><span><span class="status-pill status-${c.status}">${statusLabel(c.status)}</span></span></div>
+        <div class="pp-field"><label>Responsável</label><span>${c.responsible||'—'}</span></div>
+        ${canSeeFinancialDocs() ? `<div class="pp-field"><label>Valor Mensal</label><span style="color:var(--green);font-size:15px">${fmt.currency(c.monthly_value)}</span></div>` : ''}
+        <div class="pp-field"><label>Início</label><span>${fmt.date(c.start_date)}</span></div>
+        <div class="pp-field"><label>Renovação</label><span>${fmt.date(c.renewal_date)}</span></div>
+      </div>
+    </div>
+
+    <div class="pp-section">
+      <div class="pp-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        Jobs <button class="btn btn-ghost btn-sm" onclick="openJobModal(null,'${c.id}')">+ Job</button>
+      </div>
+      ${jobs.length ? jobs.map(j => `
+        <div class="pp-job" onclick="openJobModal('${j.id}')">
+          <div class="pp-job-status" style="background:${JOB_STATUS[j.status]||'#999'}"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${j.title}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${JOB_LABEL[j.status]||j.status} · Prazo: ${fmt.date(j.deadline)}</div>
+          </div>
+        </div>`).join('') : '<p style="font-size:13px;color:var(--text-muted)">Nenhum job.</p>'}
+    </div>
+
+    ${c.observations ? `<div class="pp-section">
+      <div class="pp-section-title">Observações</div>
+      <div class="pp-note">${c.observations}<div class="pp-note-meta">Nota interna</div></div>
+    </div>` : ''}
+  `;
+
+  document.getElementById('pp-actions').innerHTML = `
+    ${canEditClient() ? `<button class="btn btn-primary" onclick="openClientModal('${c.id}')">Editar</button>` : ''}
+    <button class="btn btn-secondary" onclick="switchTab('jobs');document.getElementById('filter-job-client').value='${c.id}';renderJobs();closeProfile()">Ver jobs</button>
+  `;
+
+  document.getElementById('profile-panel').classList.add('open');
+  document.getElementById('panel-overlay').classList.add('show');
 }
 
-function closeModal() { document.getElementById('client-modal').classList.remove('show'); }
+function closeProfile() {
+  document.getElementById('profile-panel').classList.remove('open');
+  document.getElementById('panel-overlay').classList.remove('show');
+  selectedClientId = null;
+}
+
+// ---- Client modal ----
+function openClientModal(id) {
+  const c = id ? allClients.find(x => x.id === id) : null;
+  document.getElementById('cm-title').textContent = c ? 'Editar Cliente' : 'Novo Cliente';
+  document.getElementById('cm-id').value        = c?.id || '';
+  document.getElementById('cm-name').value      = c?.name || '';
+  document.getElementById('cm-nicho').value     = c?.nicho || '';
+  document.getElementById('cm-pais').value      = c?.pais || 'br';
+  document.getElementById('cm-status').value    = c?.status || 'ativo';
+  document.getElementById('cm-resp').value      = c?.responsible || 'Daniel';
+  document.getElementById('cm-valor').value     = c?.monthly_value || '';
+  document.getElementById('cm-inicio').value    = c?.start_date || '';
+  document.getElementById('cm-renovacao').value = c?.renewal_date || '';
+  document.getElementById('cm-obs').value       = c?.observations || '';
+  document.getElementById('cm-delete').style.display = c ? 'inline-flex' : 'none';
+  document.getElementById('client-modal').classList.add('show');
+}
+function closeClientModal() { document.getElementById('client-modal').classList.remove('show'); }
 
 async function saveClient() {
-  const id   = document.getElementById('client-id').value;
-  const name = document.getElementById('client-name').value.trim();
-  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+  const id   = document.getElementById('cm-id').value;
+  const name = document.getElementById('cm-name').value.trim();
+  const nicho= document.getElementById('cm-nicho').value;
+  if (!name || !nicho) { showToast('Nome e nicho são obrigatórios.', 'error'); return; }
 
   const data = {
-    name,
-    service:       document.getElementById('client-service').value.trim(),
-    responsible:   document.getElementById('client-resp').value,
-    monthly_value: Number(document.getElementById('client-value').value) || null,
-    start_date:    document.getElementById('client-start').value || null,
-    renewal_date:  document.getElementById('client-renewal').value || null,
-    health:        document.getElementById('client-health').value,
-    active:        document.getElementById('client-active').value === 'true',
+    name, nicho,
+    pais:          document.getElementById('cm-pais').value,
+    status:        document.getElementById('cm-status').value,
+    responsible:   document.getElementById('cm-resp').value,
+    monthly_value: Number(document.getElementById('cm-valor').value) || null,
+    start_date:    document.getElementById('cm-inicio').value || null,
+    renewal_date:  document.getElementById('cm-renovacao').value || null,
+    observations:  document.getElementById('cm-obs').value.trim(),
   };
 
+  window.DRCache?.clear('clientes');
   if (id) {
-    if (window.drSupabase) await window.drSupabase.from('clients').update(data).eq('id', id);
-    const idx = allClients.findIndex(c => c.id == id);
+    const idx = allClients.findIndex(c => c.id === id);
     if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
-    saveClientsLocal();
+    if (window.drSupabase) window.drSupabase.from('clients').update(data).eq('id', id).then(()=>{});
     showToast('Cliente atualizado!', 'success');
-    logActivity({ icon:'📋', color:'#f59e0b', msg:`Cliente ${name} atualizado`, sector:'administrativo' });
   } else {
-    data.created_at = new Date().toISOString();
-    if (window.drSupabase) {
-      const { data: ins } = await window.drSupabase.from('clients').insert(data).select().single();
-      if (ins) allClients.push(ins);
-      else allClients.push({ ...data, id: Date.now() });
-    } else { allClients.push({ ...data, id: Date.now() }); }
-    saveClientsLocal();
+    const newC = { ...data, id: 'c'+Date.now(), created_at: new Date().toISOString() };
+    allClients.push(newC);
+    if (window.drSupabase) window.drSupabase.from('clients').insert(data).then(()=>{});
     showToast('Cliente criado!', 'success');
-    logActivity({ icon:'🤝', color:'#f59e0b', msg:`Novo cliente cadastrado — ${name}${data.service ? ' ('+data.service+')' : ''}`, sector:'administrativo' });
+    logActivity({ icon:'🤝', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
   }
-
-  closeModal();
-  updateKPIs();
-  filterClients();
+  closeClientModal(); closeProfile(); refresh();
 }
 
 async function deleteClient() {
-  const id = document.getElementById('client-id').value;
+  const id = document.getElementById('cm-id').value;
   if (!id || !confirm('Excluir este cliente?')) return;
-  const client = allClients.find(c => c.id == id);
-  if (window.drSupabase) await window.drSupabase.from('clients').delete().eq('id', id);
-  allClients = allClients.filter(c => c.id != id);
-  saveClientsLocal();
-  closeModal();
-  updateKPIs();
-  filterClients();
+  window.DRCache?.clear('clientes');
+  allClients = allClients.filter(c => c.id !== id);
+  if (window.drSupabase) window.drSupabase.from('clients').delete().eq('id', id).then(()=>{});
+  closeClientModal(); closeProfile(); refresh();
   showToast('Cliente excluído.', 'info');
-  if (client) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Cliente ${client.name} removido`, sector:'administrativo' });
 }
 
-document.getElementById('client-modal').addEventListener('click', e => { if (e.target === document.getElementById('client-modal')) closeModal(); });
-loadClients();
+// ---- Job modal ----
+function openJobModal(jobId, presetClientId) {
+  const j = jobId ? allJobs.find(x => x.id === jobId) : null;
+  document.getElementById('jm-title').textContent = j ? 'Editar Job' : 'Novo Job';
+  document.getElementById('jm-id').value           = j?.id || '';
+  document.getElementById('jm-title-input').value  = j?.title || '';
+  document.getElementById('jm-resp').value         = j?.responsible || firstName;
+  document.getElementById('jm-status').value       = j?.status || 'todo';
+  document.getElementById('jm-prazo').value        = j?.deadline || '';
+  document.getElementById('jm-desc').value         = j?.description || '';
+  document.getElementById('jm-delete').style.display = j ? 'inline-flex' : 'none';
+
+  // populate client select
+  const sel = document.getElementById('jm-client');
+  const visible = allClients.filter(canSeeClient);
+  sel.innerHTML = visible.map(c => `<option value="${c.id}" data-name="${c.name}">${c.name}</option>`).join('');
+  if (j) sel.value = j.client_id || '';
+  else if (presetClientId) sel.value = presetClientId;
+
+  document.getElementById('job-modal').classList.add('show');
+}
+function closeJobModal() { document.getElementById('job-modal').classList.remove('show'); }
+
+async function saveJob() {
+  const id    = document.getElementById('jm-id').value;
+  const title = document.getElementById('jm-title-input').value.trim();
+  const sel   = document.getElementById('jm-client');
+  const cId   = sel.value;
+  const cName = sel.options[sel.selectedIndex]?.dataset.name || '';
+  if (!title || !cId) { showToast('Título e cliente são obrigatórios.', 'error'); return; }
+
+  const data = {
+    title, client_id: cId, client_name: cName,
+    responsible: document.getElementById('jm-resp').value,
+    status:      document.getElementById('jm-status').value,
+    deadline:    document.getElementById('jm-prazo').value || null,
+    description: document.getElementById('jm-desc').value.trim(),
+    updated_at:  new Date().toISOString(),
+  };
+
+  window.DRCache?.clear('clientes');
+  if (id) {
+    const idx = allJobs.findIndex(j => j.id === id);
+    if (idx >= 0) allJobs[idx] = { ...allJobs[idx], ...data };
+    if (window.drSupabase) window.drSupabase.from('jobs').update(data).eq('id', id).then(()=>{});
+    showToast('Job atualizado!', 'success');
+  } else {
+    const newJ = { ...data, id: 'j'+Date.now(), created_at: new Date().toISOString() };
+    allJobs.push(newJ);
+    if (window.drSupabase) window.drSupabase.from('jobs').insert(data).then(()=>{});
+    showToast('Job criado!', 'success');
+    logActivity({ icon:'⚡', color:'#3b82f6', msg:`Novo job: ${title} (${cName})`, sector:'clientes' });
+  }
+  closeJobModal(); refresh();
+}
+
+async function deleteJob() {
+  const id = document.getElementById('jm-id').value;
+  if (!id || !confirm('Excluir este job?')) return;
+  window.DRCache?.clear('clientes');
+  allJobs = allJobs.filter(j => j.id !== id);
+  if (window.drSupabase) window.drSupabase.from('jobs').delete().eq('id', id).then(()=>{});
+  closeJobModal(); refresh();
+  showToast('Job excluído.', 'info');
+}
+
+// ---- Document modal ----
+function openDocModal() {
+  document.getElementById('dm-id').value     = '';
+  document.getElementById('dm-name').value   = '';
+  document.getElementById('dm-tipo').value   = 'contrato';
+  document.getElementById('dm-url').value    = '';
+  const sel = document.getElementById('dm-client');
+  sel.innerHTML = '<option value="">— Sem cliente —</option>' +
+    allClients.filter(canSeeClient).map(c => `<option value="${c.id}" data-name="${c.name}">${c.name}</option>`).join('');
+  document.getElementById('doc-modal').classList.add('show');
+}
+function closeDocModal() { document.getElementById('doc-modal').classList.remove('show'); }
+
+async function saveDoc() {
+  const name = document.getElementById('dm-name').value.trim();
+  if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
+  const sel  = document.getElementById('dm-client');
+  const data = {
+    name, tipo: document.getElementById('dm-tipo').value,
+    client_id:   sel.value || null,
+    client_name: sel.options[sel.selectedIndex]?.dataset.name || 'Sem cliente',
+    url:         document.getElementById('dm-url').value.trim() || '#',
+    uploaded_by: firstName,
+    created_at:  new Date().toISOString(),
+  };
+  window.DRCache?.clear('clientes');
+  allDocs.push({ ...data, id: 'd'+Date.now() });
+  if (window.drSupabase) window.drSupabase.from('documents').insert(data).then(()=>{});
+  closeDocModal(); renderDocumentos();
+  showToast('Documento adicionado!', 'success');
+}
+
+function deleteDoc(id) {
+  if (!confirm('Remover documento?')) return;
+  window.DRCache?.clear('clientes');
+  allDocs = allDocs.filter(d => d.id !== id);
+  if (window.drSupabase) window.drSupabase.from('documents').delete().eq('id', id).then(()=>{});
+  renderDocumentos();
+  showToast('Documento removido.', 'info');
+}
+
+// ---- Helpers ----
+function statusLabel(s) {
+  return { ativo:'Ativo', pausado:'Pausado', risco:'Em Risco', encerrado:'Encerrado' }[s] || s;
+}
+function clientColor(name) {
+  const colors = ['#1e3a6f','#244c9c','#10B981','#f97316','#a855f7','#3b82f6','#ef4444'];
+  let h = 0; for (const c of (name||'')) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return colors[h % colors.length];
+}
+
+// Close modals on overlay click
+['client-modal','job-modal','doc-modal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('show');
+  });
+});
+
+// ---- Public: migration from funil ----
+window.migrateLeadToClient = function(lead) {
+  const existing = allClients.find(c => c.name === (lead.company || lead.name));
+  if (existing) { showToast(`Cliente "${existing.name}" já existe na carteira.`, 'info'); return; }
+  const newC = {
+    id: 'c'+Date.now(),
+    name:         lead.company || lead.name,
+    nicho:        lead.nicho || 'Outros',
+    pais:         lead.country || 'br',
+    status:       'ativo',
+    responsible:  lead.responsible || firstName,
+    monthly_value: lead.value || null,
+    start_date:   new Date().toISOString().split('T')[0],
+    renewal_date: null,
+    observations: `Migrado do funil. Lead original: ${lead.name}`,
+    lead_id:      String(lead.id),
+    created_at:   new Date().toISOString(),
+  };
+  window.DRCache?.clear('clientes');
+  allClients.push(newC);
+  if (window.drSupabase) window.drSupabase.from('clients').insert(newC).then(()=>{});
+  logActivity({ icon:'🤝', color:'#10B981', msg:`Lead migrado para Clientes: ${newC.name}`, sector:'clientes' });
+};
+
+// ---- Init ----
+loadData();
+
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

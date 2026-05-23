@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div><img src="imgs/logo-white.png" alt="Logo da empresa"></div>
   </div>
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
@@ -357,5 +357,6 @@ renderPermissions();
 renderUsers();
 renderSystemInfo();
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

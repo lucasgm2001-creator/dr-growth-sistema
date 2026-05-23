@@ -35,9 +35,19 @@ const SECTIONS = [
     roles: ['comercial'],
   },
   {
+    id: 'clientes',
+    label: 'Clientes',
+    floor: '03',
+    page: 'clientes.html',
+    icon: '🤝',
+    color: '#10B981',
+    desc: 'Pós-venda & Jobs',
+    roles: ['comercial', 'financeiro', 'trafego'],
+  },
+  {
     id: 'financeiro',
     label: 'Financeiro',
-    floor: '03',
+    floor: '04',
     page: 'financeiro.html',
     icon: '💰',
     color: '#22c55e',
@@ -47,11 +57,11 @@ const SECTIONS = [
   {
     id: 'administrativo',
     label: 'Administrativo',
-    floor: '04',
+    floor: '05',
     page: 'administrativo.html',
     icon: '⚙',
     color: '#f97316',
-    desc: 'Clientes & Tarefas',
+    desc: 'Configurações',
     roles: ['financeiro', 'trafego'],
   },
 ];
@@ -70,10 +80,10 @@ const ADMIN_SECTION = {
 // ---- Usuários de demonstração ----
 const AUTH = {
   demoUsers: [
-    { email: 'daniel@drgrowth.com',   password: 'daniel123',   name: 'Daniel Ramos',   role: 'admin',      color: '#6366f1' },
-    { email: 'lucas@drgrowth.com',    password: 'lucas123',    name: 'Lucas Moraes',   role: 'comercial',  color: '#3b82f6' },
-    { email: 'gabriel@drgrowth.com',  password: 'gabriel123',  name: 'Gabriel Ramos',  role: 'trafego',    color: '#a855f7' },
-    { email: 'thamyris@drgrowth.com', password: 'thamyris123', name: 'Thamyris Lages', role: 'financeiro', color: '#22c55e' },
+    { email: 'daniel@drgrowth.com',    password: 'drg@admin2025', name: 'Daniel Ramos',   role: 'admin',      color: '#6366f1' },
+    { email: 'lucasgm2001@gmail.com',  password: 'drg@admin2025', name: 'Lucas Moraes',   role: 'comercial',  color: '#3b82f6' },
+    { email: 'gabriel@drgrowth.com',   password: 'drg@admin2025', name: 'Gabriel Ramos',  role: 'trafego',    color: '#a855f7' },
+    { email: 'thamyris@drgrowth.com',  password: 'drg@admin2025', name: 'Thamyris Lages', role: 'financeiro', color: '#22c55e' },
   ],
 
   roleLabels: {
@@ -107,23 +117,77 @@ const AUTH = {
   },
 
   async login(email, password) {
-    const demo = this.demoUsers.find(u => u.email === email && u.password === password);
-    if (demo) {
-      this.saveSession(demo);
-      return { user: demo, error: null };
-    }
-
     if (window.drSupabase) {
       const { data, error } = await window.drSupabase.auth.signInWithPassword({ email, password });
-      if (error) return { user: null, error: error.message };
-      const { data: profile } = await window.drSupabase
-        .from('profiles').select('*').eq('id', data.user.id).single();
-      const user = { email, name: profile?.name || email, role: profile?.role || 'trafego', color: profile?.avatar_color || '#6366f1' };
+      if (!error && data?.user) {
+        const { data: profile } = await window.drSupabase
+          .from('profiles').select('*').eq('id', data.user.id).single();
+        const user = { email, name: profile?.name || email, role: profile?.role || 'trafego', color: profile?.avatar_color || '#6366f1' };
+        this.saveSession(user);
+        return { user, error: null };
+      }
+    }
+
+    // Fallback local: valida contra lista de usuários da equipe
+    const found = this.demoUsers.find(u => u.email === email && u.password === password);
+    if (found) {
+      const user = { email: found.email, name: found.name, role: found.role, color: found.color };
       this.saveSession(user);
       return { user, error: null };
     }
 
-    return { user: null, error: 'Credenciais inválidas.' };
+    return { user: null, error: 'E-mail ou senha inválidos.' };
+  },
+
+  // Cria os usuários da equipe no Supabase Auth (roda uma vez por dispositivo)
+  async ensureDemoUsers() {
+    if (!window.drSupabase) return;
+    const key = 'drg_demo_seeded_v3';
+    if (localStorage.getItem(key)) return;
+
+    for (const u of this.demoUsers) {
+      const { data, error } = await window.drSupabase.auth.signUp({
+        email: u.email,
+        password: u.password,
+        options: { data: { name: u.name, role: u.role } },
+      });
+
+      if (!error && data?.user) {
+        await window.drSupabase.from('profiles').upsert({
+          id: data.user.id,
+          name: u.name,
+          role: u.role,
+          avatar_color: u.color,
+        }, { onConflict: 'id' });
+      }
+    }
+
+    localStorage.setItem(key, '1');
+  },
+
+  // Cria um novo usuário via Supabase Auth + profiles
+  async createUser({ name, email, password, role }) {
+    if (!window.drSupabase) return { error: 'Supabase não disponível.' };
+
+    const { data, error } = await window.drSupabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name, role } },
+    });
+
+    if (error) return { error: error.message };
+
+    if (data?.user) {
+      const colors = { admin: '#6366f1', comercial: '#3b82f6', trafego: '#a855f7', financeiro: '#22c55e' };
+      await window.drSupabase.from('profiles').upsert({
+        id: data.user.id,
+        name,
+        role,
+        avatar_color: colors[role] || '#6366f1',
+      }, { onConflict: 'id' });
+    }
+
+    return { error: null };
   },
 
   async logout() {
@@ -192,6 +256,7 @@ function renderElevator(currentPage) {
 
     html += `
       <div class="elevator-floor ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}"
+        data-tip="${section.label}"
         onclick="${isLocked ? `showAccessDenied('${section.label}')` : `location.href='${section.page}'`}"
         title="${section.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${section.color}` : ''}">
@@ -211,6 +276,7 @@ function renderElevator(currentPage) {
     const isActive = currentPage === ADMIN_SECTION.page;
     html += `
       <div class="elevator-floor admin-floor ${isActive ? 'active' : ''}"
+        data-tip="${ADMIN_SECTION.label}"
         onclick="location.href='${ADMIN_SECTION.page}'" title="${ADMIN_SECTION.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${ADMIN_SECTION.color}` : ''}">
           <span class="floor-number" style="color:${isActive ? ADMIN_SECTION.color : ''}">${ADMIN_SECTION.floor}</span>
@@ -269,20 +335,100 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================================
-//  Mobile sidebar
+//  Sidebar — 3 estados (desktop) + overlay (mobile)
+//  closed (16 px) | semi (64 px, padrão) | full (240 px)
 // ============================================================
 function initMobileSidebar() {
   const toggle  = document.getElementById('menu-toggle');
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   if (!toggle || !sidebar) return;
+
+  const hasElevator = !!document.getElementById('elevator-nav');
+
+  // Páginas sem elevator usam o overlay original
+  if (!hasElevator) {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('show');
+    });
+    if (overlay) overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+    return;
+  }
+
+  const isMobile = () => window.innerWidth <= 768;
+  const KEY      = 'drg_sidebar_state';
+  const CYCLE    = ['semi', 'full', 'closed'];
+
+  function getState() {
+    return document.body.getAttribute('data-sidebar') || 'semi';
+  }
+  function setState(state) {
+    document.body.setAttribute('data-sidebar', state);
+    if (!isMobile()) localStorage.setItem(KEY, state);
+  }
+
+  // Aplica estado salvo (ou padrão semi)
+  setState(isMobile() ? 'semi' : (localStorage.getItem(KEY) || 'semi'));
+
+  // Toggle: cicla pelos 3 estados no desktop, overlay no mobile
   toggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('show');
+    if (isMobile()) {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('show');
+      return;
+    }
+    const cur = getState();
+    setState(CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length]);
   });
+
+  // Clique na faixa fechada → abre semi
+  sidebar.addEventListener('click', () => {
+    if (!isMobile() && getState() === 'closed') setState('semi');
+  });
+
   if (overlay) overlay.addEventListener('click', () => {
     sidebar.classList.remove('open');
     overlay.classList.remove('show');
+  });
+}
+
+// ============================================================
+//  Tooltip para estado semi (JS — evita clip do overflow)
+// ============================================================
+function initElevatorTooltips() {
+  if (!document.getElementById('elevator-nav')) return;
+
+  const tip = document.createElement('div');
+  tip.id = 'elev-tip';
+  tip.style.cssText = [
+    'position:fixed', 'z-index:9999', 'pointer-events:none',
+    'background:#1a2744', 'color:#f1f5f9', 'font-size:12px',
+    'font-weight:600', 'white-space:nowrap', 'padding:5px 10px',
+    'border-radius:6px', 'border:1px solid rgba(255,255,255,.15)',
+    'box-shadow:0 4px 14px rgba(0,0,0,.45)', 'opacity:0',
+    'transition:opacity .15s', 'top:0', 'left:0',
+  ].join(';');
+  document.body.appendChild(tip);
+
+  let hideTimer;
+
+  document.getElementById('elevator-nav').addEventListener('mouseover', e => {
+    const floor = e.target.closest('.elevator-floor[data-tip]');
+    if (!floor || document.body.getAttribute('data-sidebar') !== 'semi') return;
+    clearTimeout(hideTimer);
+    const r = floor.getBoundingClientRect();
+    tip.textContent = floor.dataset.tip;
+    tip.style.left   = (r.right + 8) + 'px';
+    tip.style.top    = (r.top + r.height / 2 - tip.offsetHeight / 2) + 'px';
+    tip.style.opacity = '1';
+  });
+
+  document.getElementById('elevator-nav').addEventListener('mouseout', () => {
+    hideTimer = setTimeout(() => { tip.style.opacity = '0'; }, 80);
   });
 }
 
@@ -345,6 +491,90 @@ const fmt = {
 };
 
 // ============================================================
+//  Banner de status do Supabase
+// ============================================================
+(function injectSupabaseBannerStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    #supabase-banner {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+      background: #7f1d1d; color: #fecaca;
+      font-size: 13px; font-weight: 500;
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
+      animation: _sbSlideDown .25s ease;
+    }
+    #supabase-banner.warn {
+      background: #78350f; color: #fde68a;
+    }
+    #supabase-banner.ok {
+      background: #14532d; color: #bbf7d0;
+    }
+    @keyframes _sbSlideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    #supabase-banner .sb-close {
+      margin-left: auto; background: none; border: none;
+      color: inherit; opacity: .7; cursor: pointer; font-size: 16px; padding: 0 4px;
+    }
+    #supabase-banner .sb-close:hover { opacity: 1; }
+    body.has-sb-banner .main-content,
+    body.has-sb-banner .sidebar { padding-top: 42px; }
+  `;
+  document.head.appendChild(style);
+})();
+
+function showSupabaseBanner(type, msg) {
+  let el = document.getElementById('supabase-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'supabase-banner';
+    el.innerHTML = `<span id="sb-msg"></span><button class="sb-close" onclick="dismissSupabaseBanner()">✕</button>`;
+    document.body.prepend(el);
+  }
+  el.className = type;
+  document.getElementById('sb-msg').textContent = msg;
+  document.body.classList.add('has-sb-banner');
+}
+
+function dismissSupabaseBanner() {
+  const el = document.getElementById('supabase-banner');
+  if (el) el.remove();
+  document.body.classList.remove('has-sb-banner');
+}
+
+async function checkSupabaseStatus() {
+  // Pula verificação se status OK foi confirmado nos últimos 10 min
+  if (DRCache.get('_sb_ok')) return;
+
+  if (!window.drSupabase) {
+    showSupabaseBanner('warn', '⚠️ Supabase não inicializado — verifique a chave em supabase-config.js. Navegação funciona, dados não carregam.');
+    return;
+  }
+  try {
+    const { error } = await window.drSupabase.from('profiles').select('id').limit(0);
+    if (!error) {
+      DRCache.set('_sb_ok', true, 10 * 60 * 1000);
+      dismissSupabaseBanner();
+      return;
+    }
+    const msg = error.message || error.code || JSON.stringify(error);
+    if (msg.includes('usage_exceeded') || msg.includes('Usage exceeded')) {
+      showSupabaseBanner('',
+        '🚫 Limite do plano Supabase excedido. Dados não carregam até o reset mensal ou upgrade. ' +
+        'Login e navegação continuam funcionando.'
+      );
+    } else {
+      showSupabaseBanner('warn', `⚠️ Supabase indisponível: ${msg.slice(0, 120)}`);
+    }
+  } catch (e) {
+    showSupabaseBanner('warn', '⚠️ Sem conexão com Supabase. Verifique sua internet ou o status do projeto.');
+  }
+}
+
+// ============================================================
 //  Inicialização comum
 // ============================================================
 function initPage(currentPage) {
@@ -354,7 +584,10 @@ function initPage(currentPage) {
   renderElevator(currentPage || window.location.pathname.split('/').pop());
   renderUserProfile(session);
   initMobileSidebar();
+  initElevatorTooltips();
   startClocks();
+  // Checa Supabase em background — não bloqueia a página
+  setTimeout(checkSupabaseStatus, 800);
 
   return session;
 }
@@ -563,6 +796,51 @@ function logActivity(opts) {
   }
 }
 
+// ============================================================
+//  Cache local de dados — evita requisições repetidas
+//  TTL padrão: 5 min. Invalidar em qualquer escrita.
+// ============================================================
+const DRCache = {
+  _ttl: 5 * 60 * 1000,
+  set(key, data, ttlMs) {
+    try {
+      const ttl = ttlMs || this._ttl;
+      localStorage.setItem('drg_cache_' + key, JSON.stringify({ ts: Date.now(), ttl, data }));
+    } catch (e) {}
+  },
+  get(key) {
+    try {
+      const raw = localStorage.getItem('drg_cache_' + key);
+      if (!raw) return null;
+      const { ts, ttl, data } = JSON.parse(raw);
+      if (Date.now() - ts > (ttl || this._ttl)) { this.clear(key); return null; }
+      return data;
+    } catch (e) { return null; }
+  },
+  clear(key) {
+    localStorage.removeItem('drg_cache_' + key);
+  },
+};
+
+// Realtime desativado — usa cache local + carregamento único por página
+function subscribeRealtime() { return null; }
+
+// ============================================================
+//  Role-based data filter
+// ============================================================
+function applyRoleFilter(items, resource) {
+  const s = AUTH.getSession();
+  if (!s || s.role === 'admin') return items;
+  if (resource === 'clients') {
+    if (s.role === 'comercial') return items.filter(i => i.country === 'us');
+    if (s.role === 'trafego')   return items.filter(i => i.country === 'br' || !i.country);
+  }
+  if (resource === 'leads') {
+    if (s.role === 'trafego') return items.filter(i => i.country === 'br' || !i.country);
+  }
+  return items;
+}
+
 // Expõe globalmente
 window.AUTH       = AUTH;
 window.logActivity = logActivity;
@@ -573,3 +851,6 @@ window.showToast  = showToast;
 window.renderElevator = renderElevator;
 window.initCountrySelector = initCountrySelector;
 window.SFX        = SFX;
+window.subscribeRealtime = subscribeRealtime;
+window.applyRoleFilter   = applyRoleFilter;
+window.DRCache           = DRCache;

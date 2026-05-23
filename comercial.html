@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Comercial — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <img src="imgs/logo.png" alt="DR Growth" class="sidebar-logo">
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
     <div class="sidebar-brand"><h2>DR Growth</h2><span>Sistema de Gestão</span></div>
   </div>
   <div class="elevator-label">Elevador</div>
@@ -95,7 +95,7 @@
         <table>
           <thead>
             <tr>
-              <th>Lead</th><th>Estágio</th><th>Valor</th><th>Responsável</th><th>Origem</th><th>Data</th><th></th>
+              <th>Lead</th><th>Estágio</th><th class="col-hide-mobile">Valor</th><th>Responsável</th><th class="col-hide-mobile">Origem</th><th class="col-hide-mobile">Data</th><th></th>
             </tr>
           </thead>
           <tbody id="leads-tbody"></tbody>
@@ -374,8 +374,44 @@ const session = initPage('comercial.html');
 if (!session) throw new Error('Not authenticated');
 
 // ---- Gestão de Vendedores ----
-function getSellers()           { try { return JSON.parse(localStorage.getItem('drg_sellers') || '[]'); } catch { return []; } }
-function saveSellers(arr)       { localStorage.setItem('drg_sellers', JSON.stringify(arr)); }
+let _sellers = [];
+async function loadSellers() {
+  if (!window.drSupabase) return [];
+  const { data } = await window.drSupabase.from('sellers').select('*').order('name');
+  _sellers = data || [];
+  return _sellers;
+}
+
+async function loadAll() {
+  const cached = window.DRCache?.get('comercial');
+  if (cached) {
+    leads        = cached.leads        || [];
+    history      = cached.history      || {};
+    _sellers     = cached.sellers      || [];
+    _commissions = cached.commissions  || [];
+    updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+    populateSellersSelect(); renderSellersAdmin(); renderCommissions();
+    return;
+  }
+  if (!window.drSupabase) return;
+  const [lr, hr, sr, cr] = await Promise.all([
+    window.drSupabase.from('leads').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('lead_history').select('*').order('created_at'),
+    window.drSupabase.from('sellers').select('*').order('name'),
+    window.drSupabase.from('commissions').select('*').order('created_at', { ascending: false }),
+  ]);
+  leads        = lr.data || [];
+  history      = {};
+  (hr.data || []).forEach(h => { if (!history[h.lead_id]) history[h.lead_id] = []; history[h.lead_id].push(h); });
+  _sellers     = sr.data || [];
+  _commissions = cr.data || [];
+  window.DRCache?.set('comercial', { leads, history, sellers: _sellers, commissions: _commissions });
+  window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+  updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+  populateSellersSelect(); renderSellersAdmin(); renderCommissions();
+}
+function getSellers() { return _sellers; }
+async function saveSellersDB(arr) { /* managed via addSeller/removeSeller */ }
 
 function populateSellersSelect() {
   const sel = document.getElementById('lead-responsible');
@@ -389,25 +425,30 @@ function populateSellersSelect() {
   if (current) sel.value = current;
 }
 
-function addSeller() {
+async function addSeller() {
   if (session.role !== 'admin') return;
   const name = prompt('Nome completo do vendedor:');
   if (!name || !name.trim()) return;
   const short = name.trim().split(' ')[0];
-  const sellers = getSellers();
-  if (sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
-  sellers.push({ name: name.trim(), short });
-  saveSellers(sellers);
+  if (_sellers.find(s => s.name === name.trim())) { showToast('Vendedor já existe.', 'error'); return; }
+  window.DRCache?.clear('comercial');
+  if (window.drSupabase) {
+    const { data: ins } = await window.drSupabase.from('sellers').insert({ name: name.trim(), short }).select().single();
+    if (ins) _sellers.push(ins);
+  } else {
+    _sellers.push({ name: name.trim(), short, id: Date.now() });
+  }
   populateSellersSelect();
   renderSellersAdmin();
   renderPipeline();
   showToast(`${name.trim()} adicionado como vendedor.`, 'success');
 }
 
-function removeSeller(short) {
+async function removeSeller(short) {
   if (session.role !== 'admin') return;
-  const sellers = getSellers().filter(s => s.short !== short);
-  saveSellers(sellers);
+  window.DRCache?.clear('comercial');
+  if (window.drSupabase) await window.drSupabase.from('sellers').delete().eq('short', short);
+  _sellers = _sellers.filter(s => s.short !== short);
   populateSellersSelect();
   renderSellersAdmin();
   renderPipeline();
@@ -464,7 +505,6 @@ function addPhoneToLead(id) {
   const phone = prompt(`Cadastrar telefone para ${lead.name}:\n(Ex: +55 11 99999-9999 ou +1 305 555-0000)`);
   if (!phone || !phone.trim()) return;
   lead.phone = phone.trim();
-  saveLeadsLocal();
   renderLeadsTable(leads);
   renderKanban();
   if (selectedLeadId === id) selectLead(id);
@@ -565,8 +605,13 @@ function renderAgendaGrid(data) {
 }
 
 // ---- Comissões ----
-function getCommissions() { try { return JSON.parse(localStorage.getItem('drg_commissions') || '[]'); } catch { return []; } }
-function saveCommissionsLocal(arr) { localStorage.setItem('drg_commissions', JSON.stringify(arr)); }
+let _commissions = [];
+async function loadCommissions() {
+  if (!window.drSupabase) return;
+  const { data } = await window.drSupabase.from('commissions').select('*').order('created_at', { ascending: false });
+  _commissions = data || [];
+}
+function getCommissions() { return _commissions; }
 
 let pendingCommissionLeadId = null;
 
@@ -574,7 +619,7 @@ function openCommissionModal(leadId) {
   const lead = leads.find(l => l.id === leadId);
   if (!lead) return;
   pendingCommissionLeadId = leadId;
-  const existing = getCommissions().find(c => c.lead_id == leadId);
+  const existing = _commissions.find(c => c.lead_id == leadId);
   document.getElementById('commission-lead-info').innerHTML =
     `<strong>${lead.name}</strong>${lead.company ? ' · ' + lead.company : ''}<br>Valor fechado: <strong style="color:var(--green)">${lead.value ? fmt.currency(lead.value) : '—'}</strong>`;
   document.getElementById('commission-lead-id').value = leadId;
@@ -588,17 +633,14 @@ function closeCommissionModal() {
   pendingCommissionLeadId = null;
 }
 
-function saveCommission() {
+async function saveCommission() {
   const amount = parseFloat(document.getElementById('commission-amount').value) || 0;
   const notes = document.getElementById('commission-notes').value.trim();
   const leadId = pendingCommissionLeadId;
   if (!leadId) return;
   const lead = leads.find(l => l.id == leadId);
   if (!lead) return;
-  const all = getCommissions();
-  const idx = all.findIndex(c => c.lead_id == leadId);
   const entry = {
-    id: idx >= 0 ? all[idx].id : Date.now(),
     lead_id: leadId,
     lead_name: lead.name,
     lead_company: lead.company || '',
@@ -606,11 +648,19 @@ function saveCommission() {
     seller: lead.responsible,
     commission_amount: amount,
     notes,
-    created_at: idx >= 0 ? all[idx].created_at : new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
   };
-  if (idx >= 0) all[idx] = entry; else all.push(entry);
-  saveCommissionsLocal(all);
+  window.DRCache?.clear('comercial');
+  if (window.drSupabase) {
+    const existing = _commissions.find(c => c.lead_id == leadId);
+    if (existing) {
+      await window.drSupabase.from('commissions').update({ commission_amount: amount, notes }).eq('id', existing.id);
+      Object.assign(existing, { commission_amount: amount, notes });
+    } else {
+      const { data: ins } = await window.drSupabase.from('commissions').insert(entry).select().single();
+      if (ins) _commissions.push(ins);
+    }
+  }
   closeCommissionModal();
   showToast('Comissão registrada!', 'success');
 }
@@ -745,20 +795,18 @@ STAGES.forEach(s => STAGE_INFO[s.key] = s);
 
 let leads = [], history = {}, draggedId = null, selectedLeadId = null;
 
-function saveLeadsLocal() { try { localStorage.setItem('drg_leads', JSON.stringify(leads)); } catch {} }
-function loadLeadsLocal() { try { return JSON.parse(localStorage.getItem('drg_leads') || '[]'); } catch { return []; } }
-
 async function loadLeads() {
-  let loadedFromRemote = false;
-  if (window.drSupabase) {
-    try {
-      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
-      if (!error && data) { leads = data; loadedFromRemote = true; }
-      const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
-      if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
-    } catch {}
-  }
-  if (!loadedFromRemote) leads = loadLeadsLocal();
+  if (!window.drSupabase) return;
+  const [leadsRes, histRes] = await Promise.all([
+    window.drSupabase.from('leads').select('*').order('created_at', { ascending: false }),
+    window.drSupabase.from('lead_history').select('*').order('created_at'),
+  ]);
+  leads   = leadsRes.data || [];
+  history = {};
+  (histRes.data || []).forEach(h => {
+    if (!history[h.lead_id]) history[h.lead_id] = [];
+    history[h.lead_id].push(h);
+  });
   updateSubtitle();
   renderKanban();
   renderLeadsTable(leads);
@@ -1003,8 +1051,8 @@ async function onDrop(e, stage) {
   if (!lead || lead.stage === stage) return;
   const oldStage = lead.stage;
   lead.stage = stage;
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) { try { await window.drSupabase.from('leads').update({ stage }).eq('id', draggedId); } catch {} }
-  saveLeadsLocal();
   renderKanban(); renderLeadsTable(leads); renderPipeline(); updateSubtitle();
   showToast(`Lead movido → ${STAGE_INFO[stage]?.label}`, 'success');
   const sa = STAGE_ACTIVITY[stage];
@@ -1036,10 +1084,10 @@ function renderLeadsTable(data) {
     <tr style="cursor:pointer" onclick="selectLead(${l.id})">
       <td><div class="td-main">${l.name}</div><div class="td-sub">${l.company||'—'}</div></td>
       <td><span class="badge" style="background:${STAGE_INFO[l.stage]?.color}18;color:${STAGE_INFO[l.stage]?.color};border-color:${STAGE_INFO[l.stage]?.color}30">${STAGE_INFO[l.stage]?.label||l.stage}</span></td>
-      <td style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
+      <td class="col-hide-mobile" style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
       <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>${l.responsible}</div></td>
-      <td>${l.origin ? `<span class="badge ${l.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}">${l.origin === 'Magnetic Funnels' ? '🧲 ' : ''}${l.origin}</span>` : '—'}</td>
-      <td>${fmt.date(l.created_at)}</td>
+      <td class="col-hide-mobile">${l.origin ? `<span class="badge ${l.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}">${l.origin === 'Magnetic Funnels' ? '🧲 ' : ''}${l.origin}</span>` : '—'}</td>
+      <td class="col-hide-mobile">${fmt.date(l.created_at)}</td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
           ${l.phone
@@ -1094,6 +1142,7 @@ async function addInteraction() {
   const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: text, created_at: new Date().toISOString() };
   if (!history[selectedLeadId]) history[selectedLeadId] = [];
   history[selectedLeadId].push(entry);
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) await window.drSupabase.from('lead_history').insert(entry);
   input.value = '';
   renderHistory(selectedLeadId);
@@ -1374,21 +1423,21 @@ function saveLead() {
       const idx = leads.findIndex(l => l.id == id);
       const oldStage = idx >= 0 ? leads[idx].stage : null;
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
-      saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
       logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
-      if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
+      window.DRCache?.clear('comercial');
+    if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado' && oldStage !== 'fechado') openCommissionModal(Number(id));
     } else {
       data.created_at = new Date().toISOString();
       data.id = Date.now();
       leads.unshift(data);
-      saveLeadsLocal();
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
       logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
+      window.DRCache?.clear('comercial');
       if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado') openCommissionModal(data.id);
     }
@@ -1402,9 +1451,9 @@ async function deleteLead() {
   const id = document.getElementById('lead-id').value;
   if (!id || !confirm('Excluir este lead?')) return;
   const lead = leads.find(l => l.id == id);
+  window.DRCache?.clear('comercial');
   if (window.drSupabase) { try { await window.drSupabase.from('leads').delete().eq('id', id); } catch {} }
   leads = leads.filter(l => l.id != id);
-  saveLeadsLocal();
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
   showToast('Lead excluído.', 'info');
   if (lead) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Lead ${lead.name} removido do funil`, sector:'comercial' });
@@ -1424,8 +1473,7 @@ if (session.role === 'admin') {
   if (vendBtn) vendBtn.style.display = '';
 }
 
-loadLeads().then(() => {
-  populateSellersSelect();
+loadAll().then(() => {
   initCountrySelector('comercial', () => {
     renderKanban();
     filterLeads();
@@ -1433,36 +1481,7 @@ loadLeads().then(() => {
     renderMetrics();
   });
 });
-
-// ---- Auto-refresh: detecta novos leads do Magnetic Funnels a cada 30s ----
-if (window.drSupabase) {
-  let lastCheck = new Date().toISOString();
-  setInterval(async () => {
-    try {
-      const { data, error } = await window.drSupabase
-        .from('leads')
-        .select('*')
-        .gt('created_at', lastCheck)
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        lastCheck = new Date().toISOString();
-        data.forEach(newLead => {
-          if (!leads.find(l => l.id === newLead.id)) {
-            leads.unshift(newLead);
-            saveLeadsLocal();
-            SFX.newLead();
-            showToast(`🧲 Novo lead do Magnetic Funnels: ${newLead.name}`, 'success');
-            logActivity({ icon:'🧲', color:'#a855f7', msg:`Lead automático via Magnetic Funnels — ${newLead.name}${newLead.phone ? ' ('+newLead.phone+')' : ''}`, sector:'comercial' });
-          }
-        });
-        renderKanban();
-        renderLeadsTable(leads);
-        updateSubtitle();
-      }
-    } catch (_) {}
-  }, 30000);
-}
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

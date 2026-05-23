@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Administrativo — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <img src="imgs/logo.png" alt="DR Growth" class="sidebar-logo">
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
   </div>
   <div class="elevator-label">Elevador</div>
   <nav class="elevator-nav" id="elevator-nav"></nav>
@@ -283,16 +283,22 @@ function switchTab(name, btn) {
 }
 
 async function loadData() {
-  if (window.drSupabase) {
+  const cached = window.DRCache?.get('administrativo');
+  if (cached) {
+    allClients = cached.clients || [];
+    allTasks   = cached.tasks   || [];
+  } else if (window.drSupabase) {
     try {
       const [c,t] = await Promise.all([
         window.drSupabase.from('clients').select('*').order('name'),
         window.drSupabase.from('tasks').select('*').order('due_date'),
       ]);
-      allClients = (!c.error && c.data?.length) ? c.data : DEMO_CLIENTS;
-      allTasks   = (!t.error && t.data?.length) ? t.data : DEMO_TASKS;
-    } catch { allClients=DEMO_CLIENTS; allTasks=DEMO_TASKS; }
-  } else { allClients=DEMO_CLIENTS; allTasks=DEMO_TASKS; }
+      allClients = c.data || [];
+      allTasks   = t.data || [];
+      window.DRCache?.set('administrativo', { clients: allClients, tasks: allTasks });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+    } catch { allClients=[]; allTasks=[]; }
+  }
   updateClientKPIs(); renderClientsGrid(allClients);
   updateTaskKPIs();  renderTasksList(allTasks);
   document.getElementById('adm-subtitle').textContent =
@@ -465,6 +471,7 @@ async function toggleTask(id, e) {
     return;
   }
   t.status = t.status==='done'?'pending':'done';
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:t.status}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   showToast(t.status==='done'?'Tarefa concluída! ✓':'Tarefa reaberta.','success');
@@ -479,6 +486,7 @@ async function updateTaskStatus(id, newStatus, e) {
     return;
   }
   t.status = newStatus;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   const labels = { pending:'Pendente', in_progress:'Em andamento', done:'Concluído' };
@@ -521,6 +529,7 @@ async function saveClient() {
   const name=document.getElementById('client-name').value.trim();
   if (!name) { showToast('Nome é obrigatório.','error'); return; }
   const data={name,service:document.getElementById('client-service').value.trim(),responsible:document.getElementById('client-resp').value,monthly_value:Number(document.getElementById('client-value').value)||null,start_date:document.getElementById('client-start').value||null,renewal_date:document.getElementById('client-renewal').value||null,health:document.getElementById('client-health').value,active:true};
+  window.DRCache?.clear('administrativo');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('clients').update(data).eq('id',id);
     const idx=allClients.findIndex(c=>c.id==id);
@@ -539,6 +548,7 @@ async function saveClient() {
 async function deleteClient() {
   const id=document.getElementById('client-id').value;
   if (!id||!confirm('Excluir cliente?')) return;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('clients').delete().eq('id',id);
   allClients=allClients.filter(c=>c.id!=id);
   closeClientModal(); updateClientKPIs(); filterClients();
@@ -579,6 +589,7 @@ async function saveTask() {
   const title=document.getElementById('task-title').value.trim();
   if (!title) { showToast('Título é obrigatório.','error'); return; }
   const data={title,description:document.getElementById('task-desc').value.trim(),responsible:document.getElementById('task-resp').value,assigned_by:session.name,due_date:document.getElementById('task-due').value||null,priority:document.getElementById('task-priority').value,status:document.getElementById('task-status').value};
+  window.DRCache?.clear('administrativo');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id',id);
     const idx=allTasks.findIndex(t=>t.id==id);
@@ -598,6 +609,7 @@ async function saveTask() {
 async function deleteTask() {
   const id=document.getElementById('task-id').value;
   if (!id||!confirm('Excluir tarefa?')) return;
+  window.DRCache?.clear('administrativo');
   if (window.drSupabase) await window.drSupabase.from('tasks').delete().eq('id',id);
   allTasks=allTasks.filter(t=>t.id!=id);
   closeTaskModal(); updateTaskKPIs(); filterTasks();
@@ -679,6 +691,8 @@ loadData().then(() => {
     updateTaskKPIs();
   });
 });
+
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+permita editar <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestão de Leads — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -125,7 +125,6 @@
                 <div>
                   <div class="text-muted mb-1">Telefone</div>
                   <div id="detail-phone" style="font-size:13px"></div>
-                  <div id="detail-call-btns" style="margin-top:6px;gap:6px;flex-wrap:wrap"></div>
                 </div>
               </div>
               <div class="mt-3">
@@ -216,9 +215,6 @@ if (!session) throw new Error('Not authenticated');
 let allLeads = [], selectedLeadId = null;
 let history = {};
 
-function saveLeadsLocal() { try { localStorage.setItem('drg_leads', JSON.stringify(allLeads)); } catch {} }
-function loadLeadsLocal() { try { return JSON.parse(localStorage.getItem('drg_leads') || '[]'); } catch { return []; } }
-
 const DEMO_LEADS = [
   { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', email:'carlos@medtech.com', phone:'(11) 99234-5678', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', notes:'Interessado em gestão de tráfego pago.', created_at:'2026-05-10' },
   { id:2, name:'Sarah Johnson',   company:'US Digital LLC', email:'sarah@usdigital.com', phone:'+1 305 555-0192', stage:'reuniao', value:8200, responsible:'Lucas', origin:'Indicação', notes:'Reunião agendada para 20/05.', created_at:'2026-05-08' },
@@ -245,18 +241,27 @@ const STAGE_INFO = {
 };
 
 async function loadLeads() {
-  let loadedFromRemote = false;
+  const cached = window.DRCache?.get('leads');
+  if (cached) {
+    allLeads = cached.leads || DEMO_LEADS;
+    history  = cached.history || DEMO_HISTORY;
+    updateSubtitle(); renderTable(allLeads);
+    return;
+  }
   if (window.drSupabase) {
     try {
-      const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending:false });
-      if (!error && data?.length) { allLeads = data; loadedFromRemote = true; saveLeadsLocal(); }
-      const { data: hist } = await window.drSupabase.from('lead_history').select('*').order('created_at');
-      if (hist) hist.forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
-    } catch {}
-  }
-  if (!loadedFromRemote) {
-    const local = loadLeadsLocal();
-    allLeads = local.length ? local : DEMO_LEADS;
+      const [lr, hr] = await Promise.all([
+        window.drSupabase.from('leads').select('*').order('created_at', { ascending:false }),
+        window.drSupabase.from('lead_history').select('*').order('created_at'),
+      ]);
+      allLeads = (!lr.error && lr.data?.length) ? lr.data : DEMO_LEADS;
+      history  = {};
+      (hr.data || []).forEach(h => { if (!history[h.lead_id]) history[h.lead_id]=[]; history[h.lead_id].push(h); });
+      window.DRCache?.set('leads', { leads: allLeads, history });
+      window.DRCache?.set('_sb_ok', true, 10 * 60 * 1000);
+    } catch { allLeads = DEMO_LEADS; history = DEMO_HISTORY; }
+  } else {
+    allLeads = DEMO_LEADS;
     history = DEMO_HISTORY;
   }
   updateSubtitle();
@@ -311,12 +316,7 @@ function renderTable(data) {
         <td>${l.origin ? `<span class="badge badge-muted">${l.origin}</span>` : '—'}</td>
         <td>${fmt.date(l.created_at)}</td>
         <td>
-          <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
-            ${l.phone
-              ? `<a href="https://wa.me/${waNum(l.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="event.stopPropagation();quickCallLog(${l.id})" title="${l.phone}">📞</a>`
-              : ''}
-            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️ Editar</button>
-          </div>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️ Editar</button>
         </td>
       </tr>`;
   }).join('');
@@ -332,15 +332,6 @@ function selectLead(id) {
   document.getElementById('detail-notes').textContent = lead.notes || 'Sem observações.';
   document.getElementById('detail-email').textContent = lead.email || '—';
   document.getElementById('detail-phone').textContent = lead.phone || '—';
-
-  const callBtns = document.getElementById('detail-call-btns');
-  callBtns.style.display = 'flex';
-  if (lead.phone) {
-    callBtns.innerHTML = `
-      <a href="https://wa.me/${waNum(lead.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="registerCallInteraction(event)">📞 Chamar no WhatsApp</a>`;
-  } else {
-    callBtns.innerHTML = `<button class="btn btn-sm" style="border:1px dashed var(--border);color:var(--text-muted)" onclick="addPhoneToLead(${lead.id})">+ Cadastrar telefone</button>`;
-  }
 
   renderHistory(id);
   document.getElementById('lead-detail-panel').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -370,6 +361,7 @@ async function addInteraction() {
   if (!history[selectedLeadId]) history[selectedLeadId] = [];
   history[selectedLeadId].push(entry);
 
+  window.DRCache?.clear('leads');
   if (window.drSupabase) {
     await window.drSupabase.from('lead_history').insert(entry);
   }
@@ -377,52 +369,6 @@ async function addInteraction() {
   input.value = '';
   renderHistory(selectedLeadId);
   showToast('Interação registrada!', 'success');
-}
-
-function waNum(phone) {
-  if (!phone) return '';
-  let d = phone.replace(/\D/g, '');
-  if (!d) return '';
-  if (d.startsWith('0') && d.length > 10) d = d.slice(1);
-  if (d.startsWith('1') && d.length === 11) return d;
-  if (d.startsWith('55') && d.length >= 12) return d;
-  if (d.length === 10 || d.length === 11) return '55' + d;
-  return d;
-}
-
-function addPhoneToLead(id) {
-  const lead = allLeads.find(l => l.id === id);
-  if (!lead) return;
-  const phone = prompt(`Cadastrar telefone para ${lead.name}:\n(Ex: +55 11 99999-9999)`);
-  if (!phone || !phone.trim()) return;
-  lead.phone = phone.trim();
-  renderTable(allLeads);
-  if (selectedLeadId === id) selectLead(id);
-  if (window.drSupabase) window.drSupabase.from('leads').update({ phone: lead.phone }).eq('id', id).catch(() => {});
-  showToast('Telefone cadastrado!', 'success');
-}
-
-function quickCallLog(id) {
-  const lead = allLeads.find(l => l.id === id);
-  if (!lead) return;
-  const entry = { lead_id: id, user_name: session.name.split(' ')[0], action: `WhatsApp iniciado para ${lead.phone}`, created_at: new Date().toISOString() };
-  if (!history[id]) history[id] = [];
-  history[id].push(entry);
-  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
-  if (selectedLeadId === id) renderHistory(id);
-  showToast(`WhatsApp para ${lead.name} aberto!`, 'success');
-}
-
-function registerCallInteraction(e) {
-  if (!selectedLeadId) return;
-  const lead = allLeads.find(l => l.id === selectedLeadId);
-  if (!lead) return;
-  const entry = { lead_id: selectedLeadId, user_name: session.name.split(' ')[0], action: `WhatsApp iniciado para ${lead.phone}`, created_at: new Date().toISOString() };
-  if (!history[selectedLeadId]) history[selectedLeadId] = [];
-  history[selectedLeadId].push(entry);
-  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry);
-  renderHistory(selectedLeadId);
-  showToast('Chamada registrada no histórico!', 'success');
 }
 
 function closeDetail() {
@@ -478,24 +424,20 @@ async function saveLead() {
     responsible: document.getElementById('lead-responsible').value,
   };
 
+  window.DRCache?.clear('leads');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
     const idx = allLeads.findIndex(l => l.id == id);
     if (idx >= 0) allLeads[idx] = { ...allLeads[idx], ...data };
-    saveLeadsLocal();
     showToast('Lead atualizado!', 'success');
-    logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
   } else {
     const newId = Date.now();
     data.created_at = new Date().toISOString();
     if (window.drSupabase) {
       const { data: ins } = await window.drSupabase.from('leads').insert(data).select().single();
       if (ins) allLeads.unshift(ins);
-      else allLeads.unshift({ ...data, id: newId });
     } else { allLeads.unshift({ ...data, id: newId }); }
-    saveLeadsLocal();
     showToast('Lead criado!', 'success');
-    logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${data.company ? ' ('+data.company+')' : ''}`, sector:'comercial' });
   }
 
   closeModal();
@@ -506,15 +448,13 @@ async function saveLead() {
 async function deleteLead() {
   const id = document.getElementById('lead-id').value;
   if (!id || !confirm('Excluir este lead?')) return;
-  const lead = allLeads.find(l => l.id == id);
+  window.DRCache?.clear('leads');
   if (window.drSupabase) await window.drSupabase.from('leads').delete().eq('id', id);
   allLeads = allLeads.filter(l => l.id != id);
-  saveLeadsLocal();
   closeModal();
   updateSubtitle();
   renderTable(allLeads);
   showToast('Lead excluído.', 'info');
-  if (lead) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Lead ${lead.name} removido`, sector:'comercial' });
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });

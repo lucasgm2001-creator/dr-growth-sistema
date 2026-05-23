@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Funil de Vendas — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div><img src="imgs/logo.png" alt="Logo da empresa"></div>
+    <div><img src="imgs/logo-white.png" alt="Logo da empresa"></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section">
@@ -162,25 +162,12 @@ const STAGES = [
 let leads = [];
 let draggedId = null;
 
-const DEMO_LEADS = [
-  { id:1, name:'Carlos Mendonça', company:'MedTech Brasil', stage:'proposta', value:4500, responsible:'Lucas', origin:'LinkedIn', created_at:'2026-05-10T10:00:00' },
-  { id:2, name:'Sarah Johnson',   company:'US Digital LLC', stage:'reuniao',  value:8200, responsible:'Lucas', origin:'Indicação', created_at:'2026-05-08T14:30:00' },
-  { id:3, name:'Fernanda Lima',   company:'Estudio Criativo', stage:'contato', value:2800, responsible:'Gabriel', origin:'Instagram', created_at:'2026-05-12T09:15:00' },
-  { id:4, name:'Robert Davis',    company:'GrowthX Agency', stage:'fechado',  value:12000, responsible:'Lucas', origin:'Google Ads', created_at:'2026-05-01T11:00:00' },
-  { id:5, name:'Paulo Andrade',   company:'E-commerce Plus', stage:'novo',    value:3200, responsible:'Gabriel', origin:'Referência', created_at:'2026-05-14T08:00:00' },
-  { id:6, name:'Amanda Torres',   company:'Clínica Saúde+', stage:'perdido',  value:1800, responsible:'Gabriel', origin:'Facebook', created_at:'2026-05-03T16:00:00' },
-  { id:7, name:'Marcos Souza',    company:'TechStar',        stage:'novo',    value:5500, responsible:'Daniel', origin:'LinkedIn', created_at:'2026-05-13T10:00:00' },
-];
-
 async function loadLeads() {
   if (window.drSupabase) {
     try {
       const { data, error } = await window.drSupabase.from('leads').select('*').order('created_at', { ascending: false });
-      if (!error && data?.length) { leads = data; }
-      else leads = DEMO_LEADS;
-    } catch { leads = DEMO_LEADS; }
-  } else {
-    leads = DEMO_LEADS;
+      if (!error && data) leads = data;
+    } catch {}
   }
   renderBoard();
   updateSubtitle();
@@ -296,6 +283,33 @@ async function onDrop(e, stage) {
   renderBoard();
   updateSubtitle();
   showToast(`Lead movido para "${STAGES.find(s=>s.key===stage)?.label}"`, 'success');
+
+  // Migrar para Clientes ao fechar venda
+  if (stage === 'fechado') {
+    setTimeout(() => {
+      if (confirm(`Venda fechada! Deseja migrar "${lead.company || lead.name}" para a área de Clientes?`)) {
+        try {
+          // Salva dados do lead para clientes.html consumir
+          const pending = JSON.parse(localStorage.getItem('drg_pending_clients') || '[]');
+          pending.push({ ...lead, migratedAt: new Date().toISOString() });
+          localStorage.setItem('drg_pending_clients', JSON.stringify(pending));
+
+          // Migração direta se módulo estiver carregado
+          if (typeof window.migrateLeadToClient === 'function') {
+            window.migrateLeadToClient(lead);
+          } else {
+            // Processa na próxima vez que clientes.html abrir
+            const pending2 = JSON.parse(localStorage.getItem('drg_migrate_queue') || '[]');
+            pending2.push(lead);
+            localStorage.setItem('drg_migrate_queue', JSON.stringify(pending2));
+          }
+          showToast('Lead migrado para Clientes!', 'success');
+          logActivity({ icon:'🤝', color:'#10B981', msg:`Venda fechada → Cliente: ${lead.company || lead.name}`, sector:'comercial' });
+        } catch(err) { console.error(err); }
+      }
+    }, 400);
+  }
+
   draggedId = null;
 }
 
@@ -401,5 +415,6 @@ document.getElementById('lead-modal').addEventListener('click', e => {
 
 loadLeads();
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>

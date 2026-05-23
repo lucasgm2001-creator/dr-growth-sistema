@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hall — DR Growth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
 </head>
 <body class="hall-page">
 <!-- Sky Background -->
@@ -19,7 +19,7 @@
 <!-- SIDEBAR / ELEVADOR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <img src="imgs/logo.png" alt="DR Growth" class="sidebar-logo">
+    <img src="imgs/logo-white.png" alt="DR Growth" class="sidebar-logo">
     <div class="sidebar-brand">
       <h2>DR Growth</h2>
       <span>Sistema de Gestão</span>
@@ -45,12 +45,12 @@
     <div class="topbar-actions">
       <div class="clock-row">
         <div class="clock-item">
-          <span class="clock-tz">🇧🇷 São Paulo</span>
+          <span class="clock-tz"><span class="tz-full">🇧🇷 São Paulo</span><span class="tz-short">🇧🇷 <small>SP</small></span></span>
           <span class="clock-time" id="clock-br">--:--:--</span>
         </div>
         <div class="clock-divider"></div>
         <div class="clock-item">
-          <span class="clock-tz">🇺🇸 Orlando, FL</span>
+          <span class="clock-tz"><span class="tz-full">🇺🇸 Orlando, FL</span><span class="tz-short">🇺🇸 <small>FL</small></span></span>
           <span class="clock-time" id="clock-us">--:--:--</span>
         </div>
         <div class="clock-divider"></div>
@@ -145,6 +145,19 @@
                 <span class="cal-chip type-event" style="position:static;font-size:9px;display:inline">Compromisso</span>
                 <span class="cal-chip type-meeting" style="position:static;font-size:9px;display:inline">Reunião</span>
                 <span class="cal-holiday-legend">🇧🇷🇺🇸 <em>feriado</em></span>
+              </div>
+
+              <!-- Day detail panel (iOS-style) -->
+              <div id="cal-day-panel" class="cal-day-panel">
+                <div class="cal-dp-header">
+                  <button class="cal-dp-back" onclick="hideCalDayPanel()">‹</button>
+                  <div class="cal-dp-title-wrap">
+                    <div class="cal-dp-dayname" id="cal-dp-dayname">—</div>
+                    <div class="cal-dp-datestr" id="cal-dp-datestr">—</div>
+                  </div>
+                  <button class="cal-dp-add-btn" id="cal-dp-add-btn" title="Novo compromisso">+</button>
+                </div>
+                <div class="cal-dp-list" id="cal-dp-list"></div>
               </div>
             </div>
           </div>
@@ -314,15 +327,15 @@ function getMoonEmoji() {
 // ---- Saudação dinâmica ----
 function setGreeting() {
   const h = getSPHour();
-  let period, emoji;
-  if      (h >= 6  && h < 12) { period = 'Bom dia';       emoji = '☀️'; }
-  else if (h >= 12 && h < 18) { period = 'Boa tarde';      emoji = '🌤️'; }
-  else if (h >= 18)            { period = 'Boa noite';      emoji = getMoonEmoji(); }
-  else                          { period = 'Boa madrugada'; emoji = getMoonEmoji(); }
+  let period;
+  if      (h >= 6  && h < 12) { period = 'Bom dia'; }
+  else if (h >= 12 && h < 18) { period = 'Boa tarde'; }
+  else if (h >= 18)            { period = 'Boa noite'; }
+  else                          { period = 'Boa madrugada'; }
 
   const firstName = session.name.split(' ')[0];
   document.getElementById('greeting-msg').innerHTML =
-    `${period}, <span>${firstName}</span> ${emoji}`;
+    `${period},&nbsp;<span>${firstName}</span>!`;
 
   const subs = {
     admin:     'Você tem acesso total ao sistema. Bom trabalho!',
@@ -1249,6 +1262,16 @@ function _holHtml(dateStr) {
   return _holidaysOn(dateStr).map(h=>`<div class="cal-holiday">${h.flag} <em>${h.name}</em></div>`).join('');
 }
 
+// Abbreviated holiday pill for month/week cells (keeps cells proportional)
+function _holCellHtml(dateStr) {
+  const hols = _holidaysOn(dateStr);
+  if (!hols.length) return '';
+  const h = hols[0];
+  const short = h.name.length > 9 ? h.name.slice(0,8) + '…' : h.name;
+  const extra = hols.length > 1 ? ` +${hols.length-1}` : '';
+  return `<div class="cal-hol-pill">${h.flag} ${short}${extra}</div>`;
+}
+
 // ---- View controls ----
 function setCalView(v) {
   calView = v;
@@ -1318,13 +1341,18 @@ function renderCalMonth() {
     const isToday=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
     const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dayEvs=events.filter(e=>e.date===dateStr);
-    const chips=dayEvs.slice(0,2).map(ev=>{
+    // Show 1 chip if there's a holiday, else 2 chips
+    const hasHol=_holidaysOn(dateStr).length>0;
+    const maxChips=hasHol?1:2;
+    const chips=dayEvs.slice(0,maxChips).map(ev=>{
       const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
-      return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+      const shortTitle=ev.title.length>12?ev.title.slice(0,11)+'…':ev.title;
+      return `<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">${label?label+' ':''}${shortTitle}</div>`;
     }).join('');
-    const extra=dayEvs.length>2?`<div class="cal-chip cal-chip-more" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+${dayEvs.length-2} mais</div>`:'';
-    html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalAdd('${dateStr}')">
-      <div class="cal-cell-num">${d}<span class="cal-add-btn" onclick="event.stopPropagation();openCalAdd('${dateStr}')">+</span></div>${_holHtml(dateStr)}${chips}${extra}</div>`;
+    const moreCount=dayEvs.length-maxChips;
+    const extra=moreCount>0?`<div class="cal-chip cal-chip-more" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">+${moreCount}</div>`:'';
+    html+=`<div class="cal-cell${isToday?' today':''}" onclick="openCalDayPanel('${dateStr}')">
+      <div class="cal-cell-num">${d}</div>${_holCellHtml(dateStr)}${chips}${extra}</div>`;
   }
   const filled=firstDay+daysInMonth, remainder=(7-(filled%7))%7;
   for (let d=1;d<=remainder;d++)
@@ -1350,15 +1378,16 @@ function renderCalWeek() {
     const day=_addDays(weekStart,i), dateStr=_fmtDate(day);
     const isToday=dateStr===todayStr, isWknd=i===0||i===6;
     const dayEvs=events.filter(e=>e.date===dateStr);
-    html+=`<div class="cal-week-col${isToday?' today':''}${isWknd?' weekend':''}" onclick="openCalAdd('${dateStr}')">
+    html+=`<div class="cal-week-col${isToday?' today':''}${isWknd?' weekend':''}" onclick="openCalDayPanel('${dateStr}')">
       <div class="cal-week-head">
         <div class="cal-week-dayname">${DN[i]}</div>
         <div class="cal-week-daynum${isToday?' today':''}">${day.getDate()}</div>
       </div>
-      <div class="cal-week-events">${_holHtml(dateStr)}`;
+      <div class="cal-week-events">${_holCellHtml(dateStr)}`;
     dayEvs.forEach(ev=>{
       const label=ev.utc?utcToTzTime(ev.utc,'America/Sao_Paulo'):(ev.time||'');
-      html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalView('${ev.id}')">${label?label+' ':''}${ev.title}</div>`;
+      const shortTitle=ev.title.length>12?ev.title.slice(0,11)+'…':ev.title;
+      html+=`<div class="cal-chip ${ev.isMeeting?'type-meeting':'type-event'}" onclick="event.stopPropagation();openCalDayPanel('${dateStr}')">${label?label+' ':''}${shortTitle}</div>`;
     });
     html+=`</div></div>`;
   }
@@ -1476,24 +1505,121 @@ function saveCalEvent() {
     events.push({id:String(Date.now()),title,date,time,notes,timezone:calSelTz,isMeeting:calMeeting,utc,createdBy:session?.name?.split(' ')[0]||''});
   }
   saveCalEvents(events);
+  // After saving: if day panel is open for the same date, update it; else open panel for the new date
+  const savedDate = date;
   closeCalModal();
   renderCalendar();
+  // Show the day panel for the saved date
+  openCalDayPanel(savedDate);
   showToast(calEditId?'Compromisso atualizado!':'Compromisso adicionado!','success');
 }
 
 function deleteCalEvent() {
   if (!calEditId||!confirm('Remover este compromisso?')) return;
+  const dateOfEvent = getCalEvents().find(e=>e.id===calEditId)?.date;
   saveCalEvents(getCalEvents().filter(e=>e.id!==calEditId));
-  closeCalModal(); renderCalendar();
+  document.getElementById('cal-modal').classList.remove('show');
+  renderCalendar();
+  // Re-render (or re-open) panel for the same day
+  if (dateOfEvent) openCalDayPanel(dateOfEvent);
   showToast('Compromisso removido.','info');
 }
 
-function closeCalModal() { document.getElementById('cal-modal').classList.remove('show'); }
+function closeCalModal() {
+  document.getElementById('cal-modal').classList.remove('show');
+}
 
 document.getElementById('cal-modal').addEventListener('click', e => { if (e.target===document.getElementById('cal-modal')) closeCalModal(); });
+
+// ---- Day Detail Panel (iOS-style) ----
+let calDayPanelDate = null;
+
+const _DAYS_FULL  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const _MONTHS_FULL= ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function openCalDayPanel(dateStr) {
+  calDayPanelDate = dateStr;
+  renderDayPanel(dateStr);
+  document.getElementById('cal-day-panel').classList.add('open');
+}
+
+function hideCalDayPanel() {
+  document.getElementById('cal-day-panel').classList.remove('open');
+  calDayPanelDate = null;
+}
+
+function renderDayPanel(dateStr) {
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, mo-1, d);
+  document.getElementById('cal-dp-dayname').textContent = _DAYS_FULL[dt.getDay()];
+  document.getElementById('cal-dp-datestr').textContent = `${d} de ${_MONTHS_FULL[mo-1]} de ${y}`;
+  document.getElementById('cal-dp-add-btn').onclick = () => openCalAdd(dateStr);
+
+  const holidays = _holidaysOn(dateStr);
+  const events   = getCalEvents().filter(e=>e.date===dateStr).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  const list     = document.getElementById('cal-dp-list');
+
+  let html = '';
+
+  holidays.forEach(h => {
+    html += `<div class="cal-dp-holiday"><span class="cal-dp-holiday-flag">${h.flag}</span><span class="cal-dp-holiday-name">${h.name}</span></div>`;
+  });
+
+  if (!events.length) {
+    if (!holidays.length) {
+      html += `<div class="cal-dp-empty"><div class="cal-dp-empty-icon">📅</div>Nenhum compromisso.<div class="cal-dp-empty-hint">Toque em + para adicionar.</div></div>`;
+    }
+  } else {
+    events.forEach(ev => {
+      const timeStr  = ev.utc ? utcToTzTime(ev.utc,'America/Sao_Paulo') : (ev.time||'');
+      const typeClass= ev.isMeeting ? 'meeting' : 'event';
+      const typeLabel= ev.isMeeting ? '📹 Reunião' : '📌 Compromisso';
+      const tzInfo   = ev.timezone ? CAL_TZS.find(t=>t.id===ev.timezone) : null;
+      const tzStr    = tzInfo ? `${tzInfo.flag} ${tzInfo.name} (${tzInfo.code})` : '';
+      const metaItems= [];
+      if (timeStr && ev.timezone && ev.timezone !== 'America/Sao_Paulo') metaItems.push(tzStr);
+      if (ev.createdBy) metaItems.push(`Criado por ${ev.createdBy}`);
+      const notesHtml = ev.notes ? `<div class="cal-dp-event-notes">${ev.notes}</div>` : '<div class="cal-dp-event-notes" style="color:var(--text-muted);font-style:italic">Sem observações.</div>';
+      const metaHtml  = metaItems.length ? `<div class="cal-dp-event-meta">${metaItems.map(m=>`<span>${m}</span>`).join('')}</div>` : '';
+
+      html += `<div class="cal-dp-event" id="cal-dp-ev-${ev.id}" onclick="toggleDayPanelEvent('${ev.id}')">
+        <div class="cal-dp-event-time">${timeStr||'Sem horário definido'}</div>
+        <div class="cal-dp-event-title">${ev.title}</div>
+        <span class="cal-dp-event-badge ${typeClass}">${typeLabel}</span>
+        <div class="cal-dp-event-detail">
+          ${notesHtml}
+          ${metaHtml}
+          <div class="cal-dp-event-actions">
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openCalView('${ev.id}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteDayPanelEvent('${ev.id}')">Excluir</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  list.innerHTML = html;
+}
+
+function toggleDayPanelEvent(id) {
+  const el = document.getElementById(`cal-dp-ev-${id}`);
+  if (!el) return;
+  // Collapse others
+  document.querySelectorAll('.cal-dp-event.expanded').forEach(e => { if (e !== el) e.classList.remove('expanded'); });
+  el.classList.toggle('expanded');
+}
+
+function deleteDayPanelEvent(id) {
+  if (!confirm('Remover este compromisso?')) return;
+  saveCalEvents(getCalEvents().filter(e=>e.id!==id));
+  renderCalendar();
+  if (calDayPanelDate) renderDayPanel(calDayPanelDate);
+  showToast('Compromisso removido.','info');
+}
 
 // Render calendar on script load (ensures it populates on page load)
 renderCalendar();
 </script>
+<script>if("serviceWorker"in navigator){navigator.serviceWorker.register("/sw.js").then(r=>{setInterval(()=>r.update(),30000);r.addEventListener("updatefound",()=>{const w=r.installing;w.addEventListener("statechange",()=>{if(w.state==="activated")location.reload();});});});navigator.serviceWorker.addEventListener("message",e=>{if(e.data?.type==="RELOAD")location.reload();});}</script>
 </body>
 </html>
