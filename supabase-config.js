@@ -7,10 +7,18 @@
 const SUPABASE_URL  = 'https://qofzhpksvuqxzjqhwcpr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvZnpocGtzdnVxeHpqcWh3Y3ByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMTIzMzIsImV4cCI6MjA5NDY4ODMzMn0.wP4quwNKztf9ulFYQFozDSoypS0NMQnO_DMauJozEC0';
 
-// Inicializa o cliente Supabase (usando CDN via index.html)
-const supabase = window.supabase
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+// Inicializa o cliente Supabase — tenta múltiplas formas de acessar a biblioteca
+let _supabaseClient = null;
+try {
+  const lib = (typeof supabase !== 'undefined' && supabase?.createClient) ? supabase
+            : (window.supabase?.createClient ? window.supabase : null);
+  if (lib) {
+    _supabaseClient = lib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch(e) {
+  console.warn('[DR Growth] Supabase init error:', e);
+}
+const supabaseClient = _supabaseClient;
 
 // ============================================================
 //  ESTRUTURA DAS TABELAS (execute no SQL Editor do Supabase)
@@ -191,7 +199,7 @@ CREATE POLICY "auth_full" ON content_pieces FOR ALL USING (auth.role() = 'authen
 //  DADOS DE DEMONSTRAÇÃO — chame seedDemoData() uma vez
 // ============================================================
 async function seedDemoData() {
-  if (!supabase) return;
+  if (!_supabaseClient) return;
 
   // Leads de exemplo
   const leads = [
@@ -230,14 +238,14 @@ async function seedDemoData() {
     { client_name:'GrowthX Agency',    description:'Serviços abr/2026', amount:12000, due_date:'2026-04-10', paid_date:'2026-04-08', status:'paid' },
   ];
 
-  await supabase.from('leads').insert(leads);
-  await supabase.from('tasks').insert(tasks);
-  await supabase.from('clients').insert(clients);
-  await supabase.from('payments').insert(payments);
+  await _supabaseClient.from('leads').insert(leads);
+  await _supabaseClient.from('tasks').insert(tasks);
+  await _supabaseClient.from('clients').insert(clients);
+  await _supabaseClient.from('payments').insert(payments);
 
   console.log('✅ Dados de demonstração inseridos!');
 }
 
 // Exporta para uso global
-window.drSupabase = supabase;
+window.drSupabase = _supabaseClient;
 window.seedDemoData = seedDemoData;
