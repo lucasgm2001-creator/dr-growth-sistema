@@ -1670,6 +1670,279 @@ async function deleteLead() {
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
 document.getElementById('commission-modal').addEventListener('click', e => { if (e.target === document.getElementById('commission-modal')) closeCommissionModal(); });
 
+// ======================================================
+//  DIÁRIO DO LEAD
+// ======================================================
+const leadState = { id: null, lead: null, history: [], contactType: 'ligacao_atendida' };
+
+const TEMP_CONFIG = {
+  gelado:  { label:'Gelado',  color:'#6366f1' },
+  morno:   { label:'Morno',   color:'#F59E0B' },
+  quente:  { label:'Quente',  color:'#f97316' },
+  urgente: { label:'Urgente', color:'#ef4444' },
+};
+
+function calcTemperature(lead, hist) {
+  if (!lead) return 'gelado';
+  if (lead.priority === 'alta') return 'urgente';
+  if (lead.followup_date) {
+    const diff = Math.floor((new Date(lead.followup_date + 'T12:00:00') - new Date()) / 86400000);
+    if (diff < 0) return 'urgente';
+  }
+  const n = hist.length;
+  if (['proposta','reuniao'].includes(lead.stage) || n >= 6) return 'quente';
+  if (n >= 2) return 'morno';
+  return 'gelado';
+}
+
+function calcLeadStats(hist) {
+  const total  = hist.length;
+  const ans    = hist.filter(h => h.type === 'ligacao_atendida').length;
+  const noAns  = hist.filter(h => h.type === 'ligacao_nao_atendida').length;
+  const ai     = hist.filter(h => h.type === 'ia_analise').length;
+  return { total, ans, noAns, ai };
+}
+
+function buildNextStep(lead, hist) {
+  if (lead.stage === 'fechado') return 'Lead fechado — cliente ativo.';
+  if (lead.stage === 'perdido') return 'Lead marcado como perdido.';
+  const stats = calcLeadStats(hist);
+  if (stats.noAns >= 3) return 'Ligou 3x sem resposta — tente WhatsApp ou e-mail direto.';
+  if (lead.stage === 'proposta') return 'Aguardando decisão — faça follow-up da proposta.';
+  if (lead.stage === 'reuniao') return 'Reunião agendada — confirme horário e prepare a apresentação.';
+  if (lead.followup_date) {
+    const diff = Math.floor((new Date(lead.followup_date + 'T12:00:00') - new Date()) / 86400000);
+    if (diff <= 0) return `Contato deveria ter sido feito${diff < 0 ? ` há ${Math.abs(diff)}d` : ' hoje'} — entre em contato agora.`;
+    if (diff <= 2) return `Próximo contato em ${diff} dia${diff > 1 ? 's' : ''} — prepare o roteiro.`;
+  }
+  if (stats.total === 0) return 'Primeiro contato ainda não realizado — ligue agora.';
+  return 'Continue o acompanhamento e tente avançar para o próximo estágio.';
+}
+
+const LD_TYPE_ICONS = {
+  ligacao_atendida: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 010 .14 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/><polyline points="16 2 18 4 22 0"/></svg>`,
+  ligacao_nao_atendida: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9a2 2 0 01-.45 2.11L7.27 12.4a16 16 0 006.33 6.33l1.28-1.28A2 2 0 0117 17c.907.339 1.85.573 2.81.7A2 2 0 0122 19.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0111.19 22a19.5 19.5 0 01-7.38-7.38A19.79 19.79 0 010 5.82 2 2 0 012 3.66h3A2 2 0 016.62 5.6c.127.96.361 1.903.7 2.81A2 2 0 016.87 10.5"/></svg>`,
+  mensagem: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+  nota: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  ia_analise: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+};
+
+const LD_TYPE_LABELS = {
+  ligacao_atendida: 'Atendeu',
+  ligacao_nao_atendida: 'Não Atendeu',
+  mensagem: 'Mensagem',
+  nota: 'Nota',
+  ia_analise: 'Análise IA',
+};
+
+const LD_TYPE_COLORS = {
+  ligacao_atendida: 'var(--green)',
+  ligacao_nao_atendida: 'var(--red)',
+  mensagem: 'var(--blue)',
+  nota: 'var(--text-muted)',
+  ia_analise: 'var(--purple)',
+};
+
+function openLeadDaily(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  leadState.id = id;
+  leadState.lead = lead;
+  leadState.history = history[id] || [];
+  leadState.contactType = 'ligacao_atendida';
+  document.querySelectorAll('.ld-type-btn').forEach((b,i) => b.classList.toggle('active', i === 0));
+  document.getElementById('ld-note-text').value = '';
+  document.getElementById('ld-ai-result').style.display = 'none';
+  document.getElementById('ld-ai-loading').style.display = 'none';
+  renderLeadDailyPanel();
+  document.getElementById('lead-daily-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLeadDaily() {
+  document.getElementById('lead-daily-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeLeadDailyOnOverlay(e) {
+  if (e.target === document.getElementById('lead-daily-overlay')) closeLeadDaily();
+}
+
+function selectContactType(type, btn) {
+  leadState.contactType = type;
+  document.querySelectorAll('.ld-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderLeadDailyPanel() {
+  const { lead, history: hist } = leadState;
+  if (!lead) return;
+  const temp    = calcTemperature(lead, hist);
+  const tempCfg = TEMP_CONFIG[temp];
+  const stats   = calcLeadStats(hist);
+
+  const avatarEl = document.getElementById('ld-avatar');
+  avatarEl.className = `avatar avatar-lg avatar-${fmt.avatarClass(lead.responsible)}`;
+  avatarEl.textContent = fmt.initials(lead.name);
+
+  document.getElementById('ld-name').textContent    = lead.name;
+  document.getElementById('ld-company').textContent =
+    [lead.company, lead.responsible ? 'Resp: ' + lead.responsible : ''].filter(Boolean).join(' · ');
+
+  const tempEl = document.getElementById('ld-temp');
+  tempEl.textContent = tempCfg.label;
+  tempEl.style.cssText = `color:${tempCfg.color};background:${tempCfg.color}18;border-color:${tempCfg.color}50`;
+
+  document.getElementById('ld-stat-total').textContent = stats.total;
+  document.getElementById('ld-stat-ans').textContent   = stats.ans;
+  document.getElementById('ld-stat-noans').textContent = stats.noAns;
+  document.getElementById('ld-stat-ai').textContent    = stats.ai;
+
+  const ns = buildNextStep(lead, hist);
+  const nsEl = document.getElementById('ld-next-step');
+  nsEl.textContent    = ns;
+  nsEl.style.display  = ns ? 'block' : 'none';
+
+  renderLeadDailyTimeline();
+}
+
+function renderLeadDailyTimeline() {
+  const hist = [...leadState.history].reverse();
+  const el   = document.getElementById('ld-timeline');
+  if (!hist.length) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px 0">Sem interações ainda.</div>';
+    return;
+  }
+  el.innerHTML = hist.map(h => {
+    const type  = h.type || 'nota';
+    const color = LD_TYPE_COLORS[type] || 'var(--text-muted)';
+    const icon  = LD_TYPE_ICONS[type]  || LD_TYPE_ICONS.nota;
+    const label = LD_TYPE_LABELS[type] || 'Interação';
+    return `<div class="ld-tl-item">
+      <div class="ld-tl-icon" style="border-color:${color}40;color:${color}">${icon}</div>
+      <div class="ld-tl-body">
+        <div class="ld-tl-meta">${new Date(h.created_at).toLocaleString('pt-BR')} · ${h.user_name || '—'} · <span style="color:${color};font-weight:600">${label}</span></div>
+        <div class="ld-tl-text">${h.action || ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function salvarInteracao() {
+  const text = document.getElementById('ld-note-text').value.trim();
+  const type = leadState.contactType || 'nota';
+  const id   = leadState.id;
+  if (!id) return;
+  const defaultLabels = {
+    ligacao_atendida: 'Ligação atendida.',
+    ligacao_nao_atendida: 'Ligação sem resposta.',
+    mensagem: 'Mensagem enviada.',
+    nota: 'Nota registrada.',
+  };
+  const actionText = text || defaultLabels[type] || 'Interação registrada.';
+  const entry = {
+    lead_id:    id,
+    user_name:  session.name.split(' ')[0],
+    action:     actionText,
+    type,
+    created_at: new Date().toISOString(),
+  };
+  if (!history[id]) history[id] = [];
+  history[id].push(entry);
+  leadState.history = history[id];
+  window.DRCache?.clear('comercial');
+  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry).catch(() => {});
+  document.getElementById('ld-note-text').value = '';
+  renderLeadDailyPanel();
+  showToast('Interação registrada!', 'success');
+}
+
+async function analisarComIA() {
+  const id   = leadState.id;
+  const lead = leadState.lead;
+  if (!id || !lead) return;
+  const apiKey = window.ANTHROPIC_API_KEY || '';
+  if (!apiKey) {
+    showToast('Configure ANTHROPIC_API_KEY em supabase-config.js para usar a IA.', 'error');
+    return;
+  }
+  const note  = document.getElementById('ld-note-text').value.trim();
+  const hist  = leadState.history;
+  const stats = calcLeadStats(hist);
+  const temp  = calcTemperature(lead, hist);
+  const context = [
+    `Lead: ${lead.name}`,
+    `Empresa: ${lead.company || '—'}`,
+    `Nicho: ${lead.nicho || '—'}`,
+    `Estágio: ${STAGE_INFO[lead.stage]?.label || lead.stage}`,
+    `Temperatura: ${TEMP_CONFIG[temp]?.label}`,
+    `Valor estimado: ${lead.value ? fmt.currency(lead.value) : '—'}`,
+    `Contatos totais: ${stats.total} (atendidas: ${stats.ans}, não atendidas: ${stats.noAns})`,
+    hist.length ? 'Últimas interações:\n' + hist.slice(-5).map(h => `  - ${new Date(h.created_at).toLocaleDateString('pt-BR')} · ${h.action}`).join('\n') : '',
+    note ? `\nSituação descrita pelo vendedor:\n${note}` : '',
+  ].filter(Boolean).join('\n');
+
+  document.getElementById('ld-ai-loading').style.display = 'flex';
+  document.getElementById('ld-ai-result').style.display  = 'none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        messages: [{
+          role: 'user',
+          content: `Você é consultor de vendas de uma agência de marketing digital. Analise este lead e dê orientação prática.\n\n${context}\n\nResponda em português. Seja direto e prático. Estruture em:\n1. Diagnóstico (1-2 frases)\n2. Próxima ação recomendada (específica)\n3. Script sugerido para o próximo contato`,
+        }],
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Sem resposta.';
+
+    const aiEntry = {
+      lead_id:    id,
+      user_name:  'IA',
+      action:     text.length > 800 ? text.slice(0, 800) + '…' : text,
+      type:       'ia_analise',
+      created_at: new Date().toISOString(),
+    };
+    if (!history[id]) history[id] = [];
+    history[id].push(aiEntry);
+    leadState.history = history[id];
+    window.DRCache?.clear('comercial');
+    if (window.drSupabase) window.drSupabase.from('lead_history').insert(aiEntry).catch(() => {});
+
+    document.getElementById('ld-ai-loading').style.display  = 'none';
+    document.getElementById('ld-ai-result-text').textContent = text;
+    document.getElementById('ld-ai-result').style.display   = 'block';
+    renderLeadDailyTimeline();
+  } catch (err) {
+    document.getElementById('ld-ai-loading').style.display = 'none';
+    showToast('Erro na análise IA: ' + err.message, 'error');
+  }
+}
+
+function markLeadAsClient() {
+  const lead = leadState.lead;
+  if (!lead) return;
+  if (lead.stage === 'fechado') { showToast('Lead já está fechado.', 'info'); return; }
+  lead.stage = 'fechado';
+  window.DRCache?.clear('comercial');
+  if (window.drSupabase) window.drSupabase.from('leads').update({ stage: 'fechado' }).eq('id', lead.id).catch(() => {});
+  renderKanban(); renderLeadsTable(leads); updateSubtitle();
+  autoCreateClient(lead);
+  closeLeadDaily();
+  openCommissionModal(lead.id);
+}
+
 // Auto-detecta país pelo telefone
 document.getElementById('lead-phone').addEventListener('input', function() {
   const detected = detectCountryFromPhone(this.value);
