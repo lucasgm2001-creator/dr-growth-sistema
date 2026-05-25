@@ -64,16 +64,16 @@
 
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Comercial</h1>
       <p id="comercial-subtitle">Funil de vendas & leads</p>
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
       </div>
       <button class="btn btn-primary btn-sm" id="main-action-btn" onclick="openNewLeadModal()">+ Novo Lead</button>
     </div>
@@ -93,13 +93,13 @@
         </div>
       </div>
       <div class="sector-tabs" style="--tab-color:#3b82f6">
-        <button class="sector-tab active" onclick="switchTab('funil', this)">◈ Funil Kanban</button>
-        <button class="sector-tab" onclick="switchTab('leads', this)">◉ Lista de Leads</button>
-        <button class="sector-tab" onclick="switchTab('pipeline', this)">💰 Pipeline</button>
-        <button class="sector-tab" onclick="switchTab('metricas', this)">📊 Métricas</button>
-        <button class="sector-tab" onclick="switchTab('agenda', this)">📞 Agenda</button>
-        <button class="sector-tab" onclick="switchTab('comissoes', this)">💵 Comissões</button>
-        <button class="sector-tab" id="tab-btn-vendedores" onclick="switchTab('vendedores', this)" style="display:none">👤 Vendedores</button>
+        <button class="sector-tab active" onclick="switchTab('funil', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg> Funil Kanban</button>
+        <button class="sector-tab" onclick="switchTab('leads', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Lista de Leads</button>
+        <button class="sector-tab" onclick="switchTab('pipeline', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Pipeline</button>
+        <button class="sector-tab" onclick="switchTab('metricas', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Métricas</button>
+        <button class="sector-tab" onclick="switchTab('agenda', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg> Agenda</button>
+        <button class="sector-tab" onclick="switchTab('comissoes', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Comissões</button>
+        <button class="sector-tab" id="tab-btn-vendedores" onclick="switchTab('vendedores', this)" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Vendedores</button>
       </div>
     </div>
 
@@ -115,7 +115,7 @@
     <div class="tab-panel" id="tab-leads">
       <div class="filter-bar animate-in" style="margin-top:4px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-leads" placeholder="Buscar por nome, empresa…" oninput="filterLeads()">
         </div>
         <select class="filter-select" id="filter-stage" onchange="filterLeads()">
@@ -148,7 +148,7 @@
       <div id="lead-detail" style="display:none" class="card mt-4 animate-in">
         <div class="card-header">
           <span class="card-title" id="detail-title">Histórico</span>
-          <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Fechar ✕</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeDetail()">Fechar <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="card-body">
           <div class="grid-2">
@@ -185,17 +185,17 @@
       <div class="metrics-kpi-row animate-in" id="met-kpis"></div>
       <div class="grid-2 animate-in mt-2">
         <div class="card">
-          <div class="card-header"><span class="card-title">🌎 Mercado: Brasil vs EUA</span></div>
+          <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> Mercado: Brasil vs EUA</span></div>
           <div class="card-body" id="met-markets"></div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">📥 Origem dos Leads</span></div>
+          <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg> Origem dos Leads</span></div>
           <div class="card-body" id="met-sources"></div>
         </div>
       </div>
       <div class="grid-2 animate-in mt-4">
         <div class="card">
-          <div class="card-header"><span class="card-title">🏆 Taxa de Fechamento por Responsável</span></div>
+          <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg> Taxa de Fechamento por Responsável</span></div>
           <div class="card-body" id="met-closers"></div>
         </div>
         <div class="card">
@@ -209,16 +209,16 @@
     <div class="tab-panel" id="tab-pipeline">
       <div class="grid-2 mt-2 animate-in">
         <div class="card">
-          <div class="card-header"><span class="card-title">💰 Pipeline por Estágio</span></div>
+          <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Pipeline por Estágio</span></div>
           <div class="card-body" id="pipeline-stages"></div>
         </div>
         <div class="card">
-          <div class="card-header"><span class="card-title">👤 Pipeline por Responsável</span></div>
+          <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Pipeline por Responsável</span></div>
           <div class="card-body" id="pipeline-resp"></div>
         </div>
       </div>
       <div class="card mt-4 animate-in">
-        <div class="card-header"><span class="card-title">📊 Resumo do Funil</span></div>
+        <div class="card-header"><span class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Resumo do Funil</span></div>
         <div class="card-body" id="pipeline-summary"></div>
       </div>
     </div>
@@ -227,7 +227,7 @@
     <div class="tab-panel" id="tab-agenda">
       <div class="filter-bar animate-in" style="margin-top:4px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-agenda" placeholder="Buscar por nome, empresa ou telefone…" oninput="filterAgenda()">
         </div>
         <select class="filter-select" id="agenda-filter-resp" onchange="filterAgenda()">
@@ -260,7 +260,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="modal-title">Novo Lead</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="lead-id">
@@ -269,12 +269,12 @@
       <div style="margin-bottom:16px">
         <button class="btn btn-secondary btn-sm w-full" onclick="toggleIASection()" id="ia-toggle-btn"
           style="justify-content:flex-start;gap:8px;border-style:dashed">
-          <span style="font-size:14px">&#10024;</span> Preencher com IA — cole o formulário do lead
+          <span style="font-size:14px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Preencher com IA — cole o formulário do lead
         </button>
         <div id="ia-section" style="display:none;margin-top:10px">
           <textarea class="form-control" id="ia-text" rows="5" placeholder="Cole aqui o formulário que o lead enviou no WhatsApp… A IA vai preencher os campos automaticamente." style="resize:vertical;font-size:12px"></textarea>
           <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn btn-primary btn-sm" onclick="parseLeadIA()">&#10024; Analisar e Preencher</button>
+            <button class="btn btn-primary btn-sm" onclick="parseLeadIA()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Analisar e Preencher</button>
             <button class="btn btn-secondary btn-sm" onclick="document.getElementById('ia-section').style.display='none';document.getElementById('ia-text').value=''">Cancelar</button>
           </div>
         </div>
@@ -328,7 +328,7 @@
         <label>Origem</label>
         <select class="form-control" id="lead-origin">
           <option value="">— Selecione a origem —</option>
-          <option value="Magnetic Funnels">🧲 Magnetic Funnels</option>
+          <option value="Magnetic Funnels">Magnetic Funnels</option>
           <option value="Facebook">Facebook Ads</option>
           <option value="Instagram">Instagram</option>
           <option value="Google Ads">Google Ads</option>
@@ -350,23 +350,23 @@
         <div class="form-group">
           <label>Operação</label>
           <select class="form-control" id="lead-country" onchange="onCountrySelectChange()">
-            <option value="us">🇺🇸 EUA</option>
-            <option value="br">🇧🇷 Brasil</option>
+            <option value="us">EUA</option>
+            <option value="br">Brasil</option>
           </select>
         </div>
       </div>
       <div class="grid-2">
         <div class="form-group">
-          <label>📅 Próximo Contato</label>
+          <label><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Próximo Contato</label>
           <input type="date" class="form-control" id="lead-followup">
         </div>
         <div class="form-group">
           <label>Prioridade de Contato</label>
           <select class="form-control" id="lead-priority">
             <option value="">— Normal —</option>
-            <option value="alta">🔴 Alta — contato urgente</option>
-            <option value="media">🟡 Média — acompanhar</option>
-            <option value="baixa">🟢 Baixa — sem pressa</option>
+            <option value="alta">Alta — contato urgente</option>
+            <option value="media">Média — acompanhar</option>
+            <option value="baixa">Baixa — sem pressa</option>
           </select>
         </div>
       </div>
@@ -387,8 +387,8 @@
 <div class="modal-overlay" id="commission-modal">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <h3>💰 Registrar Comissão</h3>
-      <button class="modal-close" onclick="closeCommissionModal()">✕</button>
+      <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Registrar Comissão</h3>
+      <button class="modal-close" onclick="closeCommissionModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div id="commission-lead-info" style="background:var(--bg-hover);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text-secondary)"></div>
@@ -519,6 +519,8 @@
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
+// EXECUTAR NO SUPABASE SQL EDITOR (uma vez):
+// ALTER TABLE lead_history ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'nota';
 const session = initPage('comercial.html');
 if (!session) throw new Error('Not authenticated');
 
@@ -698,7 +700,7 @@ function renderAgendaGrid(data) {
   const el = document.getElementById('agenda-grid');
   if (!el) return;
   if (!data.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📞</div><h3>Nenhum contato encontrado</h3></div>';
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg></div><h3>Nenhum contato encontrado</h3></div>';
     return;
   }
   const withPhone = data.filter(l => l.phone);
@@ -888,7 +890,7 @@ function renderCommissions() {
                   <td style="font-weight:700;color:var(--accent);font-size:15px">${c.commission_amount ? fmt.currency(c.commission_amount) : '<span style="color:var(--text-muted)">—</span>'}</td>
                   <td style="font-size:12px;color:var(--text-muted)">${c.notes || '—'}</td>
                   <td style="font-size:12px">${fmt.date(c.created_at)}</td>
-                  <td>${canEdit ? `<button class="btn btn-ghost btn-sm" onclick="editCommission(${c.lead_id})">✏️</button>` : ''}</td>
+                  <td>${canEdit ? `<button class="btn btn-ghost btn-sm" onclick="editCommission(${c.lead_id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}</td>
                 </tr>`).join('')}
               </tbody>
             </table>`
@@ -1166,14 +1168,14 @@ function buildFollowupBadge(lead) {
   if (lead.followup_date) {
     const diff = Math.floor((new Date(lead.followup_date + 'T12:00:00') - new Date()) / 86400000);
     let color, label;
-    if (diff < 0)      { color='#ef4444'; label=`📅 Atrasado ${Math.abs(diff)}d`; }
-    else if (diff === 0){ color='#f97316'; label='📅 Hoje'; }
-    else if (diff === 1){ color='#eab308'; label='📅 Amanhã'; }
-    else               { color='#6366f1'; label=`📅 em ${diff}d`; }
+    if (diff < 0)      { color='#ef4444'; label=`Cal. Atrasado ${Math.abs(diff)}d`; }
+    else if (diff === 0){ color='#f97316'; label='Cal. Hoje'; }
+    else if (diff === 1){ color='#eab308'; label='Cal. Amanhã'; }
+    else               { color='#6366f1'; label=`Cal. em ${diff}d`; }
     parts.push(`<span class="followup-badge" style="background:${color}18;color:${color};border-color:${color}30">${label}</span>`);
   }
   if (lead.priority) {
-    const map = { alta:'🔴', media:'🟡', baixa:'🟢' };
+    const map = { alta:'●', media:'●', baixa:'●' };
     parts.push(`<span class="followup-badge" style="background:var(--bg-hover);color:var(--text-muted)">${map[lead.priority]||''} ${lead.priority}</span>`);
   }
   return parts.length ? `<div class="followup-row">${parts.join('')}</div>` : '';
@@ -1198,11 +1200,11 @@ function buildCard(lead) {
       <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
         <div class="avatar avatar-sm avatar-${fmt.avatarClass(lead.responsible)}">${fmt.initials(lead.responsible)}</div>
         <span style="font-size:11px;color:var(--text-muted)">${lead.responsible}</span>
-        ${lead.origin ? `<span class="badge ${lead.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}" style="margin-left:auto;font-size:10px">${lead.origin === 'Magnetic Funnels' ? '🧲 ' : ''}${lead.origin}</span>` : ''}
+        ${lead.origin ? `<span class="badge ${lead.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}" style="margin-left:auto;font-size:10px">${lead.origin === 'Magnetic Funnels' ? '' : ''}${lead.origin}</span>` : ''}
       </div>
       <div class="lead-card-meta">
         <div class="lead-card-dates">
-          <strong>🇧🇷 ${brTime} &nbsp;🇺🇸 ${usTime}</strong>
+          <strong>BR ${brTime} &nbsp;EUA ${usTime}</strong>
           <span>Há ${daysAgo === 0 ? 'hoje' : daysAgo + 'd'}</span>
         </div>
       </div>
@@ -1216,13 +1218,13 @@ function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySel
 function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 const STAGE_ACTIVITY = {
-  novo:         { icon:'🔄', color:'#6366f1', msg: n => `Lead ${n} movido de volta ao início do funil` },
-  seminteracao: { icon:'😶', color:'#64748b', msg: n => `${n} sem resposta — marcado como Sem Interação` },
-  contato:      { icon:'💬', color:'#3b82f6', msg: n => `${n} demonstrou interesse — Lead Engajado` },
-  reuniao:      { icon:'📅', color:'#a855f7', msg: n => `Reunião agendada com ${n}` },
-  proposta:     { icon:'📋', color:'#f97316', msg: n => `Proposta enviada para ${n}` },
-  fechado:      { icon:'🎉', color:'#22c55e', msg: n => `Venda fechada! ${n} é agora cliente da DR Growth` },
-  perdido:      { icon:'❌', color:'#ef4444', msg: n => `Lead ${n} marcado como perdido` },
+  novo:         { icon:'↺', color:'#6366f1', msg: n => `Lead ${n} movido de volta ao início do funil` },
+  seminteracao: { icon:'—', color:'#64748b', msg: n => `${n} sem resposta — marcado como Sem Interação` },
+  contato:      { icon:'msg', color:'#3b82f6', msg: n => `${n} demonstrou interesse — Lead Engajado` },
+  reuniao:      { icon:'Cal.', color:'#a855f7', msg: n => `Reunião agendada com ${n}` },
+  proposta:     { icon:'Doc.', color:'#f97316', msg: n => `Proposta enviada para ${n}` },
+  fechado:      { icon:'★', color:'#22c55e', msg: n => `Venda fechada! ${n} é agora cliente da DR Growth` },
+  perdido:      { icon:'✗', color:'#ef4444', msg: n => `Lead ${n} marcado como perdido` },
 };
 
 async function onDrop(e, stage) {
@@ -1265,8 +1267,8 @@ async function autoCreateClient(lead) {
     };
     await window.drSupabase.from('clients').insert(clientData);
   }
-  showToast(`🎉 "${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
-  logActivity({ icon:'🤝', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
+  showToast(`"${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
+  logActivity({ icon:'+', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
 }
 
 // ---- Tabela de leads ----
@@ -1285,7 +1287,7 @@ function filterLeads() {
 
 function renderLeadsTable(data) {
   if (!data.length) {
-    document.getElementById('leads-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">◉</div><h3>Nenhum lead</h3></div></td></tr>`;
+    document.getElementById('leads-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></div><h3>Nenhum lead</h3></div></td></tr>`;
     return;
   }
   document.getElementById('leads-tbody').innerHTML = data.map(l => `
@@ -1294,14 +1296,14 @@ function renderLeadsTable(data) {
       <td><span class="badge" style="background:${STAGE_INFO[l.stage]?.color}18;color:${STAGE_INFO[l.stage]?.color};border-color:${STAGE_INFO[l.stage]?.color}30">${STAGE_INFO[l.stage]?.label||l.stage}</span></td>
       <td class="col-hide-mobile" style="font-weight:700;color:var(--green)">${l.value ? fmt.currency(l.value) : '—'}</td>
       <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(l.responsible)}">${fmt.initials(l.responsible)}</div>${l.responsible}</div></td>
-      <td class="col-hide-mobile">${l.origin ? `<span class="badge ${l.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}">${l.origin === 'Magnetic Funnels' ? '🧲 ' : ''}${l.origin}</span>` : '—'}</td>
+      <td class="col-hide-mobile">${l.origin ? `<span class="badge ${l.origin === 'Magnetic Funnels' ? 'badge-purple' : 'badge-muted'}">${l.origin === 'Magnetic Funnels' ? '' : ''}${l.origin}</span>` : '—'}</td>
       <td class="col-hide-mobile">${fmt.date(l.created_at)}</td>
       <td>
         <div style="display:flex;gap:4px;align-items:center">
           ${l.phone
-            ? `<a href="https://wa.me/${waNumber(l.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none;padding:4px 8px" onclick="event.stopPropagation();quickCallLog(${l.id})" title="WhatsApp: ${l.phone}">📞</a>`
-            : `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();addPhoneToLead(${l.id})" title="Cadastrar telefone" style="opacity:.6">📵</button>`}
-          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})">✏️</button>
+            ? `<a href="https://wa.me/${waNumber(l.phone)}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none;padding:4px 8px" onclick="event.stopPropagation();quickCallLog(${l.id})" title="WhatsApp: ${l.phone}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg></a>`
+            : `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();addPhoneToLead(${l.id})" title="Cadastrar telefone" style="opacity:.6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9a2 2 0 01-.45 2.11L7.27 12.4a16 16 0 006.33 6.33l1.28-1.28A2 2 0 0117 17c.907.339 1.85.573 2.81.7A2 2 0 0122 19.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0111.19 22a19.5 19.5 0 01-7.38-7.38A19.79 19.79 0 010 5.82 2 2 0 012 3.66h3A2 2 0 016.62 5.6"/></svg></button>`}
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditModal(${l.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         </div>
       </td>
     </tr>`).join('');
@@ -1322,7 +1324,7 @@ function selectLead(id) {
     const waN = waNumber(lead.phone);
     callBtns.style.display = 'flex';
     callBtns.innerHTML = `
-      <a href="https://wa.me/${waN}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="quickCallLog(${lead.id})">📞 Chamar no WhatsApp</a>`;
+      <a href="https://wa.me/${waN}" target="_blank" class="btn btn-sm" style="background:#25D366;color:#fff;text-decoration:none" onclick="quickCallLog(${lead.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg> Chamar no WhatsApp</a>`;
   } else {
     callBtns.style.display = 'flex';
     callBtns.innerHTML = `<button class="btn btn-sm" style="background:var(--bg-hover);color:var(--text-muted);border:1px dashed var(--border)" onclick="addPhoneToLead(${lead.id})">+ Cadastrar telefone</button>`;
@@ -1633,7 +1635,7 @@ function saveLead() {
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       showToast('Lead atualizado!', 'success');
-      logActivity({ icon:'✏️', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
+      logActivity({ icon:'/', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
       window.DRCache?.clear('comercial');
     if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado' && oldStage !== 'fechado') { autoCreateClient(leads.find(l=>l.id==id)||data); openCommissionModal(Number(id)); }
@@ -1644,7 +1646,7 @@ function saveLead() {
       closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
       SFX.newLead();
       showToast('Novo lead adicionado!', 'success');
-      logActivity({ icon:'🎯', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
+      logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
       window.DRCache?.clear('comercial');
       if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado') openCommissionModal(data.id);
@@ -1664,7 +1666,7 @@ async function deleteLead() {
   leads = leads.filter(l => l.id != id);
   closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
   showToast('Lead excluído.', 'info');
-  if (lead) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Lead ${lead.name} removido do funil`, sector:'comercial' });
+  if (lead) logActivity({ icon:'×', color:'#ef4444', msg:`Lead ${lead.name} removido do funil`, sector:'comercial' });
 }
 
 document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === document.getElementById('lead-modal')) closeModal(); });
