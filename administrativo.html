@@ -767,12 +767,128 @@ function renderRelatorio() {
   content.innerHTML = html;
 }
 
+// ---- MAPA DE CLIENTES ----
+let _mapInstance = null;
+
+const US_CITIES = [
+  { name:'Miami',        lat:25.7617,  lng:-80.1918 },
+  { name:'New York',     lat:40.7128,  lng:-74.0060 },
+  { name:'Los Angeles',  lat:34.0522,  lng:-118.2437 },
+  { name:'Houston',      lat:29.7604,  lng:-95.3698 },
+  { name:'Dallas',       lat:32.7767,  lng:-96.7970 },
+  { name:'Austin',       lat:30.2672,  lng:-97.7431 },
+  { name:'Orlando',      lat:28.5383,  lng:-81.3792 },
+  { name:'Atlanta',      lat:33.7490,  lng:-84.3880 },
+  { name:'Chicago',      lat:41.8781,  lng:-87.6298 },
+  { name:'Boston',       lat:42.3601,  lng:-71.0589 },
+  { name:'Seattle',      lat:47.6062,  lng:-122.3321 },
+  { name:'Phoenix',      lat:33.4484,  lng:-112.0740 },
+];
+
+const BR_CITIES = [
+  { name:'São Paulo',        lat:-23.5505, lng:-46.6333 },
+  { name:'Rio de Janeiro',   lat:-22.9068, lng:-43.1729 },
+  { name:'Belo Horizonte',   lat:-19.9191, lng:-43.9386 },
+  { name:'Salvador',         lat:-12.9714, lng:-38.5014 },
+  { name:'Fortaleza',        lat:-3.7172,  lng:-38.5434 },
+  { name:'Curitiba',         lat:-25.4284, lng:-49.2733 },
+  { name:'Recife',           lat:-8.0476,  lng:-34.8770 },
+  { name:'Porto Alegre',     lat:-30.0346, lng:-51.2177 },
+  { name:'Campinas',         lat:-22.9099, lng:-47.0626 },
+  { name:'Brasília',         lat:-15.7801, lng:-47.9292 },
+  { name:'Manaus',           lat:-3.1190,  lng:-60.0217 },
+  { name:'Florianópolis',    lat:-27.5954, lng:-48.5480 },
+];
+
+function getClientCoords(client) {
+  let hash = 0;
+  for (const ch of (client.name || 'x')) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0;
+  hash = Math.abs(hash);
+  const isUS = !client.country || client.country === 'us';
+  const cities = isUS ? US_CITIES : BR_CITIES;
+  const city = cities[hash % cities.length];
+  // tiny deterministic jitter so same-city clients don't stack
+  const jitter = ((hash >> 8) % 9 - 4) * 0.018;
+  return [city.lat + jitter, city.lng + jitter];
+}
+
+function renderMap() {
+  const container = document.getElementById('map-container');
+  if (!container) return;
+
+  const base   = window.filterByCountry ? window.filterByCountry(allClients) : allClients;
+  const active = base.filter(c => c.active !== false);
+
+  if (_mapInstance) {
+    // Refresh markers on re-open
+    _mapInstance.eachLayer(l => { if (l instanceof L.Marker) _mapInstance.removeLayer(l); });
+  } else {
+    _mapInstance = L.map('map-container', {
+      center: [10, -65],
+      zoom: 3,
+      zoomControl: true,
+      attributionControl: false,
+    });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19,
+    }).addTo(_mapInstance);
+  }
+
+  const healthColor = { green:'#22c55e', yellow:'#f59e0b', red:'#ef4444' };
+  const bounds = [];
+
+  active.forEach(client => {
+    const coords = getClientCoords(client);
+    const color  = healthColor[client.health] || '#22c55e';
+    const label  = client.name.length > 20 ? client.name.slice(0, 18) + '…' : client.name;
+    const mrr    = fmt.currency(client.monthly_value);
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="map-pin-wrap">
+        <div class="map-pin-pulse" style="--c:${color}"></div>
+        <div class="map-pin-pulse map-pin-pulse-2" style="--c:${color}"></div>
+        <div class="map-pin-dot" style="background:${color};box-shadow:0 0 8px ${color},0 0 24px ${color}55"></div>
+        <div class="map-pin-label">${label}</div>
+      </div>`,
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+      popupAnchor: [0, -18],
+    });
+
+    L.marker(coords, { icon })
+      .addTo(_mapInstance)
+      .bindPopup(`<div style="font-family:Inter,sans-serif;min-width:175px;padding:2px 0">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px">${client.name}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:8px">${client.service || '—'}</div>
+        <div style="font-size:14px;font-weight:800;color:#22c55e">${mrr}<span style="font-size:10px;font-weight:400;color:#64748b">/mês</span></div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px">Resp: ${client.responsible || '—'}</div>
+      </div>`, { maxWidth:220, className:'map-popup' });
+
+    bounds.push(coords);
+  });
+
+  if (bounds.length > 1) _mapInstance.fitBounds(bounds, { padding:[50,50], maxZoom:7 });
+  else if (bounds.length === 1) _mapInstance.setView(bounds[0], 6);
+
+  // KPI overlay
+  const mrr   = active.reduce((s,c)=>s+(Number(c.monthly_value)||0),0);
+  const kpiEl = document.getElementById('map-kpi-bar');
+  if (kpiEl) kpiEl.innerHTML = `
+    <div class="map-kpi-label" style="font-size:10px;color:#475569;margin-bottom:2px">VISÃO GERAL</div>
+    <div class="map-kpi-item"><span class="map-kpi-label">Clientes</span><span class="map-kpi-value">${active.length}</span></div>
+    <div class="map-kpi-item"><span class="map-kpi-label">MRR</span><span class="map-kpi-value" style="color:#22c55e">${fmt.currency(mrr)}</span></div>
+    <div class="map-kpi-item"><span class="map-kpi-label">Saudáveis</span><span class="map-kpi-value" style="color:#22c55e">${active.filter(c=>c.health==='green').length}</span></div>
+    <div class="map-kpi-item"><span class="map-kpi-label">Em risco</span><span class="map-kpi-value" style="color:#ef4444">${active.filter(c=>c.health==='red').length}</span></div>`;
+}
+
 loadData().then(() => {
   initCountrySelector('administrativo', () => {
     filterClients();
     filterTasks();
     updateClientKPIs();
     updateTaskKPIs();
+    if (_mapInstance) renderMap();
   });
 });
 
