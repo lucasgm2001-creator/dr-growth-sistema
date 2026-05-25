@@ -1430,7 +1430,8 @@ tbody td {
   .kpi-grid { grid-template-columns: 1fr 1fr; }
 
   .kanban-board { flex-direction: column; }
-  .kanban-col { min-width: unset; width: 100%; max-height: none; }
+  .kanban-row { flex-direction: column; }
+  .kanban-col { min-width: unset; width: 100%; max-height: none; flex: none; }
 
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 
