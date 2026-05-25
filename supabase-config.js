@@ -246,6 +246,12 @@ async function seedDemoData() {
   console.log('✅ Dados de demonstração inseridos!');
 }
 
+// ============================================================
+//  ANTHROPIC API — IA no Diário do Lead
+//  Obtenha sua chave em: https://console.anthropic.com/settings/keys
+// ============================================================
+window.ANTHROPIC_API_KEY = '';   // ← cole sua chave aqui
+
 // Exporta para uso global
 window.drSupabase = _supabaseClient;
 window.seedDemoData = seedDemoData;
