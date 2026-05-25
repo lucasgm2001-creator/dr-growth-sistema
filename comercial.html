@@ -1063,7 +1063,7 @@ function buildCard(lead) {
 
 // Drag & Drop
 function onDragStart(e, id) { draggedId = id; setTimeout(() => e.target.classList.add('dragging'), 0); e.dataTransfer.effectAllowed = 'move'; }
-function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.kanban-cards').forEach(c => c.classList.remove('drag-over')); }
+function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.tree-node-leads,.kanban-cards').forEach(c => c.classList.remove('drag-over')); }
 function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
 function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 const STAGE_ACTIVITY = {
