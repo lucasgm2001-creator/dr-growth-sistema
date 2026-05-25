@@ -3921,7 +3921,8 @@ body.hall-page { background: transparent; }
 
   /* Kanban */
   .kanban-board { flex-direction: column; }
-  .kanban-col   { min-width: unset; width: 100%; max-height: none; }
+  .kanban-row   { flex-direction: column; }
+  .kanban-col   { min-width: unset; width: 100%; max-height: none; flex: none; }
 
   /* Grids genéricos */
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
