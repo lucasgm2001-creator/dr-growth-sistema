@@ -1646,15 +1646,17 @@ async function saveLead() {
     } else {
       data.created_at = new Date().toISOString();
       if (window.drSupabase) {
-        const { data: inserted, error } = await window.drSupabase.from('leads').insert(data).select().single();
+        const { data: rows, error } = await window.drSupabase.from('leads').insert(data).select('id');
         if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+        const newId = rows?.[0]?.id ?? Date.now();
+        const inserted = { ...data, id: newId };
         leads.unshift(inserted);
         closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
         SFX.newLead();
         showToast('Novo lead adicionado!', 'success');
         logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
         window.DRCache?.clear('comercial');
-        if (data.stage === 'fechado') openCommissionModal(inserted.id);
+        if (data.stage === 'fechado') openCommissionModal(newId);
       } else {
         data.id = Date.now();
         leads.unshift(data);
