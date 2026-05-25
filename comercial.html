@@ -1653,7 +1653,7 @@ async function saveLead() {
         showToast('Novo lead adicionado!', 'success');
         logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
         window.DRCache?.clear('comercial');
-        if (data.stage === 'fechado') openCommissionModal(newId);
+        if (data.stage === 'fechado') openCommissionModal(inserted.id);
       } else {
         data.id = Date.now();
         leads.unshift(data);
