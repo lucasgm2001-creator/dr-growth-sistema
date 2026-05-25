@@ -37,7 +37,7 @@
 <!-- MAIN -->
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Hall</h1>
       <p>Recepção · DR Growth</p>
@@ -57,7 +57,7 @@
         <!-- Time hoje — pill dropdown -->
         <div class="team-pill-wrap" id="team-pill-wrap">
           <button class="team-pill-btn" onclick="toggleTeamPanel(event)">
-            <span>👥</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span>
             <span id="team-pill-count">–</span>
           </button>
           <div class="team-pill-panel" id="team-pill-panel">
@@ -80,7 +80,7 @@
     <div class="hall-greeting animate-in">
       <div class="hall-greeting-inner">
         <div class="greeting-text">
-          <h1 id="greeting-msg">Bom dia, <span id="greeting-name">—</span> 👋</h1>
+          <h1 id="greeting-msg">Bom dia, <span id="greeting-name">—</span></h1>
           <p id="greeting-sub">Aqui estão as novidades de hoje na DR Growth.</p>
         </div>
         <div class="greeting-date">
@@ -109,7 +109,7 @@
         <!-- Q2 direita: Calendário (span 2 linhas) -->
         <div class="hall-accordion animate-in open hall-quad" id="acc-cal" style="animation-delay:0.12s;grid-row:span 2">
           <div class="hall-acc-header">
-            <span style="font-size:14px;flex-shrink:0">📅</span>
+            <span style="flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
             <span class="hall-acc-title">Calendário</span>
           </div>
           <div class="hall-acc-body hall-quad-body">
@@ -166,7 +166,7 @@
         <!-- Q3 baixo-esquerda: Mural de Avisos -->
         <div class="hall-accordion animate-in open hall-quad" id="acc-mural" style="animation-delay:0.16s">
           <div class="hall-acc-header">
-            <span style="font-size:14px;flex-shrink:0">📌</span>
+            <span style="flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span class="hall-acc-title">Mural de Avisos</span>
           </div>
           <div class="hall-acc-body hall-quad-body">
@@ -191,7 +191,7 @@
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
       <h3 id="cal-modal-title">Novo Compromisso</h3>
-      <button class="modal-close" onclick="closeCalModal()">✕</button>
+      <button class="modal-close" onclick="closeCalModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -237,7 +237,7 @@
       <div class="form-group">
         <div class="tog-row" onclick="toggleMeeting()">
           <div class="tog" id="meeting-tog"></div>
-          <span>📹 Marcar como reunião</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Marcar como reunião</span>
         </div>
       </div>
       <div class="form-group">
@@ -313,15 +313,15 @@ function getMoonEmoji() {
   const knownNew = new Date('2000-01-06T18:14:00Z');
   const days = (Date.now() - knownNew) / 86400000;
   const phase = ((days % 29.530589) / 29.530589 + 1) % 1;
-  if (phase < 0.0625) return '🌑';
-  if (phase < 0.1875) return '🌒';
-  if (phase < 0.3125) return '🌓';
-  if (phase < 0.4375) return '🌔';
-  if (phase < 0.5625) return '🌕';
-  if (phase < 0.6875) return '🌖';
-  if (phase < 0.8125) return '🌗';
-  if (phase < 0.9375) return '🌘';
-  return '🌑';
+  if (phase < 0.0625) return '◐';
+  if (phase < 0.1875) return '◑';
+  if (phase < 0.3125) return '◒';
+  if (phase < 0.4375) return '◓';
+  if (phase < 0.5625) return '●';
+  if (phase < 0.6875) return '◓';
+  if (phase < 0.8125) return '◒';
+  if (phase < 0.9375) return '◑';
+  return '◐';
 }
 
 // ---- Saudação dinâmica ----
@@ -377,7 +377,7 @@ const SECTOR_LABELS = {
 
 function renderFeed(items) {
   if (!items.length) {
-    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon">📡</div><h3>Tudo quieto</h3><p>Nenhuma novidade ainda.</p></div>`;
+    document.getElementById('feed-list').innerHTML = `<div class="empty-state" style="padding:32px"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h3>Tudo quieto</h3><p>Nenhuma novidade ainda.</p></div>`;
     return;
   }
 
@@ -548,7 +548,7 @@ function postFeedItem() {
   if (!text) return;
   const items = getFeedItems();
   items.unshift({
-    id: Date.now(), type:'update', icon:'💬', color:'#244c9c',
+    id: Date.now(), type:'update', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', color:'#244c9c',
     msg: text, who: session.name.split(' ')[0], time: new Date().toISOString(),
     authorFull: session.name, editable: true
   });
@@ -788,7 +788,7 @@ function showPulso() {
   // Bonus
   const bonusEl = document.getElementById('pulso-bonus');
   if (content.bonus) {
-    bonusEl.textContent = '💰 ' + content.bonus;
+    bonusEl.textContent = content.bonus;
     bonusEl.style.display = 'block';
   } else {
     bonusEl.style.display = 'none';
@@ -1131,16 +1131,16 @@ function showWeatherBadge(w, scenario) {
   const tempEl   = document.getElementById('weather-temp-label');
   if (!el) return;
   const icons = {
-    'manha-limpa':'☀️','manha-nuvem':'⛅','tarde-limpa':'🌤️','tarde-nuvem':'🌥️',
-    'noite-limpa':'🌙','noite-nuvem':'☁️','madrugada':'🌑',
-    'nublado-dia':'☁️','nublado-noite':'☁️',
-    'garoa-dia':'🌦️','garoa-noite':'🌧️',
-    'chuva-dia':'🌧️','chuva-noite':'🌧️',
-    'tempestade-dia':'⛈️','tempestade-noite':'⛈️',
-    'neve-dia':'❄️','neve-noite':'❄️',
-    'neblina-dia':'🌫️','neblina-noite':'🌫️',
+    'manha-limpa':'☀','manha-nuvem':'~','tarde-limpa':'~','tarde-nuvem':'~',
+    'noite-limpa':'◑','noite-nuvem':'☁','madrugada':'◐',
+    'nublado-dia':'☁','nublado-noite':'☁',
+    'garoa-dia':'~','garoa-noite':'~',
+    'chuva-dia':'~','chuva-noite':'~',
+    'tempestade-dia':'!!','tempestade-noite':'!!',
+    'neve-dia':'❄','neve-noite':'❄',
+    'neblina-dia':'≋','neblina-noite':'≋',
   };
-  const icon = icons[scenario] || '🌐';
+  const icon = icons[scenario] || '·';
   iconEl.textContent = icon + ' Clima';
   tempEl.textContent = `${w.temp}°C`;
   el.style.display = '';
@@ -1567,13 +1567,13 @@ function renderDayPanel(dateStr) {
 
   if (!events.length) {
     if (!holidays.length) {
-      html += `<div class="cal-dp-empty"><div class="cal-dp-empty-icon">📅</div>Nenhum compromisso.<div class="cal-dp-empty-hint">Toque em + para adicionar.</div></div>`;
+      html += `<div class="cal-dp-empty"><div class="cal-dp-empty-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Nenhum compromisso.<div class="cal-dp-empty-hint">Toque em + para adicionar.</div></div>`;
     }
   } else {
     events.forEach(ev => {
       const timeStr  = ev.utc ? utcToTzTime(ev.utc,'America/Sao_Paulo') : (ev.time||'');
       const typeClass= ev.isMeeting ? 'meeting' : 'event';
-      const typeLabel= ev.isMeeting ? '📹 Reunião' : '📌 Compromisso';
+      const typeLabel= ev.isMeeting ? 'Reunião' : 'Compromisso';
       const tzInfo   = ev.timezone ? CAL_TZS.find(t=>t.id===ev.timezone) : null;
       const tzStr    = tzInfo ? `${tzInfo.flag} ${tzInfo.name} (${tzInfo.code})` : '';
       const metaItems= [];

@@ -122,7 +122,7 @@
 
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Clientes</h1>
       <p id="page-subtitle">Pós-venda · DR Growth</p>
@@ -157,12 +157,12 @@
     <div class="tab-pane active" id="tab-overview">
       <div class="cli-kpi animate-in">
         <div class="kpi-card green">
-          <div class="kpi-top"><span class="kpi-label">Clientes Ativos</span><div class="kpi-icon green">🤝</div></div>
+          <div class="kpi-top"><span class="kpi-label">Clientes Ativos</span><div class="kpi-icon green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div></div>
           <div class="kpi-value" id="kpi-ativos">—</div>
           <div class="kpi-change neutral">contratos vigentes</div>
         </div>
         <div class="kpi-card accent">
-          <div class="kpi-top"><span class="kpi-label">Jobs em Andamento</span><div class="kpi-icon accent">⚡</div></div>
+          <div class="kpi-top"><span class="kpi-label">Jobs em Andamento</span><div class="kpi-icon accent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div></div>
           <div class="kpi-value" id="kpi-jobs-doing">—</div>
           <div class="kpi-change neutral">em execução</div>
         </div>
@@ -172,7 +172,7 @@
           <div class="kpi-change down">prazo vencido</div>
         </div>
         <div class="kpi-card red">
-          <div class="kpi-top"><span class="kpi-label">Clientes em Risco</span><div class="kpi-icon red">⚠</div></div>
+          <div class="kpi-top"><span class="kpi-label">Clientes em Risco</span><div class="kpi-icon red"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></div>
           <div class="kpi-value" id="kpi-risco">—</div>
           <div class="kpi-change down">atenção necessária</div>
         </div>
@@ -196,7 +196,7 @@
     <div class="tab-pane" id="tab-carteira">
       <div class="filter-bar animate-in" style="margin-bottom:16px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-carteira" placeholder="Buscar cliente…" oninput="renderCarteira()">
         </div>
         <select class="filter-select" id="filter-status" onchange="renderCarteira()">
@@ -235,7 +235,7 @@
     <div class="tab-pane" id="tab-jobs">
       <div class="filter-bar animate-in" style="margin-bottom:16px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-jobs" placeholder="Buscar job…" oninput="renderJobs()">
         </div>
         <select class="filter-select" id="filter-job-client" onchange="renderJobs()">
@@ -254,7 +254,7 @@
     <div class="tab-pane" id="tab-documentos">
       <div class="filter-bar animate-in" style="margin-bottom:16px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-docs" placeholder="Buscar documento…" oninput="renderDocumentos()">
         </div>
         <button class="btn btn-primary btn-sm" onclick="openDocModal()">+ Adicionar Documento</button>
@@ -275,7 +275,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="cm-title">Novo Cliente</h3>
-      <button class="modal-close" onclick="closeClientModal()">✕</button>
+      <button class="modal-close" onclick="closeClientModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="cm-id">
@@ -337,7 +337,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="jm-title">Novo Job</h3>
-      <button class="modal-close" onclick="closeJobModal()">✕</button>
+      <button class="modal-close" onclick="closeJobModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="jm-id">
@@ -380,7 +380,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3>Adicionar Documento</h3>
-      <button class="modal-close" onclick="closeDocModal()">✕</button>
+      <button class="modal-close" onclick="closeDocModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="dm-id">
@@ -703,7 +703,7 @@ function dropJob(e, status) {
 // ---- Documentos ----
 function renderDocumentos() {
   const q = (document.getElementById('search-docs')?.value||'').toLowerCase();
-  const TYPE_ICON = { contrato:'📄', briefing:'📋', relatorio:'📊', proposta:'💼', outro:'📁' };
+  const TYPE_ICON = { contrato:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>', briefing:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>', relatorio:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', proposta:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>', outro:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>' };
 
   const docs = allDocs.filter(d => {
     if (!canSeeFinancialDocs() && d.tipo === 'contrato') return false;
@@ -721,23 +721,23 @@ function renderDocumentos() {
 
   const container = document.getElementById('docs-list');
   if (!Object.keys(groups).length) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📁</div><h3>Nenhum documento</h3><p>Adicione contratos, briefings e relatórios.</p></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div><h3>Nenhum documento</h3><p>Adicione contratos, briefings e relatórios.</p></div>`;
     return;
   }
   container.innerHTML = Object.entries(groups).map(([client, items]) => `
     <div class="doc-folder open">
       <div class="doc-folder-header" onclick="this.parentElement.classList.toggle('open')">
-        <span>📁</span> ${client} <span style="margin-left:auto;font-size:11px;color:var(--text-muted)">${items.length} arquivo${items.length!==1?'s':''}</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></span> ${client} <span style="margin-left:auto;font-size:11px;color:var(--text-muted)">${items.length} arquivo${items.length!==1?'s':''}</span>
       </div>
       <div class="doc-list">
         ${items.map(d => `<div class="doc-item">
-          <span class="doc-icon">${TYPE_ICON[d.tipo]||'📄'}</span>
+          <span class="doc-icon">${TYPE_ICON[d.tipo]||'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'}</span>
           <div class="doc-info">
             <div class="doc-name">${d.name}</div>
             <div class="doc-meta">${d.tipo} · ${fmt.date(d.created_at?.split('T')[0])} · ${d.uploaded_by||'—'}</div>
           </div>
           ${d.url && d.url !== '#' ? `<a href="${d.url}" target="_blank" class="btn btn-ghost btn-sm">Abrir</a>` : ''}
-          ${canEditClient() ? `<button class="btn btn-ghost btn-sm" onclick="deleteDoc('${d.id}')">✕</button>` : ''}
+          ${canEditClient() ? `<button class="btn btn-ghost btn-sm" onclick="deleteDoc('${d.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
         </div>`).join('')}
       </div>
     </div>`).join('');
@@ -754,29 +754,29 @@ function renderAlertas() {
     if (!visible.find(c => c.id === j.client_id)) return;
     const days = Math.ceil((new Date(j.deadline) - now) / 86400000);
     if (days <= 2 && days >= 0) alertas.push({ type:'urgent', icon:'⏰', title:`Job vencendo: ${j.title}`, desc:`${j.client_name} · Prazo: ${fmt.date(j.deadline)} (${days===0?'hoje':`${days}d`})` });
-    if (days < 0)               alertas.push({ type:'urgent', icon:'🔴', title:`Job atrasado: ${j.title}`,  desc:`${j.client_name} · Venceu há ${Math.abs(days)} dia${Math.abs(days)!==1?'s':''}` });
+    if (days < 0)               alertas.push({ type:'urgent', icon:'!', title:`Job atrasado: ${j.title}`,  desc:`${j.client_name} · Venceu há ${Math.abs(days)} dia${Math.abs(days)!==1?'s':''}` });
   });
 
   // Renovações em 30 dias
   visible.filter(c => c.renewal_date && c.status === 'ativo').forEach(c => {
     const days = Math.ceil((new Date(c.renewal_date) - now) / 86400000);
-    if (days <= 30 && days >= 0) alertas.push({ type:'warn', icon:'📅', title:`Renovação chegando: ${c.name}`, desc:`Renova em ${days} dia${days!==1?'s':''} · ${fmt.date(c.renewal_date)}` });
+    if (days <= 30 && days >= 0) alertas.push({ type:'warn', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', title:`Renovação chegando: ${c.name}`, desc:`Renova em ${days} dia${days!==1?'s':''} · ${fmt.date(c.renewal_date)}` });
   });
 
   // Clientes sem jobs há 15 dias
   visible.filter(c => c.status === 'ativo').forEach(c => {
     const cJobs = allJobs.filter(j => j.client_id === c.id && j.status !== 'done');
-    if (!cJobs.length) alertas.push({ type:'info', icon:'💤', title:`Sem jobs ativos: ${c.name}`, desc:`Nenhum job em aberto para este cliente.` });
+    if (!cJobs.length) alertas.push({ type:'info', icon:'zzz', title:`Sem jobs ativos: ${c.name}`, desc:`Nenhum job em aberto para este cliente.` });
   });
 
   // Clientes em risco
   visible.filter(c => c.status === 'risco').forEach(c => {
-    alertas.push({ type:'urgent', icon:'⚠️', title:`Cliente em risco: ${c.name}`, desc:`Verifique o histórico e agende uma reunião.` });
+    alertas.push({ type:'urgent', icon:'!', title:`Cliente em risco: ${c.name}`, desc:`Verifique o histórico e agende uma reunião.` });
   });
 
   const el = document.getElementById('alertas-list');
   if (!alertas.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><h3>Tudo em ordem</h3><p>Nenhum alerta no momento.</p></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><h3>Tudo em ordem</h3><p>Nenhum alerta no momento.</p></div>`;
     return;
   }
   el.innerHTML = alertas.map(a => `
@@ -805,7 +805,7 @@ function openProfile(clientId) {
       <h2>${c.name}</h2>
       <p>${c.nicho||'—'} · ${c.pais==='us'?'🇺🇸 EUA':'🇧🇷 Brasil'}</p>
     </div>
-    <button class="pp-close" onclick="closeProfile()">✕</button>`;
+    <button class="pp-close" onclick="closeProfile()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
 
   document.getElementById('pp-body').innerHTML = `
     <div class="pp-section">
@@ -900,7 +900,7 @@ async function saveClient() {
     allClients.push(newC);
     if (window.drSupabase) window.drSupabase.from('clients').insert(data).then(()=>{});
     showToast('Cliente criado!', 'success');
-    logActivity({ icon:'🤝', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
+    logActivity({ icon:'+', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
   }
   closeClientModal(); closeProfile(); refresh();
 }
@@ -966,7 +966,7 @@ async function saveJob() {
     allJobs.push(newJ);
     if (window.drSupabase) window.drSupabase.from('jobs').insert(data).then(()=>{});
     showToast('Job criado!', 'success');
-    logActivity({ icon:'⚡', color:'#3b82f6', msg:`Novo job: ${title} (${cName})`, sector:'clientes' });
+    logActivity({ icon:'z', color:'#3b82f6', msg:`Novo job: ${title} (${cName})`, sector:'clientes' });
   }
   closeJobModal(); refresh();
 }
@@ -1060,7 +1060,7 @@ window.migrateLeadToClient = function(lead) {
   window.DRCache?.clear('clientes');
   allClients.push(newC);
   if (window.drSupabase) window.drSupabase.from('clients').insert(newC).then(()=>{});
-  logActivity({ icon:'🤝', color:'#10B981', msg:`Lead migrado para Clientes: ${newC.name}`, sector:'clientes' });
+  logActivity({ icon:'+', color:'#10B981', msg:`Lead migrado para Clientes: ${newC.name}`, sector:'clientes' });
 };
 
 // ---- Init ----

@@ -22,16 +22,16 @@
 
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Tráfego & Marketing</h1>
       <p id="traf-subtitle">Campanhas, métricas e desempenho</p>
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
       </div>
       <button class="btn btn-primary btn-sm" id="main-btn" onclick="openCampaignModal()">+ Campanha</button>
     </div>
@@ -67,22 +67,22 @@
       <!-- KPIs de tráfego -->
       <div class="kpi-grid animate-in" style="margin-bottom:20px">
         <div class="kpi-card" style="border-color:rgba(168,85,247,0.3)">
-          <div class="kpi-top"><span class="kpi-label">Campanhas Ativas</span><div class="kpi-icon" style="background:rgba(168,85,247,0.15)">🚀</div></div>
+          <div class="kpi-top"><span class="kpi-label">Campanhas Ativas</span><div class="kpi-icon" style="background:rgba(168,85,247,0.15)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg></div></div>
           <div class="kpi-value" id="kpi-active-campaigns" style="color:#a855f7">—</div>
           <div class="kpi-change neutral">em veiculação</div>
         </div>
         <div class="kpi-card" style="border-color:rgba(239,68,68,0.3)">
-          <div class="kpi-top"><span class="kpi-label">Invest. Total/mês</span><div class="kpi-icon" style="background:rgba(239,68,68,0.12)">💸</div></div>
+          <div class="kpi-top"><span class="kpi-label">Invest. Total/mês</span><div class="kpi-icon" style="background:rgba(239,68,68,0.12)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div></div>
           <div class="kpi-value" id="kpi-spend" style="color:var(--red)">—</div>
           <div class="kpi-change neutral">gasto em mídia</div>
         </div>
         <div class="kpi-card" style="border-color:rgba(59,130,246,0.3)">
-          <div class="kpi-top"><span class="kpi-label">Leads Gerados</span><div class="kpi-icon" style="background:rgba(59,130,246,0.12)">🎯</div></div>
+          <div class="kpi-top"><span class="kpi-label">Leads Gerados</span><div class="kpi-icon" style="background:rgba(59,130,246,0.12)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div></div>
           <div class="kpi-value" id="kpi-leads-gen" style="color:var(--blue)">—</div>
           <div class="kpi-change neutral">este mês</div>
         </div>
         <div class="kpi-card" style="border-color:rgba(34,197,94,0.3)">
-          <div class="kpi-top"><span class="kpi-label">CPL Médio</span><div class="kpi-icon" style="background:rgba(34,197,94,0.12)">📉</div></div>
+          <div class="kpi-top"><span class="kpi-label">CPL Médio</span><div class="kpi-icon" style="background:rgba(34,197,94,0.12)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div></div>
           <div class="kpi-value" id="kpi-cpl" style="color:var(--green)">—</div>
           <div class="kpi-change neutral">custo por lead</div>
         </div>
@@ -166,7 +166,7 @@
           <div style="font-size:13px;font-weight:700">Integração Meta Ads</div>
           <div style="font-size:12px;color:var(--text-muted);margin-top:2px" id="meta-status-text">Exibindo dados de demonstração · Configure suas credenciais para dados reais</div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="openMetaConfig()">⚙️ Configurar API</button>
+        <button class="btn btn-secondary btn-sm" onclick="openMetaConfig()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configurar API</button>
         <button class="btn btn-primary btn-sm" onclick="fetchMetaData()">↻ Atualizar</button>
       </div>
       <div class="metrics-kpi-row animate-in" id="meta-kpis"></div>
@@ -188,8 +188,8 @@
 <div class="modal-overlay" id="meta-modal">
   <div class="modal" style="max-width:460px">
     <div class="modal-header">
-      <h3>⚙️ Configurar Meta Ads API</h3>
-      <button class="modal-close" onclick="closeMetaModal()">✕</button>
+      <h3><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Configurar Meta Ads API</h3>
+      <button class="modal-close" onclick="closeMetaModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div style="background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text-secondary);line-height:1.6">
@@ -217,7 +217,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="camp-modal-title">Nova Campanha</h3>
-      <button class="modal-close" onclick="closeCampaignModal()">✕</button>
+      <button class="modal-close" onclick="closeCampaignModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="camp-id">
@@ -271,7 +271,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3>Novo Conteúdo</h3>
-      <button class="modal-close" onclick="closeContentModal()">✕</button>
+      <button class="modal-close" onclick="closeContentModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="grid-2">
@@ -345,10 +345,10 @@ async function loadData() {
 }
 
 const PLATFORM_INFO = {
-  google:   { name:'Google Ads',  icon:'🔍', color:'#ea4335' },
-  meta:     { name:'Meta Ads',    icon:'📘', color:'#1877f2' },
-  tiktok:   { name:'TikTok Ads',  icon:'🎵', color:'#000000' },
-  linkedin: { name:'LinkedIn Ads',icon:'💼', color:'#0a66c2' },
+  google:   { name:'Google Ads',  icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', color:'#ea4335' },
+  meta:     { name:'Meta Ads',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>', color:'#1877f2' },
+  tiktok:   { name:'TikTok Ads',  icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', color:'#000000' },
+  linkedin: { name:'LinkedIn Ads',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>', color:'#0a66c2' },
 };
 
 const STATUS_CAMP = {
@@ -358,10 +358,10 @@ const STATUS_CAMP = {
 };
 
 const STATUS_CONT = {
-  draft:     { label:'Rascunho',   cls:'badge-muted',   icon:'📝' },
-  revision:  { label:'Em revisão', cls:'badge-yellow',  icon:'👁' },
-  scheduled: { label:'Agendado',   cls:'badge-accent',  icon:'📅' },
-  published: { label:'Publicado',  cls:'badge-green',   icon:'✅' },
+  draft:     { label:'Rascunho',   cls:'badge-muted',   icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' },
+  revision:  { label:'Em revisão', cls:'badge-yellow',  icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' },
+  scheduled: { label:'Agendado',   cls:'badge-accent',  icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' },
+  published: { label:'Publicado',  cls:'badge-green',   icon:'OK' },
 };
 
 function switchTab(name, btn) {
@@ -471,11 +471,11 @@ function renderCampaigns() {
   const grid = document.getElementById('campaigns-grid');
   const vis  = (window.filterByCountry || (x=>x))(campaigns);
   if (!vis.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🚀</div><h3>Sem campanhas</h3><p>Adicione a primeira campanha.</p></div>`;
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/></svg></div><h3>Sem campanhas</h3><p>Adicione a primeira campanha.</p></div>`;
     return;
   }
   grid.innerHTML = vis.map(c => {
-    const pi = PLATFORM_INFO[c.platform] || { name:c.platform, icon:'📊', color:'#6366f1' };
+    const pi = PLATFORM_INFO[c.platform] || { name:c.platform, icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', color:'#6366f1' };
     const si = STATUS_CAMP[c.status] || { label:c.status, cls:'badge-muted' };
     const roas = c.spend > 0 ? ((c.leads * 500) / c.spend).toFixed(1) : '—'; // estimated
     const cpl  = c.leads > 0 ? fmt.currency(c.spend / c.leads) : '—';
@@ -525,7 +525,7 @@ function renderCampaigns() {
           </div>
         </div>
 
-        ${c.notes ? `<div class="text-muted text-sm mt-2" style="padding-top:10px;border-top:1px solid var(--border)">💬 ${c.notes}</div>` : ''}
+        ${c.notes ? `<div class="text-muted text-sm mt-2" style="padding-top:10px;border-top:1px solid var(--border)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> ${c.notes}</div>` : ''}
       </div>`;
   }).join('');
 }
@@ -534,7 +534,7 @@ function renderMetrics() {
   const vis = (window.filterByCountry || (x=>x))(campaigns);
   // Tabela
   document.getElementById('metrics-tbody').innerHTML = vis.map(c => {
-    const pi = PLATFORM_INFO[c.platform] || { icon:'📊' };
+    const pi = PLATFORM_INFO[c.platform] || { icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' };
     const cpl  = c.leads > 0 ? fmt.currency(c.spend/c.leads) : '—';
     const ctr  = c.impressions > 0 ? ((c.clicks/c.impressions)*100).toFixed(2)+'%' : '—';
     const roas = c.spend > 0 ? ((c.leads*500)/c.spend).toFixed(1)+'x' : '—';
@@ -559,7 +559,7 @@ function renderMetrics() {
   });
   const totalSpend = Object.values(platData).reduce((s,p)=>s+p.spend,0)||1;
   document.getElementById('platform-breakdown').innerHTML = Object.entries(platData).map(([key, val]) => {
-    const pi = PLATFORM_INFO[key]||{ icon:'📊', name:key };
+    const pi = PLATFORM_INFO[key]||{ icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', name:key };
     const pct = Math.round((val.spend/totalSpend)*100);
     return `<div style="margin-bottom:14px">
       <div class="flex items-center justify-between mb-1">
@@ -609,12 +609,12 @@ function filterContent() {
 function renderContent(items) {
   const grid = document.getElementById('content-grid');
   if (!items.length) {
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📅</div><h3>Sem conteúdo</h3></div>`;
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h3>Sem conteúdo</h3></div>`;
     return;
   }
   grid.innerHTML = items.map(c => {
-    const si = STATUS_CONT[c.status]||{ label:c.status, cls:'badge-muted', icon:'📝' };
-    const platformIcons = { Instagram:'📸', Facebook:'📘', LinkedIn:'💼', TikTok:'🎵' };
+    const si = STATUS_CONT[c.status]||{ label:c.status, cls:'badge-muted', icon:'·' };
+    const platformIcons = { Instagram:'IG', Facebook:'FB', LinkedIn:'IN', TikTok:'TK' };
     const isOverdue = c.status !== 'published' && c.date && new Date(c.date+'T23:59:59') < new Date();
     return `
       <div class="card" style="padding:16px;transition:all 0.18s;${isOverdue?'border-color:rgba(239,68,68,0.3)':''}"
@@ -622,7 +622,7 @@ function renderContent(items) {
         onmouseleave="this.style.transform='';this.style.boxShadow=''">
         <div class="flex items-center justify-between mb-2">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="font-size:16px">${platformIcons[c.platform]||'📱'}</span>
+            <span style="font-size:16px">${platformIcons[c.platform]||'·'}</span>
             <span style="font-size:11px;color:var(--text-muted);font-weight:600">${c.platform} · ${c.format}</span>
           </div>
           <span class="badge ${si.cls}">${si.label}</span>
@@ -631,7 +631,7 @@ function renderContent(items) {
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${c.client}</div>
         ${c.descricao ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;line-height:1.4">${c.descricao}</div>` : ''}
         <div style="font-size:11px;color:${isOverdue?'var(--red)':'var(--text-muted)'}">
-          📅 ${fmt.date(c.date)} ${fmt.relative(c.date) ? '· '+fmt.relative(c.date) : ''} ${isOverdue?'⚠️ Atrasado':''}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fmt.date(c.date)} ${fmt.relative(c.date) ? '· '+fmt.relative(c.date) : ''} ${isOverdue?'Atrasado!':''}
         </div>
       </div>`;
   }).join('');
@@ -681,12 +681,12 @@ async function saveCampaign() {
     const idx = campaigns.findIndex(c => c.id == id);
     if (idx >= 0) campaigns[idx] = { ...campaigns[idx], ...data };
     showToast('Campanha atualizada!', 'success');
-    logActivity({ icon:'📊', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
+    logActivity({ icon:''+CHART+'', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
   } else {
     const { data: ins } = await window.drSupabase.from('campaigns').insert({ ...data, spend:0, impressions:0, clicks:0, leads:0 }).select().single();
     campaigns.unshift(ins || { ...data, id: Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
     showToast('Campanha criada!', 'success');
-    logActivity({ icon:'📣', color:'#a855f7', msg:`Nova campanha criada — "${name}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
+    logActivity({ icon:'+', color:'#a855f7', msg:`Nova campanha criada — "${name}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
   }
   closeCampaignModal();
   updateKPIs(); renderCampaigns();
@@ -702,7 +702,7 @@ async function deleteCampaign() {
   campaigns = campaigns.filter(c => c.id != id);
   closeCampaignModal();
   showToast('Campanha excluída.', 'info');
-  if (camp) logActivity({ icon:'🗑️', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
+  if (camp) logActivity({ icon:'×', color:'#ef4444', msg:`Campanha "${camp.name}" removida`, sector:'trafego' });
   updateKPIs(); renderCampaigns();
 }
 
@@ -720,7 +720,7 @@ async function saveContent() {
   contents.unshift(ins || { ...data, id: Date.now() });
   closeContentModal();
   showToast('Conteúdo adicionado!', 'success');
-  logActivity({ icon:'🎬', color:'#a855f7', msg:`Novo conteúdo programado — "${title}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
+  logActivity({ icon:'▶', color:'#a855f7', msg:`Novo conteúdo programado — "${title}"${data.platform ? ' no '+data.platform : ''}`, sector:'trafego' });
   filterContent();
 }
 
@@ -781,7 +781,7 @@ function renderMetaCampaigns() {
   const filtered = filter ? metaData.filter(c => c.status === filter) : metaData;
 
   if (!filtered.length) {
-    document.getElementById('meta-campaigns').innerHTML = `<div class="empty-state"><div class="empty-icon">📣</div><h3>Nenhuma campanha</h3></div>`;
+    document.getElementById('meta-campaigns').innerHTML = `<div class="empty-state"><div class="empty-icon">+</div><h3>Nenhuma campanha</h3></div>`;
     return;
   }
 

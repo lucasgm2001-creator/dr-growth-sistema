@@ -21,16 +21,16 @@
 
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Configurações</h1>
       <p>Controle de acesso e permissões</p>
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
       </div>
     </div>
   </header>
@@ -40,7 +40,7 @@
     <!-- Aviso admin only -->
     <div id="access-denied" style="display:none">
       <div class="empty-state" style="padding:80px 24px">
-        <div class="empty-icon" style="font-size:48px">🔒</div>
+        <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         <h3 style="font-size:18px;margin-bottom:8px">Acesso restrito</h3>
         <p>Esta área é exclusiva para administradores.</p>
         <button class="btn btn-primary mt-4" onclick="location.href='hall.html'">Voltar ao Hall</button>
@@ -52,16 +52,16 @@
       <!-- Tabs -->
       <div class="sector-header">
         <div class="sector-title">
-          <div class="sector-icon" style="background:rgba(99,102,241,0.15)">🔑</div>
+          <div class="sector-icon" style="background:rgba(99,102,241,0.15)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg></div>
           <div>
             <div class="sector-name" style="color:#6366f1">Configurações</div>
             <div class="text-muted">Acesso ao sistema · Gerenciamento de usuários</div>
           </div>
         </div>
         <div class="sector-tabs" style="--tab-color:#6366f1">
-          <button class="sector-tab active" onclick="switchTab('acesso', this)">🔐 Controle de Acesso</button>
-          <button class="sector-tab" onclick="switchTab('usuarios', this)">👥 Usuários</button>
-          <button class="sector-tab" onclick="switchTab('sistema', this)">⚙ Sistema</button>
+          <button class="sector-tab active" onclick="switchTab('acesso', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Controle de Acesso</button>
+          <button class="sector-tab" onclick="switchTab('usuarios', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> Usuários</button>
+          <button class="sector-tab" onclick="switchTab('sistema', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Sistema</button>
         </div>
       </div>
 
@@ -111,7 +111,7 @@
               </p>
               <button class="btn btn-secondary w-full" onclick="runSeed()">Inserir Dados Demo no Supabase</button>
               <div class="mt-3">
-                <p style="font-size:12px;color:var(--text-muted)">⚠️ Execute apenas uma vez. Requer Supabase configurado.</p>
+                <p style="font-size:12px;color:var(--text-muted)">Atenção: Execute apenas uma vez. Requer Supabase configurado.</p>
               </div>
             </div>
           </div>
@@ -124,8 +124,8 @@
               Limpa avisos do mural, permissões customizadas e sessão atual armazenados localmente.
             </p>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="btn btn-secondary btn-sm" onclick="clearAvisos()">🗑 Limpar Mural</button>
-              <button class="btn btn-secondary btn-sm" onclick="clearPermissions()">🔓 Resetar Permissões</button>
+              <button class="btn btn-secondary btn-sm" onclick="clearAvisos()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg> Limpar Mural</button>
+              <button class="btn btn-secondary btn-sm" onclick="clearPermissions()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg> Resetar Permissões</button>
               <button class="btn btn-danger btn-sm" onclick="if(confirm('Fazer logout?')) AUTH.logout()">⎋ Logout</button>
             </div>
           </div>
@@ -141,7 +141,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3>Convidar Usuário</h3>
-      <button class="modal-close" onclick="closeUserModal()">✕</button>
+      <button class="modal-close" onclick="closeUserModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="u-name" placeholder="Nome completo"></div>
@@ -157,7 +157,7 @@
       </div>
       <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;margin-top:4px">
         <p style="font-size:12px;color:var(--text-muted)">
-          💡 Em produção com Supabase, o convite será enviado por e-mail. No modo demo, adicione o usuário ao array <code>demoUsers</code> em <code>auth.js</code>.
+          Em produção com Supabase, o convite será enviado por e-mail. No modo demo, adicione o usuário ao array <code>demoUsers</code> em <code>auth.js</code>.
         </p>
       </div>
     </div>
@@ -227,7 +227,7 @@ function renderPermissions() {
         </div>
 
         <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" onclick="savePerm('${user.email}')">💾 Salvar permissões</button>
+          <button class="btn btn-primary btn-sm" onclick="savePerm('${user.email}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar permissões</button>
           ${custom ? `<button class="btn btn-ghost btn-sm" onclick="resetPerm('${user.email}')">↩ Restaurar padrão</button>` : ''}
         </div>
       </div>`;
@@ -287,13 +287,13 @@ function renderUsers() {
       <div class="task-content">
         <div class="task-title">${u.name}</div>
         <div class="task-meta">
-          <span>✉ ${u.email}</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> ${u.email}</span>
           <span class="badge badge-accent">${AUTH.roleLabels[u.role] || u.role}</span>
           ${u.role === 'admin' ? '<span class="badge badge-green">Admin</span>' : ''}
         </div>
       </div>
       <div style="font-size:11px;color:var(--text-muted)">
-        ${AUTH.getCustomPermissions(u.email) ? '🔧 Permissões customizadas' : '📋 Padrão da função'}
+        ${AUTH.getCustomPermissions(u.email) ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg> Permissões customizadas' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg> Padrão da função'}
       </div>
     </div>`).join('');
 }
@@ -308,7 +308,7 @@ function renderSystemInfo() {
         { label:'Usuário atual', value:session?.name || '—' },
         { label:'Role',         value:AUTH.roleLabels[session?.role] || session?.role },
         { label:'Login em',     value:session?.loginAt ? new Date(session.loginAt).toLocaleString('pt-BR') : '—' },
-        { label:'Supabase',     value:window.drSupabase ? '✅ Conectado' : '⚠️ Modo demo (sem Supabase)' },
+        { label:'Supabase',     value:window.drSupabase ? 'Conectado' : 'Modo demo (sem Supabase)' },
         { label:'Avisos no mural', value:`${JSON.parse(localStorage.getItem('drg_avisos')||'[]').length} aviso(s)` },
       ].map(item => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">

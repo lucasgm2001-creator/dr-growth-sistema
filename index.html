@@ -188,7 +188,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3>Criar Conta</h3>
-        <button class="modal-close" onclick="closeCreateModal()">✕</button>
+        <button class="modal-close" onclick="closeCreateModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-msg error"   id="create-error"></div>
       <div class="modal-msg success" id="create-success"></div>
@@ -249,7 +249,7 @@
         btn.textContent = 'Entrar no Sistema';
         return;
       }
-      btn.textContent = '✓ Bem-vindo, ' + user.name.split(' ')[0] + '!';
+      btn.textContent = 'Bem-vindo, ' + user.name.split(' ')[0] + '!';
       setTimeout(() => { window.location.href = 'hall.html'; }, 400);
     }
 
@@ -274,7 +274,7 @@
         btn.textContent = 'Entrar no Sistema';
         return;
       }
-      btn.textContent = '✓ Bem-vindo, ' + user.name.split(' ')[0] + '!';
+      btn.textContent = 'Bem-vindo, ' + user.name.split(' ')[0] + '!';
       setTimeout(() => { window.location.href = 'hall.html'; }, 400);
     });
 
@@ -317,7 +317,7 @@
 
       succEl.textContent = 'Conta criada! Verifique seu e-mail para confirmar o acesso.';
       succEl.classList.add('show');
-      btn.textContent = '✓ Conta criada!';
+      btn.textContent = 'Conta criada!';
       setTimeout(closeCreateModal, 3500);
     });
   </script>

@@ -21,16 +21,16 @@
 
 <div class="main-content">
   <header class="topbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menu-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <div class="topbar-title">
       <h1>Financeiro</h1>
       <p id="fin-subtitle">MRR, contratos e recebimentos</p>
     </div>
     <div class="topbar-actions">
       <div class="clock-row">
-        <div class="clock-item"><span class="clock-tz">🇧🇷 BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">BR</span><span class="clock-time" id="clock-br">--:--:--</span></div>
         <div class="clock-divider"></div>
-        <div class="clock-item"><span class="clock-tz">🇺🇸 ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
+        <div class="clock-item"><span class="clock-tz">ET</span><span class="clock-time" id="clock-us">--:--:--</span></div>
       </div>
       <button class="btn btn-primary btn-sm" id="main-action-btn" onclick="openModal()">+ Lançamento</button>
     </div>
@@ -40,19 +40,19 @@
 
     <div class="sector-header">
       <div class="sector-title">
-        <div class="sector-icon" style="background:rgba(34,197,94,0.15)">💰</div>
+        <div class="sector-icon" style="background:rgba(34,197,94,0.15)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
         <div>
           <div class="sector-name" style="color:#22c55e">Financeiro</div>
           <div class="text-muted">Andar 03 · MRR, Contratos & Recebimentos</div>
         </div>
       </div>
       <div class="sector-tabs" style="--tab-color:#22c55e">
-        <button class="sector-tab active" onclick="switchTab('visao', this)">📊 Visão Geral</button>
-        <button class="sector-tab" onclick="switchTab('receber', this)">📋 Contas a Receber</button>
-        <button class="sector-tab" onclick="switchTab('contratos', this)">📝 Contratos</button>
-        <button class="sector-tab" onclick="switchTab('despesas', this)">💸 Despesas</button>
-        <button class="sector-tab" onclick="switchTab('balanco', this)">⚖️ Balanço</button>
-        <button class="sector-tab" onclick="switchTab('resultado', this)">📈 Resultado</button>
+        <button class="sector-tab active" onclick="switchTab('visao', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Visão Geral</button>
+        <button class="sector-tab" onclick="switchTab('receber', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg> Contas a Receber</button>
+        <button class="sector-tab" onclick="switchTab('contratos', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Contratos</button>
+        <button class="sector-tab" onclick="switchTab('despesas', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Despesas</button>
+        <button class="sector-tab" onclick="switchTab('balanco', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Balanço</button>
+        <button class="sector-tab" onclick="switchTab('resultado', this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Resultado</button>
       </div>
     </div>
 
@@ -64,7 +64,7 @@
 
       <!-- Alerta de atraso -->
       <div id="overdue-alert" style="display:none" class="overdue-alert animate-in">
-        <div class="overdue-alert-icon">⚠️</div>
+        <div class="overdue-alert-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         <div class="overdue-alert-text">
           <strong id="overdue-msg"></strong>
           <span id="overdue-detail"></span>
@@ -110,7 +110,7 @@
     <div class="tab-panel" id="tab-receber">
       <div class="filter-bar animate-in" style="margin-top:4px">
         <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
           <input type="text" id="search-pay" placeholder="Buscar cliente…" oninput="filterPayments()">
         </div>
         <select class="filter-select" id="filter-status" onchange="filterPayments()">
@@ -135,7 +135,7 @@
 
       <!-- Explicação contrato em risco -->
       <div class="overdue-alert animate-in" style="display:flex;margin-bottom:16px;background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.25)">
-        <div class="overdue-alert-icon">⚠️</div>
+        <div class="overdue-alert-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
         <div class="overdue-alert-text">
           <strong>O que é contrato em risco?</strong>
           <span>Contratos marcados como "Em risco" indicam clientes com pagamentos atrasados, baixo engajamento ou saúde "vermelha". Requerem ação imediata para evitar churn.</span>
@@ -221,7 +221,7 @@
           <!-- Ativo -->
           <div class="card">
             <div class="card-header" style="background:rgba(34,197,94,0.06);border-bottom:2px solid rgba(34,197,94,0.2)">
-              <span class="card-title" style="color:var(--green)">⬆ ATIVO</span>
+              <span class="card-title" style="color:var(--green)">&uarr; ATIVO</span>
               <span class="text-muted text-sm" id="ativo-total">—</span>
             </div>
             <div class="card-body">
@@ -240,14 +240,14 @@
           <div>
             <div class="card mb-3">
               <div class="card-header" style="background:rgba(239,68,68,0.06);border-bottom:2px solid rgba(239,68,68,0.2)">
-                <span class="card-title" style="color:var(--red)">⬇ PASSIVO</span>
+                <span class="card-title" style="color:var(--red)">&darr; PASSIVO</span>
                 <span class="text-muted text-sm" id="passivo-total">—</span>
               </div>
               <div class="card-body" id="passivo-body"></div>
             </div>
             <div class="card">
               <div class="card-header" style="background:rgba(99,102,241,0.06);border-bottom:2px solid rgba(99,102,241,0.2)">
-                <span class="card-title" style="color:var(--accent)">💎 PATRIMÔNIO LÍQUIDO</span>
+                <span class="card-title" style="color:var(--accent)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> PATRIMÔNIO LÍQUIDO</span>
                 <span class="text-muted text-sm" id="pl-total">—</span>
               </div>
               <div class="card-body" id="pl-body"></div>
@@ -319,7 +319,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="despesa-modal-title">Nova Despesa</h3>
-      <button class="modal-close" onclick="closeDespesaModal()">✕</button>
+      <button class="modal-close" onclick="closeDespesaModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="desp-id">
@@ -361,7 +361,7 @@
   <div class="modal">
     <div class="modal-header">
       <h3 id="modal-title">Novo Lançamento</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <button class="modal-close" onclick="closeModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pay-id">
@@ -525,7 +525,7 @@ function renderPaymentsTable(payments) {
     return (o[a.status]||1)-(o[b.status]||1) || (a.due_date||'').localeCompare(b.due_date||'');
   });
   if (!sorted.length) {
-    document.getElementById('payments-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💰</div><h3>Sem lançamentos</h3></div></td></tr>`;
+    document.getElementById('payments-tbody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><h3>Sem lançamentos</h3></div></td></tr>`;
     return;
   }
   document.getElementById('payments-tbody').innerHTML = sorted.map(p => {
@@ -538,8 +538,8 @@ function renderPaymentsTable(payments) {
       <td>${p.paid_date ? fmt.date(p.paid_date) : '<span style="color:var(--text-muted)">—</span>'}</td>
       <td><span class="badge ${si.cls}">${si.label}</span></td>
       <td style="display:flex;gap:6px">
-        ${p.status!=='paid' ? `<button class="btn btn-secondary btn-sm" onclick="markPaid(${p.id})">✓ Pago</button>` : ''}
-        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})">✏️</button>
+        ${p.status!=='paid' ? `<button class="btn btn-secondary btn-sm" onclick="markPaid(${p.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Pago</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(${p.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       </td>
     </tr>`;
   }).join('');
@@ -575,7 +575,7 @@ function renderContracts() {
         </div>
         <div style="display:flex;gap:6px;margin-bottom:12px">
           <span class="badge badge-muted" style="font-size:10px">${c.service}</span>
-          <span class="badge ${planColor[plano]}" style="font-size:10px">📦 ${plano}</span>
+          <span class="badge ${planColor[plano]}" style="font-size:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> ${plano}</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
@@ -599,7 +599,7 @@ function renderContracts() {
         </div>
         ${renewLabel}
       </div>`;
-  }).join('') || `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📝</div><h3>Nenhum contrato encontrado</h3></div>`;
+  }).join('') || `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><h3>Nenhum contrato encontrado</h3></div>`;
 }
 
 async function markPaid(id) {
@@ -651,13 +651,13 @@ async function savePayment() {
     const idx = allPayments.findIndex(p => p.id==id);
     if (idx>=0) allPayments[idx] = { ...allPayments[idx], ...data };
     showToast('Lançamento atualizado!', 'success');
-    logActivity({ icon:'💰', color:'#22c55e', msg:`Lançamento de ${client} atualizado`, sector:'financeiro' });
+    logActivity({ icon:'+', color:'#22c55e', msg:`Lançamento de ${client} atualizado`, sector:'financeiro' });
   } else {
     data.created_at = new Date().toISOString();
     if (window.drSupabase) { const { data:ins } = await window.drSupabase.from('payments').insert(data).select().single(); if (ins) allPayments.unshift(ins); else allPayments.unshift({ ...data, id:Date.now() }); }
     else allPayments.unshift({ ...data, id:Date.now() });
     showToast('Lançamento criado!', 'success');
-    logActivity({ icon:'💰', color:'#22c55e', msg:`Recebimento registrado — ${client} · ${fmt.currency(amount)}`, sector:'financeiro' });
+    logActivity({ icon:'+', color:'#22c55e', msg:`Recebimento registrado — ${client} · ${fmt.currency(amount)}`, sector:'financeiro' });
   }
   closeModal(); updateKPIs(); filterPayments();
 }
@@ -709,9 +709,9 @@ function renderDespesasUI() {
       <td style="font-weight:700;color:var(--red)">${fmt.currency(d.valor)}</td>
       <td>${fmt.date(d.data)}</td>
       <td><span class="badge ${d.status==='paid'?'badge-green':'badge-yellow'}">${d.status==='paid'?'Pago':'A pagar'}</span></td>
-      <td><button class="btn btn-ghost btn-sm" onclick="openEditDespesa(${d.id})">✏️</button></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openEditDespesa(${d.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></td>
     </tr>`;
-  }).join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">💸</div><h3>Sem despesas</h3></div></td></tr>`;
+  }).join('') || `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><h3>Sem despesas</h3></div></td></tr>`;
   document.getElementById('despesas-tbody').innerHTML = rows;
 }
 
@@ -754,12 +754,12 @@ async function saveDespesa() {
     const idx = allDespesas.findIndex(d => d.id == id);
     if (idx >= 0) allDespesas[idx] = { ...allDespesas[idx], ...data };
     showToast('Despesa atualizada!', 'success');
-    logActivity({ icon:'💸', color:'#ef4444', msg:`Despesa "${descricao}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
+    logActivity({ icon:'-', color:'#ef4444', msg:`Despesa "${descricao}" atualizada · ${fmt.currency(valor)}`, sector:'financeiro' });
   } else {
     const { data: ins } = await window.drSupabase.from('expenses').insert(data).select().single();
     allDespesas.unshift(ins || { ...data, id: Date.now() });
     showToast('Despesa criada!', 'success');
-    logActivity({ icon:'💸', color:'#ef4444', msg:`Nova despesa lançada — "${descricao}" · ${fmt.currency(valor)}`, sector:'financeiro' });
+    logActivity({ icon:'-', color:'#ef4444', msg:`Nova despesa lançada — "${descricao}" · ${fmt.currency(valor)}`, sector:'financeiro' });
   }
   closeDespesaModal();
   renderDespesasUI();
@@ -821,8 +821,8 @@ function renderBalanco() {
 
   const balanced = Math.abs(totalAtivo - (totalPassivo + pl)) < 1;
   document.getElementById('balanco-check').innerHTML = balanced
-    ? `<span style="color:var(--green)">✓ Balanço conferido (Ativo = ${fmt.currency(totalAtivo)})</span>`
-    : `<span style="color:var(--red)">⚠ Divergência detectada</span>`;
+    ? `<span style="color:var(--green)">&#10003; Balanço conferido (Ativo = ${fmt.currency(totalAtivo)})</span>`
+    : `<span style="color:var(--red)">&#9888; Divergência detectada</span>`;
 }
 
 // ---- RESULTADO ----
