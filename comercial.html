@@ -1613,8 +1613,7 @@ async function saveLead() {
     const nichoCustom = document.getElementById('lead-nicho-custom').value.trim();
     const nicho = nichoSel === 'outros' ? nichoCustom : nichoSel;
     const stage = document.getElementById('lead-stage').value;
-    if (!name) { showToast('Nome é obrigatório.', 'error'); return; }
-    if (nichoSel === 'outros' && !nicho) { showToast('Descreva o nicho em "Outros".', 'error'); return; }
+
     const data = {
       name, nicho, stage,
       region:      (document.getElementById('lead-region')      || {}).value?.trim() || '',
