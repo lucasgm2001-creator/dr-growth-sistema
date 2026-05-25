@@ -1862,11 +1862,17 @@ async function salvarInteracao() {
     type,
     created_at: new Date().toISOString(),
   };
-  if (!history[id]) history[id] = [];
-  history[id].push(entry);
+  if (window.drSupabase) {
+    const { data: inserted, error } = await window.drSupabase.from('lead_history').insert(entry).select().single();
+    if (error) { showToast('Erro ao salvar interação: ' + error.message, 'error'); return; }
+    if (!history[id]) history[id] = [];
+    history[id].push(inserted);
+  } else {
+    if (!history[id]) history[id] = [];
+    history[id].push(entry);
+  }
   leadState.history = history[id];
   window.DRCache?.clear('comercial');
-  if (window.drSupabase) window.drSupabase.from('lead_history').insert(entry).catch(() => {});
   document.getElementById('ld-note-text').value = '';
   renderLeadDailyPanel();
   showToast('Interação registrada!', 'success');
