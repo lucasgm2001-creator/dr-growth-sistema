@@ -865,22 +865,26 @@ tbody td {
    ============================================ */
 .kanban-board {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 16px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 8px;
+}
+
+.kanban-row {
+  display: flex;
+  gap: 10px;
 }
 
 .kanban-col {
-  min-width: 260px;
-  width: 260px;
+  flex: 1;
+  min-width: 0;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 160px);
+  max-height: calc((100vh - 310px) / 2);
+  min-height: 140px;
 }
 
 .kanban-col-header {
