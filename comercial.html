@@ -1645,10 +1645,8 @@ async function saveLead() {
     } else {
       data.created_at = new Date().toISOString();
       if (window.drSupabase) {
-        const { data: rows, error } = await window.drSupabase.from('leads').insert(data).select('id');
+        const { data: inserted, error } = await window.drSupabase.from('leads').insert(data).select().single();
         if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
-        const newId = rows?.[0]?.id ?? Date.now();
-        const inserted = { ...data, id: newId };
         leads.unshift(inserted);
         closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
         SFX.newLead();
