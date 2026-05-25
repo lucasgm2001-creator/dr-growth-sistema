@@ -6,6 +6,48 @@
   <title>Comercial — DR Growth</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+/* ---- Diário do Lead ---- */
+.lead-daily-overlay{position:fixed;inset:0;background:rgba(14,20,40,.52);backdrop-filter:blur(4px);z-index:1100;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.lead-daily-overlay.active{opacity:1;pointer-events:all}
+.lead-daily-panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100vw);background:var(--bg-secondary);box-shadow:-8px 0 40px rgba(0,0,0,.18);overflow-y:auto;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);z-index:1101;display:flex;flex-direction:column}
+.lead-daily-overlay.active .lead-daily-panel{transform:translateX(0)}
+.ld-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg-secondary);z-index:10}
+.ld-header-top{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.ld-back-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);padding:4px 0;background:none;border:none;cursor:pointer;transition:color .15s}
+.ld-back-btn:hover{color:var(--accent)}
+.ld-lead-row{display:flex;align-items:center;gap:14px}
+.ld-lead-meta{flex:1;min-width:0}
+.ld-lead-name{font-size:16px;font-weight:700;color:var(--text-primary);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ld-lead-company{font-size:12px;color:var(--text-muted);margin-top:2px}
+.ld-temp-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;border:1px solid currentColor;white-space:nowrap;flex-shrink:0}
+.ld-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 22px;border-bottom:1px solid var(--border)}
+.ld-stat{background:var(--bg-tertiary);border-radius:var(--radius-md);padding:11px 8px;text-align:center}
+.ld-stat-value{font-size:20px;font-weight:800;color:var(--accent);line-height:1}
+.ld-stat-label{font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.3}
+.ld-next-step{margin:12px 22px;padding:10px 14px;border-radius:var(--radius-md);background:var(--accent-dim);border-left:3px solid var(--accent);font-size:12px;color:var(--accent);font-weight:500;line-height:1.5}
+.ld-section{padding:14px 22px;border-bottom:1px solid var(--border)}
+.ld-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:10px}
+.ld-contact-types{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.ld-type-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);color:var(--text-secondary);background:none;cursor:pointer;transition:all .15s}
+.ld-type-btn:hover,.ld-type-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.ld-type-btn.active{font-weight:700}
+.ld-textarea{width:100%;min-height:74px;resize:vertical;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:13px;color:var(--text-primary);background:var(--bg-primary);font-family:inherit;margin-bottom:9px;transition:border-color .15s}
+.ld-textarea:focus{outline:none;border-color:var(--accent);background:var(--bg-secondary)}
+.ld-actions{display:flex;gap:8px}
+.ld-ai-loading{padding:14px 22px;display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:13px}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
+.ld-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:ldSpin .7s linear infinite;flex-shrink:0}
+.ld-ai-result{margin:0 22px 12px;padding:14px;border-radius:var(--radius-md);background:linear-gradient(135deg,rgba(36,76,156,.06),rgba(124,58,237,.06));border:1px solid var(--accent-glow)}
+.ld-ai-result-header{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.ld-ai-result-text{font-size:13px;color:var(--text-secondary);line-height:1.65;white-space:pre-line}
+.ld-tl-item{display:flex;gap:12px;padding-bottom:14px;position:relative}
+.ld-tl-item:not(:last-child)::before{content:'';position:absolute;left:15px;top:30px;bottom:0;width:1px;background:var(--border)}
+.ld-tl-icon{width:30px;height:30px;border-radius:50%;background:var(--bg-tertiary);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ld-tl-body{flex:1;min-width:0;padding-top:4px}
+.ld-tl-meta{font-size:11px;color:var(--text-muted);margin-bottom:2px}
+.ld-tl-text{font-size:13px;color:var(--text-secondary);line-height:1.5}
+  </style>
 </head>
 <body>
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
