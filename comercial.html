@@ -409,6 +409,113 @@
   </div>
 </div>
 
+<!-- DIÁRIO DO LEAD -->
+<div class="lead-daily-overlay" id="lead-daily-overlay" onclick="closeLeadDailyOnOverlay(event)">
+  <div class="lead-daily-panel">
+    <!-- Header -->
+    <div class="ld-header">
+      <div class="ld-header-top">
+        <button class="ld-back-btn" onclick="closeLeadDaily()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Voltar
+        </button>
+        <div style="flex:1"></div>
+        <button class="btn btn-ghost btn-sm" onclick="openEditModal(leadState.id)" style="gap:5px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Editar
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="markLeadAsClient()" style="gap:5px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+          Fechar como Cliente
+        </button>
+      </div>
+      <div class="ld-lead-row">
+        <div class="avatar avatar-lg" id="ld-avatar"></div>
+        <div class="ld-lead-meta">
+          <div class="ld-lead-name" id="ld-name">—</div>
+          <div class="ld-lead-company" id="ld-company">—</div>
+        </div>
+        <span class="ld-temp-badge" id="ld-temp"></span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="ld-stats-row">
+      <div class="ld-stat">
+        <div class="ld-stat-value" id="ld-stat-total">0</div>
+        <div class="ld-stat-label">Contatos</div>
+      </div>
+      <div class="ld-stat">
+        <div class="ld-stat-value" id="ld-stat-ans" style="color:var(--green)">0</div>
+        <div class="ld-stat-label">Atendidas</div>
+      </div>
+      <div class="ld-stat">
+        <div class="ld-stat-value" id="ld-stat-noans" style="color:var(--red)">0</div>
+        <div class="ld-stat-label">Não Atendeu</div>
+      </div>
+      <div class="ld-stat">
+        <div class="ld-stat-value" id="ld-stat-ai" style="color:var(--purple)">0</div>
+        <div class="ld-stat-label">Ciclos IA</div>
+      </div>
+    </div>
+
+    <!-- Next Step -->
+    <div class="ld-next-step" id="ld-next-step"></div>
+
+    <!-- Register Contact -->
+    <div class="ld-section">
+      <div class="ld-section-title">Registrar Contato</div>
+      <div class="ld-contact-types">
+        <button class="ld-type-btn active" data-type="ligacao_atendida" onclick="selectContactType('ligacao_atendida',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81 19.79 19.79 0 01-.07.12 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/><polyline points="16 2 18 4 22 0"/></svg>
+          Atendeu
+        </button>
+        <button class="ld-type-btn" data-type="ligacao_nao_atendida" onclick="selectContactType('ligacao_nao_atendida',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9a2 2 0 01-.45 2.11L7.27 12.4a16 16 0 006.33 6.33l1.28-1.28A2 2 0 0117 17c.907.339 1.85.573 2.81.7A2 2 0 0122 19.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0111.19 22a19.5 19.5 0 01-7.38-7.38A19.79 19.79 0 01.89 5.82 2 2 0 012.9 3.66h3A2 2 0 017.62 5.6c.127.96.361 1.903.7 2.81A2 2 0 017.87 10.5"/></svg>
+          Não Atendeu
+        </button>
+        <button class="ld-type-btn" data-type="mensagem" onclick="selectContactType('mensagem',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Mensagem
+        </button>
+        <button class="ld-type-btn" data-type="nota" onclick="selectContactType('nota',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Nota
+        </button>
+      </div>
+      <textarea class="ld-textarea" id="ld-note-text" placeholder="Descreva o que aconteceu neste contato…"></textarea>
+      <div class="ld-actions">
+        <button class="btn btn-secondary btn-sm" onclick="analisarComIA()" style="gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Analisar com IA
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="salvarInteracao()" style="flex:1">Salvar</button>
+      </div>
+    </div>
+
+    <!-- AI Loading -->
+    <div class="ld-ai-loading" id="ld-ai-loading" style="display:none">
+      <div class="ld-spinner"></div>
+      Analisando lead com IA…
+    </div>
+
+    <!-- AI Result -->
+    <div class="ld-ai-result" id="ld-ai-result" style="display:none">
+      <div class="ld-ai-result-header">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Análise da IA
+      </div>
+      <div class="ld-ai-result-text" id="ld-ai-result-text"></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="ld-section" style="border-bottom:none">
+      <div class="ld-section-title">Histórico de Interações</div>
+      <div id="ld-timeline"></div>
+    </div>
+  </div>
+</div>
+
 <script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script>
