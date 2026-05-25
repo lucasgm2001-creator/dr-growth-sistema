@@ -440,8 +440,16 @@ function startClocks() {
     const now = new Date();
     const elBR = document.getElementById('clock-br');
     const elUS = document.getElementById('clock-us');
-    if (elBR) elBR.textContent = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    if (elUS) elUS.textContent = now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    if (elBR) {
+      const time = now.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const date = now.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
+      elBR.innerHTML = `${time}<span style="opacity:.55;font-size:.85em;margin-left:5px">${date}</span>`;
+    }
+    if (elUS) {
+      const time = now.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      const date = now.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: '2-digit', day: '2-digit' });
+      elUS.innerHTML = `${time}<span style="opacity:.55;font-size:.85em;margin-left:5px">${date}</span>`;
+    }
   }
   update();
   setInterval(update, 1000);
