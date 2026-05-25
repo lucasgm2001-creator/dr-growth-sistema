@@ -361,9 +361,9 @@ function switchTab(name, btn) {
   btn.classList.add('active');
   const mb = document.getElementById('main-btn');
   if (name==='clientes') { mb.textContent='+ Cliente'; mb.onclick=openClientModal; mb.style.display=''; }
-  else if (name==='tarefas') { mb.style.display='none'; }
   else { mb.style.display='none'; }
   if (name==='relatorio') renderRelatorio();
+  if (name==='mapa') setTimeout(renderMap, 50);
 }
 
 async function loadData() {
