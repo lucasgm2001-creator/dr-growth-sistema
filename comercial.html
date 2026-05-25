@@ -1604,7 +1604,7 @@ function openEditModal(id) {
 
 function closeModal() { document.getElementById('lead-modal').classList.remove('show'); }
 
-function saveLead() {
+async function saveLead() {
   try {
     const id = document.getElementById('lead-id').value;
     const name = document.getElementById('lead-name').value.trim();
@@ -1630,6 +1630,10 @@ function saveLead() {
     };
 
     if (id) {
+      if (window.drSupabase) {
+        const { error } = await window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id);
+        if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+      }
       const idx = leads.findIndex(l => l.id == id);
       const oldStage = idx >= 0 ? leads[idx].stage : null;
       if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
@@ -1637,19 +1641,28 @@ function saveLead() {
       showToast('Lead atualizado!', 'success');
       logActivity({ icon:'/', color:'#9898b0', msg:`Lead ${name} atualizado`, sector:'comercial' });
       window.DRCache?.clear('comercial');
-    if (window.drSupabase) window.drSupabase.from('leads').update({ ...data, updated_at: new Date().toISOString() }).eq('id', id).then().catch(e => console.warn('Supabase:', e.message));
       if (data.stage === 'fechado' && oldStage !== 'fechado') { autoCreateClient(leads.find(l=>l.id==id)||data); openCommissionModal(Number(id)); }
     } else {
       data.created_at = new Date().toISOString();
-      data.id = Date.now();
-      leads.unshift(data);
-      closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
-      SFX.newLead();
-      showToast('Novo lead adicionado!', 'success');
-      logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
-      window.DRCache?.clear('comercial');
-      if (window.drSupabase) window.drSupabase.from('leads').insert(data).then().catch(e => console.warn('Supabase:', e.message));
-      if (data.stage === 'fechado') openCommissionModal(data.id);
+      if (window.drSupabase) {
+        const { data: inserted, error } = await window.drSupabase.from('leads').insert(data).select().single();
+        if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+        leads.unshift(inserted);
+        closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+        SFX.newLead();
+        showToast('Novo lead adicionado!', 'success');
+        logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
+        window.DRCache?.clear('comercial');
+        if (data.stage === 'fechado') openCommissionModal(inserted.id);
+      } else {
+        data.id = Date.now();
+        leads.unshift(data);
+        closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
+        SFX.newLead();
+        showToast('Novo lead adicionado!', 'success');
+        logActivity({ icon:'◎', color:'#f97316', msg:`Novo lead captado — ${name}${nicho ? ' ('+nicho+')' : ''}`, sector:'comercial' });
+        if (data.stage === 'fechado') openCommissionModal(data.id);
+      }
     }
   } catch (err) {
     console.error('saveLead erro:', err);
