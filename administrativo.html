@@ -167,6 +167,25 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-top:16px" id="clients-grid" class="animate-in"></div>
     </div>
 
+    <!-- TAB: Mapa de Clientes -->
+    <div class="tab-panel" id="tab-mapa">
+      <div class="map-wrapper animate-in">
+        <div id="map-container"></div>
+        <div class="map-kpi-bar" id="map-kpi-bar"></div>
+        <div class="map-legend">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="map-legend-dot" style="background:#22c55e;box-shadow:0 0 6px #22c55e"></div> Saudável
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="map-legend-dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0b"></div> Atenção
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="map-legend-dot" style="background:#ef4444;box-shadow:0 0 6px #ef4444"></div> Em Risco
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TAB: Tarefas -->
     <div class="tab-panel" id="tab-tarefas">
       <!-- KPIs tarefas -->
