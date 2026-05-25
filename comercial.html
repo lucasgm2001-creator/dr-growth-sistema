@@ -954,29 +954,35 @@ function renderMetrics() {
 }
 
 // ---- Kanban ----
+function buildKanbanCol(stage, visible) {
+  const stageLeads = visible.filter(l => l.stage === stage.key);
+  const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
+  return `
+    <div class="kanban-col">
+      <div class="kanban-col-header">
+        <div class="col-dot" style="background:${stage.color}"></div>
+        <span class="col-title">${stage.label}</span>
+        <span class="col-count">${stageLeads.length}</span>
+      </div>
+      ${stage.key !== 'perdido' ? `<div style="padding:5px 10px 2px;font-size:11px;font-weight:600;color:var(--text-muted)">${fmt.currency(stageValue)}</div>` : ''}
+      <div class="kanban-cards" id="cards-${stage.key}"
+        ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${stage.key}')">
+        ${stageLeads.map(l => buildCard(l)).join('') || `<div style="text-align:center;font-size:11px;color:var(--text-muted);opacity:0.4;padding:10px">Arraste aqui</div>`}
+      </div>
+      <div style="padding:6px 8px 8px">
+        <button class="btn btn-ghost btn-sm w-full" onclick="openNewLeadModal('${stage.key}')">+ Adicionar</button>
+      </div>
+    </div>`;
+}
+
 function renderKanban() {
   const board = document.getElementById('kanban-board');
   const visible = (window.filterByCountry || (x=>x))(leads);
-  board.innerHTML = STAGES.map(stage => {
-    const stageLeads = visible.filter(l => l.stage === stage.key);
-    const stageValue = stageLeads.reduce((s,l) => s + (Number(l.value)||0), 0);
-    return `
-      <div class="kanban-col">
-        <div class="kanban-col-header">
-          <div class="col-dot" style="background:${stage.color}"></div>
-          <span class="col-title">${stage.label}</span>
-          <span class="col-count">${stageLeads.length}</span>
-        </div>
-        ${stage.key !== 'perdido' ? `<div style="padding:5px 10px 2px;font-size:11px;font-weight:600;color:var(--text-muted)">${fmt.currency(stageValue)}</div>` : ''}
-        <div class="kanban-cards" id="cards-${stage.key}"
-          ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event,'${stage.key}')">
-          ${stageLeads.map(l => buildCard(l)).join('') || `<div style="text-align:center;font-size:11px;color:var(--text-muted);opacity:0.4;padding:10px">Arraste aqui</div>`}
-        </div>
-        <div style="padding:6px 8px 8px">
-          <button class="btn btn-ghost btn-sm w-full" onclick="openNewLeadModal('${stage.key}')">+ Adicionar</button>
-        </div>
-      </div>`;
-  }).join('');
+  const row1 = STAGES.slice(0, 4);
+  const row2 = STAGES.slice(4);
+  board.innerHTML = `
+    <div class="kanban-row">${row1.map(s => buildKanbanCol(s, visible)).join('')}</div>
+    <div class="kanban-row">${row2.map(s => buildKanbanCol(s, visible)).join('')}</div>`;
 }
 
 function buildFollowupBadge(lead) {
