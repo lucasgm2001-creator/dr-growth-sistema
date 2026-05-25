@@ -1009,7 +1009,7 @@ const TREE_META = {
 function buildMiniCard(lead) {
   return `<div class="mini-card" draggable="true" id="card-${lead.id}"
     ondragstart="onDragStart(event,${lead.id})" ondragend="onDragEnd(event)"
-    onclick="openEditModal(${lead.id})">
+    onclick="openLeadDaily(${lead.id})">
     <div class="avatar avatar-sm avatar-${fmt.avatarClass(lead.responsible)}">${fmt.initials(lead.responsible)}</div>
     <div class="mini-card-info">
       <div class="mini-card-name">${lead.name}</div>
