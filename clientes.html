@@ -607,37 +607,81 @@ function renderOverview() {
 // ---- Carteira ----
 function renderCarteira() {
   const q      = (document.getElementById('search-carteira')?.value||'').toLowerCase();
-  const status = document.getElementById('filter-status')?.value || '';
+  const statusF = document.getElementById('filter-status')?.value || '';
   const pais   = document.getElementById('filter-pais')?.value   || '';
   const resp   = document.getElementById('filter-resp-cart')?.value || '';
 
   const rows = allClients.filter(canSeeClient).filter(c => {
     if (q && !(c.name||'').toLowerCase().includes(q)) return false;
-    if (status && c.status !== status) return false;
-    if (pais   && c.pais   !== pais)   return false;
-    if (resp   && c.responsible !== resp) return false;
+    if (statusF && c.status !== statusF) return false;
+    if (pais    && c.pais   !== pais)   return false;
+    if (resp    && c.responsible !== resp) return false;
     return true;
   });
 
-  const tbody = document.getElementById('carteira-tbody');
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px">Nenhum cliente encontrado.</td></tr>`;
-    return;
+  const container = document.getElementById('carteira-tbody').closest('.card').parentElement;
+  const cardEl    = document.getElementById('carteira-tbody').closest('.card');
+
+  const ACTIVE_STATUSES   = ['ativo','pausado','risco','inadimplente','renovacao'];
+  const INACTIVE_STATUSES = ['inativo','encerrado'];
+
+  const activos   = rows.filter(c => ACTIVE_STATUSES.includes(c.status));
+  const inativos  = rows.filter(c => INACTIVE_STATUSES.includes(c.status));
+
+  function buildTable(list, showActivate) {
+    if (!list.length) return '<p style="padding:20px;color:var(--text-muted);font-size:13px">Nenhum cliente.</p>';
+    return `<table class="client-table">
+      <thead><tr>
+        <th>Cliente</th><th>Nicho</th><th>País</th><th>Início</th>
+        <th>Responsável</th><th>Valor/mês</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>${list.map(c => `
+        <tr onclick="openProfile('${c.id}')">
+          <td><div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar avatar-sm" style="background:${clientColor(c.name)};color:#fff;font-weight:700;font-size:11px">${fmt.initials(c.name)}</div>
+            <span style="font-weight:600">${c.name}</span>
+          </div></td>
+          <td>${c.nicho||'—'}</td>
+          <td>${c.pais==='us'?'EUA':'BR'}</td>
+          <td>${fmt.date(c.start_date)}</td>
+          <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(c.responsible)}">${fmt.initials(c.responsible)}</div>${c.responsible||'—'}</div></td>
+          <td style="font-weight:600">${c.monthly_value ? fmt.currency(c.monthly_value) : '—'}</td>
+          <td><span class="status-pill status-${c.status}">${statusLabel(c.status)}</span></td>
+          <td style="white-space:nowrap">
+            ${showActivate && canEditClient() ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();activateClient('${c.id}')">Ativar</button>` : ''}
+            ${!showActivate && canEditClient() ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfile('${c.id}')">Ver</button>` : ''}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
   }
-  tbody.innerHTML = rows.map(c => `
-    <tr onclick="openProfile('${c.id}')">
-      <td><div style="display:flex;align-items:center;gap:8px">
-        <div class="avatar avatar-sm" style="background:${clientColor(c.name)};color:#fff;font-weight:700;font-size:11px">${fmt.initials(c.name)}</div>
-        <span style="font-weight:600">${c.name}</span>
-      </div></td>
-      <td>${c.nicho||'—'}</td>
-      <td>${c.pais==='us'?'🇺🇸 EUA':'🇧🇷 Brasil'}</td>
-      <td>${fmt.date(c.start_date)}</td>
-      <td><div style="display:flex;align-items:center;gap:6px"><div class="avatar avatar-sm avatar-${fmt.avatarClass(c.responsible)}">${fmt.initials(c.responsible)}</div>${c.responsible||'—'}</div></td>
-      <td><span class="status-pill status-${c.status}">${statusLabel(c.status)}</span></td>
-      <td>${fmt.date(c.renewal_date)}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProfile('${c.id}')">Ver perfil</button></td>
-    </tr>`).join('');
+
+  cardEl.innerHTML = `
+    <div style="padding:16px 16px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:14px;font-weight:700;color:var(--text-primary)">Contratos Ativos
+        <span style="font-size:12px;font-weight:500;color:var(--text-muted);margin-left:6px">${activos.length} cliente${activos.length!==1?'s':''}</span>
+      </span>
+    </div>
+    <div style="overflow-x:auto">${buildTable(activos, false)}</div>
+    <div style="padding:16px 16px 8px;border-top:2px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+      <span style="font-size:14px;font-weight:700;color:var(--text-muted)">Contratos Inativos
+        <span style="font-size:12px;font-weight:500;color:var(--text-muted);margin-left:6px">${inativos.length} cliente${inativos.length!==1?'s':''}</span>
+      </span>
+    </div>
+    <div style="overflow-x:auto">${buildTable(inativos, true)}</div>
+  `;
+}
+
+async function activateClient(id) {
+  if (!canEditClient()) return;
+  window.DRCache?.clear('clientes');
+  const idx = allClients.findIndex(c => c.id === id);
+  if (idx < 0) return;
+  allClients[idx].status = 'ativo';
+  if (window.drSupabase) window.drSupabase.from('clients').update({ status:'ativo' }).eq('id', id).then(()=>{});
+  showToast(`${allClients[idx].name} ativado como Contrato Ativo!`, 'success');
+  logActivity({ icon:'+', color:'#10B981', msg:`Contrato ativado: ${allClients[idx].name}`, sector:'clientes' });
+  refresh();
 }
 
 // ---- Jobs Kanban ----
