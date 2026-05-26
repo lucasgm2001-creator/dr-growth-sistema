@@ -617,8 +617,7 @@ function renderCarteira() {
     return true;
   });
 
-  const container = document.getElementById('carteira-tbody').closest('.card').parentElement;
-  const cardEl    = document.getElementById('carteira-tbody').closest('.card');
+  const cardEl = document.getElementById('carteira-card');
 
   const ACTIVE_STATUSES   = ['ativo','pausado','risco','inadimplente','renovacao'];
   const INACTIVE_STATUSES = ['inativo','encerrado'];
