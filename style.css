@@ -4330,37 +4330,6 @@ body.hall-page { background: transparent; }
   body[data-sidebar="closed"] .user-info,
   body[data-sidebar="closed"] .logout-btn   { display: none !important; }
 
-  /* ─── SEMI ─── */
-  body[data-sidebar="semi"] .sidebar {
-    width: var(--sb-semi) !important;
-  }
-  body[data-sidebar="semi"] .main-content {
-    margin-left: var(--sb-semi);
-  }
-  body[data-sidebar="semi"] .sidebar-header {
-    justify-content: center;
-    padding: 14px 6px;
-    gap: 0;
-  }
-  body[data-sidebar="semi"] .sidebar-brand,
-  body[data-sidebar="semi"] .elevator-label { display: none !important; }
-  body[data-sidebar="semi"] .sidebar-logo   { width: 34px; max-width: 34px; min-width: 0; }
-  body[data-sidebar="semi"] .elevator-nav   { padding: 4px 5px 12px; gap: 2px; }
-  body[data-sidebar="semi"] .elevator-floor {
-    padding: 6px 5px;
-    gap: 4px;
-    overflow: hidden;
-  }
-  body[data-sidebar="semi"] .floor-btn    { width: 28px; height: 28px; flex-shrink: 0; }
-  body[data-sidebar="semi"] .floor-number { font-size: 10px; }
-  body[data-sidebar="semi"] .floor-label  { font-size: 11px; white-space: nowrap; overflow: hidden; }
-  body[data-sidebar="semi"] .floor-desc,
-  body[data-sidebar="semi"] .floor-lock,
-  body[data-sidebar="semi"] .floor-indicator { display: none !important; }
-  body[data-sidebar="semi"] .user-profile { justify-content: center; padding: 8px 5px; gap: 0; }
-  body[data-sidebar="semi"] .user-info,
-  body[data-sidebar="semi"] .logout-btn   { display: none !important; }
-
   /* ─── FULL ─── */
   body[data-sidebar="full"] .sidebar {
     width: var(--sidebar-width) !important;
