@@ -965,9 +965,10 @@ async function saveClient() {
   if (!name || !nicho) { showToast('Nome e nicho são obrigatórios.', 'error'); return; }
 
   const newStatus = document.getElementById('cm-status').value;
+  const country   = document.getElementById('cm-pais').value;
   const data = {
     name, nicho,
-    pais:              document.getElementById('cm-pais').value,
+    country,
     status:            newStatus,
     responsible:       document.getElementById('cm-resp').value,
     monthly_value:     Number(document.getElementById('cm-valor').value) || null,
@@ -983,8 +984,11 @@ async function saveClient() {
   if (id) {
     const idx = allClients.findIndex(c => c.id === id);
     const oldStatus = idx >= 0 ? allClients[idx].status : null;
-    if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
-    if (window.drSupabase) window.drSupabase.from('clients').update(data).eq('id', id).then(()=>{});
+    if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data, pais: country };
+    if (window.drSupabase) {
+      const { error: upErr } = await window.drSupabase.from('clients').update(data).eq('id', id);
+      if (upErr) { alert('Erro ao atualizar cliente:\n' + upErr.message + '\n\nCode: ' + upErr.code); return; }
+    }
     showToast('Cliente atualizado!', 'success');
     if (newStatus === 'encerrado' && oldStatus !== 'encerrado') {
       const reason = data.end_reason ? ` — ${data.end_reason}` : '';
@@ -993,14 +997,18 @@ async function saveClient() {
     localStorage.setItem('drg_clients_updated', Date.now().toString());
   } else {
     if (window.drSupabase) {
-      const { data: ins } = await window.drSupabase.from('clients').insert(data).select().single();
-      if (ins) allClients.push(ins);
-      else allClients.push({ ...data, id: 'c'+Date.now(), created_at: new Date().toISOString() });
+      const { data: ins, error: insErr } = await window.drSupabase.from('clients').insert(data).select().single();
+      if (insErr) {
+        alert('Erro ao criar cliente:\n' + insErr.message + '\n\nCode: ' + insErr.code + '\nHint: ' + (insErr.hint || '—'));
+        return;
+      }
+      allClients.push({ ...ins, pais: ins.country || country });
     } else {
-      allClients.push({ ...data, id: 'c'+Date.now(), created_at: new Date().toISOString() });
+      allClients.push({ ...data, pais: country, id: 'c'+Date.now(), created_at: new Date().toISOString() });
     }
     showToast('Cliente criado!', 'success');
     logActivity({ icon:'+', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
+    localStorage.setItem('drg_clients_updated', Date.now().toString());
   }
   closeClientModal(); closeProfile(); refresh();
 }
