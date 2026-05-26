@@ -631,6 +631,7 @@ function openModal() {
   document.getElementById('pay-id').value = '';
   ['pay-client','pay-amount','pay-desc','pay-due','pay-paid'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('pay-status').value = 'pending';
+  document.getElementById('pay-frequency').value = 'semanal';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('pay-modal').classList.add('show');
 }
@@ -646,6 +647,7 @@ function openEditModal(id) {
   document.getElementById('pay-due').value = p.due_date||'';
   document.getElementById('pay-paid').value = p.paid_date||'';
   document.getElementById('pay-status').value = p.status||'pending';
+  document.getElementById('pay-frequency').value = p.frequency||'semanal';
   document.getElementById('delete-btn').style.display = 'inline-flex';
   document.getElementById('pay-modal').classList.add('show');
 }
