@@ -486,7 +486,7 @@ if (!session) { console.error('[clientes.html] initPage retornou null — redire
 // ---- Permission filter ----
 const role = (session && session.role) || 'comercial';
 console.log('[clientes.html] sessão ok, role:', role);
-const firstName = session.name.split(' ')[0];
+const firstName = (session && session.name) ? session.name.split(' ')[0] : '';
 
 function canSeeClient(c) {
   if (role === 'admin') return true;
