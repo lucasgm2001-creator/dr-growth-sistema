@@ -1689,7 +1689,7 @@ async function saveLead() {
     if (idx >= 0) leads[idx] = { ...leads[idx], ...data };
     closeModal(); updateSubtitle(); renderKanban(); renderLeadsTable(leads); renderPipeline();
     window.DRCache?.clear('comercial');
-    if (data.stage === 'fechado' && oldStage !== 'fechado') { autoCreateClient(leads.find(l=>l.id==id)||data); openCommissionModal(Number(id)); }
+    if (data.stage === 'fechado' && oldStage !== 'fechado') { alert('saveLead stage fechado detectado — lead: ' + (data.company || data.name)); autoCreateClient(leads.find(l=>l.id==id)||data); openCommissionModal(Number(id)); }
   } else {
     data.created_at = new Date().toISOString();
     if (window.drSupabase) {
