@@ -129,28 +129,28 @@
     <!-- Acesso rápido -->
     <div class="demo-section-label">Acesso rápido</div>
     <div class="demo-cards">
-      <div class="demo-card" onclick="promptPassword('Daniel Ramos','daniel@drgrowth.com','drg@admin2025','2c1cdbc457c004599a7e55cbe3e927360b4ec16760b6f9d7eeb270e8d95b21da')">
+      <div class="demo-card" onclick="quickLogin('daniel@drgrowth.com','drg@admin2025')">
         <div class="demo-avatar" style="background:#6366f1">DR</div>
         <div class="demo-info">
           <div class="demo-name">Daniel Ramos</div>
           <div class="demo-role">Admin</div>
         </div>
       </div>
-      <div class="demo-card" onclick="promptPassword('Lucas Moraes','lucasgm2001@gmail.com','drg@admin2025','8eff17c41ed819b0d61fc68ce85d67c2b87ed738292479dc629eea47717a3ade')">
+      <div class="demo-card" onclick="quickLogin('lucasgm2001@gmail.com','drg@admin2025')">
         <div class="demo-avatar" style="background:#3b82f6">LM</div>
         <div class="demo-info">
           <div class="demo-name">Lucas Moraes</div>
           <div class="demo-role">Admin</div>
         </div>
       </div>
-      <div class="demo-card" onclick="promptPassword('Gabriel Ramos','gabriel@drgrowth.com','drg@admin2025','d0251765c328da48addf70be9bf8a4bc89d4184d583ac4223ecadba28662c889')">
+      <div class="demo-card" onclick="quickLogin('gabriel@drgrowth.com','drg@admin2025')">
         <div class="demo-avatar" style="background:#a855f7">GR</div>
         <div class="demo-info">
           <div class="demo-name">Gabriel Ramos</div>
           <div class="demo-role">Tráfego</div>
         </div>
       </div>
-      <div class="demo-card" onclick="promptPassword('Thamyris Lages','thamyris@drgrowth.com','drg@admin2025','2adc0289d2587e186bbead8679e0c73953eaa115968ba6d650265ff37a4c2f0b')">
+      <div class="demo-card" onclick="quickLogin('thamyris@drgrowth.com','drg@admin2025')">
         <div class="demo-avatar" style="background:#22c55e">TL</div>
         <div class="demo-info">
           <div class="demo-name">Thamyris Lages</div>
@@ -181,29 +181,6 @@
 
     <button class="create-link" onclick="openCreateModal()">+ Criar nova conta</button>
 
-  </div>
-
-  <!-- Modal: Senha de perfil -->
-  <div class="modal-overlay" id="pw-modal" onclick="if(event.target===this)closePwModal()">
-    <div class="modal-box" style="max-width:340px">
-      <div class="modal-header">
-        <h3 id="pw-modal-name">Confirmar acesso</h3>
-        <button class="modal-close" onclick="closePwModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="modal-msg error" id="pw-error"></div>
-      <form id="pw-form" autocomplete="off" onsubmit="submitPwModal(event)">
-        <div class="form-group" style="margin-bottom:20px">
-          <label for="pw-input">Senha</label>
-          <div style="position:relative">
-            <input type="password" id="pw-input" class="form-control" placeholder="••••••••" required autocomplete="off" style="padding-right:42px">
-            <button type="button" onclick="togglePwVisibility()" id="pw-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;line-height:1;display:flex;align-items:center">
-              <svg id="pw-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full" id="pw-btn">Entrar</button>
-      </form>
-    </div>
   </div>
 
   <!-- Modal: Criar Conta -->
@@ -254,66 +231,6 @@
 
     // Garante usuários demo no Supabase (silencioso, uma vez)
     window.addEventListener('load', () => AUTH.ensureDemoUsers());
-
-    // Hashing helper
-    async function sha256hex(str) {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-    }
-
-    // Estado do modal de senha
-    let _pwTarget = null;
-
-    function promptPassword(displayName, email, supabasePass, hashHex) {
-      _pwTarget = { email, supabasePass, hashHex };
-      document.getElementById('pw-modal-name').textContent = displayName;
-      document.getElementById('pw-input').value = '';
-      document.getElementById('pw-error').classList.remove('show');
-      document.getElementById('pw-btn').disabled = false;
-      document.getElementById('pw-btn').textContent = 'Entrar';
-      document.getElementById('pw-modal').classList.add('show');
-      setTimeout(() => document.getElementById('pw-input').focus(), 80);
-    }
-
-    function togglePwVisibility() {
-      const inp  = document.getElementById('pw-input');
-      const icon = document.getElementById('pw-eye-icon');
-      if (inp.type === 'password') {
-        inp.type = 'text';
-        icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-      } else {
-        inp.type = 'password';
-        icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-      }
-    }
-
-    async function submitPwModal(e) {
-      e.preventDefault();
-      if (!_pwTarget) return;
-      const btn   = document.getElementById('pw-btn');
-      const errEl = document.getElementById('pw-error');
-      const typed = document.getElementById('pw-input').value;
-      btn.disabled    = true;
-      btn.textContent = 'Verificando…';
-      errEl.classList.remove('show');
-      const hash = await sha256hex(typed);
-      if (hash !== _pwTarget.hashHex) {
-        errEl.textContent = 'Senha incorreta.';
-        errEl.classList.add('show');
-        btn.disabled    = false;
-        btn.textContent = 'Entrar';
-        document.getElementById('pw-input').value = '';
-        document.getElementById('pw-input').focus();
-        return;
-      }
-      closePwModal();
-      quickLogin(_pwTarget.email, _pwTarget.supabasePass);
-    }
-
-    function closePwModal() {
-      document.getElementById('pw-modal').classList.remove('show');
-      _pwTarget = null;
-    }
 
     // Login rápido via card
     async function quickLogin(email, password) {
