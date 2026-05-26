@@ -1302,6 +1302,7 @@ const STAGE_ACTIVITY = {
 };
 
 async function onDrop(e, stage) {
+  alert('onDrop executado, stage: ' + stage);
   e.preventDefault(); e.currentTarget.classList.remove('drag-over');
   if (!draggedId) return;
   const lead = leads.find(l => l.id === draggedId);
