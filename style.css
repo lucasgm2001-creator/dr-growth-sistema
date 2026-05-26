@@ -536,6 +536,17 @@ img { display: block; max-width: 100%; }
 
 .menu-toggle:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
 
+/* Inner hamburger inside sidebar header (visible only when sidebar is full on desktop) */
+.menu-toggle-inner {
+  display: none;
+  padding: 6px;
+  border-radius: var(--radius-md);
+  color: rgba(255,255,255,0.75);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.menu-toggle-inner:hover { background: rgba(255,255,255,0.12); color: #ffffff; }
+
 .page-content {
   flex: 1;
   padding: 24px;
