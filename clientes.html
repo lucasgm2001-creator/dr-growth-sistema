@@ -996,15 +996,26 @@ async function saveClient() {
     }
     localStorage.setItem('drg_clients_updated', Date.now().toString());
   } else {
+    // Insert com exatamente as 8 colunas seguras
+    const insertData = {
+      name,
+      status:        newStatus,
+      responsible:   document.getElementById('cm-resp').value,
+      monthly_value: Number(document.getElementById('cm-valor').value) || null,
+      start_date:    document.getElementById('cm-inicio').value || null,
+      country,
+      nicho,
+      observations:  document.getElementById('cm-obs').value.trim() || null,
+    };
     if (window.drSupabase) {
-      const { data: ins, error: insErr } = await window.drSupabase.from('clients').insert(data).select().single();
+      const { data: ins, error: insErr } = await window.drSupabase.from('clients').insert(insertData).select().single();
       if (insErr) {
         alert('Erro ao criar cliente:\n' + insErr.message + '\n\nCode: ' + insErr.code + '\nHint: ' + (insErr.hint || '—'));
         return;
       }
       allClients.push({ ...ins, pais: ins.country || country });
     } else {
-      allClients.push({ ...data, pais: country, id: 'c'+Date.now(), created_at: new Date().toISOString() });
+      allClients.push({ ...insertData, pais: country, id: 'c'+Date.now(), created_at: new Date().toISOString() });
     }
     showToast('Cliente criado!', 'success');
     logActivity({ icon:'+', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
