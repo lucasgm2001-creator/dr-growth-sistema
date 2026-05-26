@@ -344,22 +344,62 @@ function initMobileSidebar() {
   const overlay = document.getElementById('sidebar-overlay');
   if (!toggle || !sidebar) return;
 
-  function openSidebar() {
+  const isMobile = () => window.innerWidth <= 768;
+  const KEY = 'drg_sidebar_state';
+
+  // Desktop: set data-sidebar attribute (controls CSS icon-only vs full)
+  function setDesktop(state) {
+    document.body.setAttribute('data-sidebar', state);
+    localStorage.setItem(KEY, state);
+  }
+
+  // Mobile: drawer open/close
+  function openMobile() {
     sidebar.classList.add('open');
     if (overlay) overlay.classList.add('show');
     document.body.style.overflow = 'hidden';
   }
-  function closeSidebar() {
+  function closeMobile() {
     sidebar.classList.remove('open');
     if (overlay) overlay.classList.remove('show');
     document.body.style.overflow = '';
   }
 
+  // Initialize desktop state (default: closed = icons only)
+  if (!isMobile()) {
+    setDesktop(localStorage.getItem(KEY) || 'closed');
+  }
+
+  // Toggle button
   toggle.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    if (isMobile()) {
+      sidebar.classList.contains('open') ? closeMobile() : openMobile();
+    } else {
+      const cur = document.body.getAttribute('data-sidebar') || 'closed';
+      setDesktop(cur === 'full' ? 'closed' : 'full');
+    }
   });
-  if (overlay) overlay.addEventListener('click', closeSidebar);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+  // Overlay closes mobile drawer
+  if (overlay) overlay.addEventListener('click', closeMobile);
+
+  // ESC closes
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    isMobile() ? closeMobile() : setDesktop('closed');
+  });
+
+  // On resize: switch modes cleanly
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      closeMobile();
+      if (!document.body.getAttribute('data-sidebar')) {
+        setDesktop(localStorage.getItem(KEY) || 'closed');
+      }
+    } else {
+      document.body.removeAttribute('data-sidebar');
+    }
+  });
 }
 
 // ============================================================
