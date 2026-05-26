@@ -1258,7 +1258,7 @@ async function autoCreateClient(lead) {
     }
     const clientData = {
       name,
-      status:        'ativo',
+      status:        'inativo',
       responsible:   lead.responsible || '',
       monthly_value: lead.value || null,
       start_date:    new Date().toISOString().split('T')[0],
@@ -1268,7 +1268,7 @@ async function autoCreateClient(lead) {
     };
     await window.drSupabase.from('clients').insert(clientData);
   }
-  showToast(`"${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
+  showToast(`"${name}" adicionado como Contrato Inativo em Clientes. Ative manualmente quando o contrato iniciar.`, 'success');
   logActivity({ icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
 }
 
