@@ -4310,6 +4310,8 @@ body.hall-page { background: transparent; }
   body[data-sidebar="closed"] .floor-lock,
   body[data-sidebar="closed"] .floor-indicator,
   body[data-sidebar="closed"] .floor-number   { display: none !important; }
+  body[data-sidebar="closed"] .floor-icon     { display: flex !important; }
+  body[data-sidebar="full"] .floor-icon       { display: none !important; }
   body[data-sidebar="closed"] .elevator-nav   { padding: 4px 6px 12px; gap: 2px; }
   body[data-sidebar="closed"] .elevator-floor { padding: 7px 6px; gap: 0; justify-content: center; }
   body[data-sidebar="closed"] .floor-btn      { width: 32px; height: 32px; flex-shrink: 0; }
