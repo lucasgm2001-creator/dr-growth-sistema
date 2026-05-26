@@ -681,7 +681,7 @@ async function saveCampaign() {
     const idx = campaigns.findIndex(c => c.id == id);
     if (idx >= 0) campaigns[idx] = { ...campaigns[idx], ...data };
     showToast('Campanha atualizada!', 'success');
-    logActivity({ icon:''+CHART+'', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
+    logActivity({ icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>', color:'#a855f7', msg:`Campanha "${name}" atualizada`, sector:'trafego' });
   } else {
     const { data: ins } = await window.drSupabase.from('campaigns').insert({ ...data, spend:0, impressions:0, clicks:0, leads:0 }).select().single();
     campaigns.unshift(ins || { ...data, id: Date.now(), spend:0, impressions:0, clicks:0, leads:0 });
