@@ -176,15 +176,24 @@ CREATE TABLE content_pieces (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Add country to existing tables (run these ALTER statements)
-ALTER TABLE leads   ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
-ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
+-- =====================================================
+-- MIGRAÇÕES OBRIGATÓRIAS — execute no SQL Editor do Supabase
+-- Supabase Dashboard → SQL Editor → New query → Cole e execute
+-- =====================================================
 
--- Ciclo de vida de clientes (execute se necessário)
+-- Leads: campo país (necessário para filtros US/BR)
+ALTER TABLE leads   ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
+ALTER TABLE leads   ADD COLUMN IF NOT EXISTS seminteracao_at TIMESTAMPTZ;
+
+-- Clients: colunas adicionais obrigatórias para o fluxo lead→cliente
+-- (sem estas colunas o autoCreateClient falha com erro 42703)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'ativo';
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS pais TEXT DEFAULT 'br';
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS nicho TEXT;
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS observations TEXT;
+
+-- Clients: ciclo de vida (encerramento de contratos)
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS end_date DATE;
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS end_reason TEXT;
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS contract_frequency TEXT DEFAULT 'semanal';
