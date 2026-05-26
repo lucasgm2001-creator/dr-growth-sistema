@@ -41,7 +41,7 @@ CREATE TABLE leads (
   company      TEXT,
   email        TEXT,
   phone        TEXT,
-  stage        TEXT DEFAULT 'novo' CHECK (stage IN ('novo','contato','reuniao','proposta','fechado','perdido')),
+  stage        TEXT DEFAULT 'novo' CHECK (stage IN ('novo','contato','seminteracao','reuniao','proposta','fechado','perdido')),
   value        NUMERIC(12,2),
   responsible  TEXT,
   origin       TEXT,
