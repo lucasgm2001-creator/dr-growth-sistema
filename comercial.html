@@ -1329,27 +1329,22 @@ async function autoCreateClient(lead) {
 
 // Helper de teste — use no console: testClientInsert()
 window.testClientInsert = async function() {
-  if (!window.drSupabase) { console.error('[testClientInsert] drSupabase não disponível'); return; }
+  if (!window.drSupabase) { alert('drSupabase não disponível'); return; }
   const testName = 'TESTE_AUTOCRIAR_' + Date.now();
   console.log('[testClientInsert] Inserindo cliente fictício:', testName);
   const { data, error } = await window.drSupabase.from('clients').insert({
     name: testName, responsible: 'teste', monthly_value: 999,
     start_date: new Date().toISOString().split('T')[0],
-    status: 'ativo', country: 'us', pais: 'us', nicho: 'teste', observations: 'cliente de teste — pode apagar',
+    status: 'ativo', country: 'us', nicho: 'teste', observations: 'cliente de teste — pode apagar',
   }).select().single();
   if (error) {
-    console.error('[testClientInsert] ✗ FALHOU:', error.message, '| code:', error.code, '| hint:', error.hint);
-    console.warn('[testClientInsert] Execute no Supabase SQL Editor:\n' +
-      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT DEFAULT \'ativo\';\n' +
-      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT \'us\';\n' +
-      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS pais TEXT DEFAULT \'br\';\n' +
-      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS nicho TEXT;\n' +
-      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS observations TEXT;');
+    const msg = 'FALHOU: ' + error.message + '\nCode: ' + error.code + '\nHint: ' + (error.hint || '—');
+    console.error('[testClientInsert] ✗', msg);
+    alert('[testClientInsert] ' + msg);
   } else {
     console.log('[testClientInsert] ✓ Sucesso! ID:', data.id);
-    console.log('[testClientInsert] Limpando registro de teste...');
     await window.drSupabase.from('clients').delete().eq('id', data.id);
-    console.log('[testClientInsert] ✓ Registro de teste removido. Tabela clients está pronta.');
+    alert('[testClientInsert] ✓ Tabela clients OK! Registro de teste removido. ID era: ' + data.id);
   }
 };
 
