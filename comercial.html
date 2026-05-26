@@ -1250,60 +1250,109 @@ async function onDrop(e, stage) {
 }
 
 async function autoCreateClient(lead) {
-  console.log('[autoCreateClient] chamado com lead:', lead);
-
-  const name = lead.company || lead.name;
-  if (!name) { console.warn('[autoCreateClient] abortado: lead sem nome e sem empresa'); return; }
-
-  console.log('[autoCreateClient] nome do cliente:', name);
+  console.log('[autoCreateClient] ▶ INÍCIO — lead recebido:', JSON.stringify(lead));
   console.log('[autoCreateClient] window.drSupabase disponível?', !!window.drSupabase);
 
+  const name = lead.company || lead.name;
+  if (!name) {
+    console.warn('[autoCreateClient] ✗ Abortado: lead sem nome nem empresa');
+    return;
+  }
+  console.log('[autoCreateClient] ✓ Nome do cliente a criar:', name);
+
   if (window.drSupabase) {
-    console.log('[autoCreateClient] verificando duplicata para:', name);
+    // 1. Verificar duplicata
+    console.log('[autoCreateClient] 1. Verificando duplicata na tabela clients...');
     const { data: existing, error: checkErr } = await window.drSupabase
       .from('clients').select('id').ilike('name', name).limit(1);
-
-    if (checkErr) console.error('[autoCreateClient] erro ao checar duplicata:', checkErr);
-    console.log('[autoCreateClient] duplicata encontrada?', existing);
+    if (checkErr) console.error('[autoCreateClient] Erro na verificação de duplicata:', checkErr.message, checkErr.code);
+    console.log('[autoCreateClient] Duplicata encontrada?', existing?.length > 0, existing);
 
     if (existing && existing.length > 0) {
-      showToast(`Cliente "${name}" já existe na aba Clientes.`, 'info'); return;
+      console.log('[autoCreateClient] ⚠ Cliente já existe, id:', existing[0].id, '— limpando cache');
+      showToast(`Cliente "${name}" já existe na aba Clientes.`, 'info');
+      window.DRCache?.clear('clientes');
+      localStorage.setItem('drg_clients_updated', Date.now().toString());
+      return;
     }
 
-    const clientData = {
+    // 2. Montar dados — colunas base (sempre existem) + extras (via ALTER TABLE)
+    const baseData = {
       name,
-      status:        'ativo',
       responsible:   lead.responsible || '',
-      monthly_value: lead.value || null,
+      monthly_value: Number(lead.value) || null,
       start_date:    new Date().toISOString().split('T')[0],
-      country:       lead.country || 'us',
-      pais:          lead.country || 'us',
-      nicho:         lead.nicho || '',
-      observations:  `Migrado do funil. Lead: ${lead.name}`,
     };
-    console.log('[autoCreateClient] inserindo no Supabase:', clientData);
+    const extraData = {
+      status:       'ativo',
+      country:      lead.country || 'us',
+      pais:         lead.country || 'us',
+      nicho:        lead.nicho  || '',
+      observations: `Migrado do funil. Lead: ${lead.name}`,
+    };
+    const clientData = { ...baseData, ...extraData };
+    console.log('[autoCreateClient] 2. Objeto a inserir:', JSON.stringify(clientData));
 
-    const { data: inserted, error } = await window.drSupabase
+    // 3. Primeiro insert — com todos os campos
+    let { data: inserted, error } = await window.drSupabase
       .from('clients').insert(clientData).select().single();
 
+    // Se falhar por coluna inexistente (42703), retentar só com colunas base
+    if (error && (error.code === '42703' || (error.message || '').toLowerCase().includes('column'))) {
+      console.warn('[autoCreateClient] ⚠ Coluna extra não existe no banco. Tentando só com colunas base...');
+      console.warn('[autoCreateClient] Erro original:', error.message, '| code:', error.code);
+      const retry = await window.drSupabase
+        .from('clients').insert(baseData).select().single();
+      inserted = retry.data;
+      error    = retry.error;
+      if (!error) console.log('[autoCreateClient] ✓ Fallback insert OK (colunas base)');
+    }
+
     if (error) {
-      console.error('[autoCreateClient] ERRO no insert:', error);
-      console.error('[autoCreateClient] detalhes:', error.message, error.details, error.hint, error.code);
+      console.error('[autoCreateClient] ✗ ERRO no insert:', error.message);
+      console.error('[autoCreateClient] Detalhes — code:', error.code, '| hint:', error.hint, '| details:', error.details);
       showToast(`Erro ao criar cliente: ${error.message}`, 'error');
       return;
     }
-    console.log('[autoCreateClient] insert OK, cliente criado:', inserted);
+    console.log('[autoCreateClient] ✓ Insert OK! ID gerado:', inserted?.id, '| registro:', JSON.stringify(inserted));
   } else {
-    console.warn('[autoCreateClient] Supabase indisponível — cliente NÃO salvo no banco');
+    console.warn('[autoCreateClient] ⚠ Supabase indisponível — cliente NÃO salvo no banco');
   }
 
+  // 4. Limpar cache e notificar outras abas
   window.DRCache?.clear('clientes');
   localStorage.setItem('drg_clients_updated', Date.now().toString());
-  console.log('[autoCreateClient] cache limpo e sinal enviado para outras abas');
+  console.log('[autoCreateClient] ✓ Cache "clientes" limpo. Sinal "drg_clients_updated" enviado via localStorage.');
 
   showToast(`"${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
   logActivity({ icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
 }
+
+// Helper de teste — use no console: testClientInsert()
+window.testClientInsert = async function() {
+  if (!window.drSupabase) { console.error('[testClientInsert] drSupabase não disponível'); return; }
+  const testName = 'TESTE_AUTOCRIAR_' + Date.now();
+  console.log('[testClientInsert] Inserindo cliente fictício:', testName);
+  const { data, error } = await window.drSupabase.from('clients').insert({
+    name: testName, responsible: 'teste', monthly_value: 999,
+    start_date: new Date().toISOString().split('T')[0],
+    status: 'ativo', country: 'us', pais: 'us', nicho: 'teste', observations: 'cliente de teste — pode apagar',
+  }).select().single();
+  if (error) {
+    console.error('[testClientInsert] ✗ FALHOU:', error.message, '| code:', error.code, '| hint:', error.hint);
+    console.warn('[testClientInsert] Execute no Supabase SQL Editor:\n' +
+      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT DEFAULT \'ativo\';\n' +
+      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT \'us\';\n' +
+      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS pais TEXT DEFAULT \'br\';\n' +
+      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS nicho TEXT;\n' +
+      'ALTER TABLE clients ADD COLUMN IF NOT EXISTS observations TEXT;');
+  } else {
+    console.log('[testClientInsert] ✓ Sucesso! ID:', data.id);
+    console.log('[testClientInsert] Limpando registro de teste...');
+    await window.drSupabase.from('clients').delete().eq('id', data.id);
+    console.log('[testClientInsert] ✓ Registro de teste removido. Tabela clients está pronta.');
+  }
+};
 
 // ---- Tabela de leads ----
 function filterLeads() {
