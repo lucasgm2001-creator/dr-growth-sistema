@@ -180,6 +180,18 @@ CREATE TABLE content_pieces (
 ALTER TABLE leads   ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
 ALTER TABLE clients ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
 
+-- Ciclo de vida de clientes (execute se necessário)
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'ativo';
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS pais TEXT DEFAULT 'br';
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS nicho TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS observations TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS end_reason TEXT;
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS contract_frequency TEXT DEFAULT 'semanal';
+
+-- Frequência de pagamentos
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS frequency TEXT DEFAULT 'semanal';
+
 -- RLS for new tables
 ALTER TABLE sellers        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE commissions    ENABLE ROW LEVEL SECURITY;
