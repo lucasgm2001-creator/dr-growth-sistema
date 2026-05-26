@@ -1310,7 +1310,9 @@ async function autoCreateClient(lead) {
     if (error) {
       console.error('[autoCreateClient] ✗ ERRO no insert:', error.message);
       console.error('[autoCreateClient] Detalhes — code:', error.code, '| hint:', error.hint, '| details:', error.details);
+      const errMsg = 'Erro ao criar cliente:\n' + error.message + '\nCode: ' + error.code + '\nHint: ' + (error.hint || '—');
       showToast(`Erro ao criar cliente: ${error.message}`, 'error');
+      alert('[autoCreateClient] ' + errMsg);
       return;
     }
     console.log('[autoCreateClient] ✓ Insert OK! ID gerado:', inserted?.id, '| registro:', JSON.stringify(inserted));
