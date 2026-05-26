@@ -327,6 +327,22 @@
         <div class="form-group"><label>Data de Início</label><input type="date" class="form-control" id="cm-inicio"></div>
         <div class="form-group"><label>Próxima Renovação</label><input type="date" class="form-control" id="cm-renovacao"></div>
       </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Frequência do Contrato</label>
+          <select class="form-control" id="cm-frequency">
+            <option value="semanal">Semanal</option>
+            <option value="quinzenal">Quinzenal</option>
+            <option value="mensal">Mensal</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="semestral">Semestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+        <div class="form-group" id="cm-enddate-group" style="display:none"><label>Data de Encerramento</label><input type="date" class="form-control" id="cm-enddate"></div>
+      </div>
+      <div class="form-group" id="cm-endreason-group" style="display:none"><label>Motivo do Encerramento</label>
+        <input type="text" class="form-control" id="cm-endreason" placeholder="Ex: Cliente cancelou, inadimplência…">
+      </div>
       <div class="form-group"><label>Observações internas</label>
         <textarea class="form-control" id="cm-obs" rows="3" placeholder="Notas sobre o cliente…"></textarea>
       </div>
