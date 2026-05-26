@@ -543,6 +543,14 @@ async function loadData() {
   refresh();
 }
 
+// Detecta novo cliente criado em outra aba (ex: lead fechado no comercial)
+window.addEventListener('storage', e => {
+  if (e.key === 'drg_clients_updated') {
+    window.DRCache?.clear('clientes');
+    loadData();
+  }
+});
+
 // ---- Tab switching ----
 function switchTab(tab) {
   activeTab = tab;
