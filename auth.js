@@ -421,7 +421,7 @@ function initElevatorTooltips() {
 
   document.getElementById('elevator-nav').addEventListener('mouseover', e => {
     const floor = e.target.closest('.elevator-floor[data-tip]');
-    if (!floor || document.body.getAttribute('data-sidebar') !== 'semi') return;
+    if (!floor || document.body.getAttribute('data-sidebar') !== 'closed') return;
     clearTimeout(hideTimer);
     const r = floor.getBoundingClientRect();
     tip.textContent = floor.dataset.tip;
