@@ -4280,104 +4280,21 @@ body.hall-page { background: transparent; }
 }
 
 /* ============================================================
-   ELEVATOR SIDEBAR — 3 ESTADOS
-   closed (16 px) | semi (64 px, padrão) | full (240 px)
+   SIDEBAR — DRAWER (overlay em todas as telas)
+   Abre com .open, fecha ao clicar no overlay ou pressionar Esc
    ============================================================ */
 
-:root {
-  --sb-closed: 60px;
-  --sb-semi:   64px;
+.sidebar.open {
+  transform: translateX(0);
 }
 
-/* ── Desktop: sidebar sempre visível, width controlada por estado ── */
-@media (min-width: 769px) {
-
-  body[data-sidebar] .sidebar {
-    transform: none !important;
-    transition: width 0.22s cubic-bezier(.4,0,.2,1) !important;
-    overflow: hidden;
-  }
-
-  body[data-sidebar] .main-content {
-    transition: margin-left 0.22s cubic-bezier(.4,0,.2,1);
-  }
-
-  /* ─── CLOSED (ícones apenas) ─── */
-  body[data-sidebar="closed"] .sidebar {
-    width: var(--sb-closed) !important;
-    cursor: pointer;
-    overflow: hidden;
-  }
-  body[data-sidebar="closed"] .main-content {
-    margin-left: var(--sb-closed);
-  }
-  body[data-sidebar="closed"] .sidebar-header {
-    justify-content: center;
-    padding: 14px 6px;
-    gap: 0;
-  }
-  body[data-sidebar="closed"] .sidebar-brand,
-  body[data-sidebar="closed"] .elevator-label { display: none !important; }
-  body[data-sidebar="closed"] .sidebar-logo   { width: 34px; max-width: 34px; min-width: 0; }
-  body[data-sidebar="closed"] .elevator-nav   { padding: 4px 5px 12px; gap: 2px; }
-  body[data-sidebar="closed"] .elevator-floor { padding: 6px 5px; gap: 0; justify-content: center; overflow: hidden; }
-  body[data-sidebar="closed"] .floor-btn      { width: 32px; height: 32px; flex-shrink: 0; }
-  body[data-sidebar="closed"] .floor-number   { display: none !important; }
-  body[data-sidebar="closed"] .floor-info,
-  body[data-sidebar="closed"] .floor-desc,
-  body[data-sidebar="closed"] .floor-lock,
-  body[data-sidebar="closed"] .floor-indicator { display: none !important; }
-  body[data-sidebar="closed"] .user-profile { justify-content: center; padding: 8px 5px; gap: 0; }
-  body[data-sidebar="closed"] .user-info,
-  body[data-sidebar="closed"] .logout-btn   { display: none !important; }
-
-  /* ─── FULL ─── */
-  body[data-sidebar="full"] .sidebar {
-    width: var(--sidebar-width) !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-  body[data-sidebar="full"] .main-content  { margin-left: var(--sidebar-width); }
-  body[data-sidebar="full"] .elevator-nav  { padding: 4px 10px 12px; gap: 3px; }
-  body[data-sidebar="full"] .elevator-floor { padding: 9px 10px; gap: 11px; }
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 50, 0.60);
+  z-index: 99;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
-
-/* ── Mobile: mantém comportamento de overlay ── */
-@media (max-width: 768px) {
-  body[data-sidebar] .sidebar {
-    width: var(--sidebar-width) !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.22s ease !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-  body[data-sidebar] .sidebar.open {
-    transform: translateX(0) !important;
-  }
-  body[data-sidebar] .main-content {
-    margin-left: 0 !important;
-    transition: none !important;
-  }
-  body[data-sidebar] .sidebar-brand,
-  body[data-sidebar] .elevator-label,
-  body[data-sidebar] .floor-desc        { display: block !important; }
-  body[data-sidebar] .floor-indicator   { display: block !important; }
-  body[data-sidebar] .user-info         { display: block !important; }
-  body[data-sidebar] .logout-btn        { display: flex !important; }
-  body[data-sidebar] .sidebar-header    {
-    justify-content: flex-start !important;
-    padding: 20px 16px 16px !important;
-    gap: 10px !important;
-  }
-  body[data-sidebar] .sidebar-logo      { width: auto !important; max-width: 144px !important; }
-  body[data-sidebar] .user-profile      { justify-content: flex-start !important; padding: 10px !important; gap: 10px !important; }
-  body[data-sidebar] .elevator-nav      { padding: 4px 10px 12px !important; gap: 3px !important; }
-  body[data-sidebar] .elevator-floor    {
-    padding: 9px 10px !important;
-    gap: 11px !important;
-    overflow: visible !important;
-  }
-  body[data-sidebar] .floor-btn    { width: 34px !important; height: 34px !important; }
-  body[data-sidebar] .floor-number { font-size: 12px !important; }
-  body[data-sidebar] .floor-label  { font-size: 13px !important; white-space: normal !important; }
-}
+.sidebar-overlay.show { display: block; }
