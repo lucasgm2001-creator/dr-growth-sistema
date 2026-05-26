@@ -4280,12 +4280,76 @@ body.hall-page { background: transparent; }
 }
 
 /* ============================================================
-   SIDEBAR — DRAWER (overlay em todas as telas)
-   Abre com .open, fecha ao clicar no overlay ou pressionar Esc
+   SIDEBAR — 2 estados no desktop, drawer no mobile
+   closed = 60px ícones | full = 240px com labels
    ============================================================ */
 
 .sidebar.open {
   transform: translateX(0);
+}
+
+/* ── Desktop: sidebar sempre visível, largura controlada ── */
+@media (min-width: 769px) {
+  body[data-sidebar] .sidebar {
+    transform: none !important;
+    transition: width 0.22s cubic-bezier(.4,0,.2,1) !important;
+    overflow: hidden;
+  }
+  body[data-sidebar] .main-content {
+    transition: margin-left 0.22s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* CLOSED — só ícones */
+  body[data-sidebar="closed"] .sidebar        { width: 60px !important; }
+  body[data-sidebar="closed"] .main-content   { margin-left: 60px; }
+  body[data-sidebar="closed"] .sidebar-header { justify-content: center; padding: 14px 6px; gap: 0; }
+  body[data-sidebar="closed"] .sidebar-logo   { width: 34px; max-width: 34px; }
+  body[data-sidebar="closed"] .elevator-label,
+  body[data-sidebar="closed"] .floor-info,
+  body[data-sidebar="closed"] .floor-desc,
+  body[data-sidebar="closed"] .floor-lock,
+  body[data-sidebar="closed"] .floor-indicator,
+  body[data-sidebar="closed"] .floor-number   { display: none !important; }
+  body[data-sidebar="closed"] .elevator-nav   { padding: 4px 6px 12px; gap: 2px; }
+  body[data-sidebar="closed"] .elevator-floor { padding: 7px 6px; gap: 0; justify-content: center; }
+  body[data-sidebar="closed"] .floor-btn      { width: 32px; height: 32px; flex-shrink: 0; }
+  body[data-sidebar="closed"] .user-profile   { justify-content: center; padding: 8px 6px; gap: 0; }
+  body[data-sidebar="closed"] .user-info,
+  body[data-sidebar="closed"] .logout-btn     { display: none !important; }
+
+  /* Non-elevator pages (nav-item) */
+  body[data-sidebar="closed"] .nav-item       { justify-content: center; padding: 9px 6px; }
+  body[data-sidebar="closed"] .nav-item > span,
+  body[data-sidebar="closed"] .nav-badge,
+  body[data-sidebar="closed"] .nav-section-label { display: none !important; }
+
+  /* FULL — ícones + labels */
+  body[data-sidebar="full"] .sidebar        { width: var(--sidebar-width) !important; overflow-y: auto !important; overflow-x: hidden !important; }
+  body[data-sidebar="full"] .main-content   { margin-left: var(--sidebar-width); }
+  body[data-sidebar="full"] .elevator-nav   { padding: 4px 10px 12px; gap: 3px; }
+  body[data-sidebar="full"] .elevator-floor { padding: 9px 10px; gap: 11px; }
+}
+
+/* ── Mobile: drawer com overlay ── */
+@media (max-width: 768px) {
+  body[data-sidebar] .sidebar {
+    transform: translateX(-100%) !important;
+    width: var(--sidebar-width) !important;
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  body[data-sidebar] .sidebar.open { transform: translateX(0) !important; }
+  body[data-sidebar] .main-content { margin-left: 0 !important; transition: none !important; }
+  /* Garante que labels e infos aparecem no mobile */
+  body[data-sidebar] .floor-info,
+  body[data-sidebar] .floor-desc,
+  body[data-sidebar] .elevator-label,
+  body[data-sidebar] .user-info      { display: block !important; }
+  body[data-sidebar] .logout-btn     { display: flex !important; }
+  body[data-sidebar] .elevator-floor { padding: 9px 10px !important; gap: 11px !important; }
+  body[data-sidebar] .sidebar-logo   { width: auto !important; max-width: 144px !important; }
+  body[data-sidebar] .user-profile   { justify-content: flex-start !important; padding: 10px !important; gap: 10px !important; }
 }
 
 .sidebar-overlay {
