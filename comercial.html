@@ -1277,6 +1277,7 @@ async function autoCreateClient(lead) {
       monthly_value: lead.value || null,
       start_date:    new Date().toISOString().split('T')[0],
       country:       lead.country || 'us',
+      pais:          lead.country || 'us',
       nicho:         lead.nicho || '',
       observations:  `Migrado do funil. Lead: ${lead.name}`,
     };
