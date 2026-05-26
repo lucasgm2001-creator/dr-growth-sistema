@@ -1011,11 +1011,7 @@ async function saveClient() {
     localStorage.setItem('drg_clients_updated', Date.now().toString());
   }
   closeClientModal(); closeProfile();
-  if (id) {
-    refresh();
-  } else {
-    loadData();
-  }
+  refresh();
 }
 
 async function deleteClient() {
