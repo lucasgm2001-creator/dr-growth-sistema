@@ -4377,6 +4377,10 @@ body.hall-page { background: transparent; }
   body[data-sidebar] .elevator-floor { padding: 9px 10px !important; gap: 11px !important; }
   body[data-sidebar] .sidebar-logo   { width: auto !important; max-width: 144px !important; }
   body[data-sidebar] .user-profile   { justify-content: flex-start !important; padding: 10px !important; gap: 10px !important; }
+  /* On mobile drawer open, show inner toggle so user can close from inside */
+  .sidebar.open .menu-toggle-inner { display: flex !important; }
+  /* Never hide the topbar toggle on mobile */
+  body[data-sidebar="full"] #menu-toggle { display: flex !important; }
 }
 
 .sidebar-overlay {
