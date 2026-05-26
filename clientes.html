@@ -302,10 +302,13 @@
           </select>
         </div>
         <div class="form-group"><label>Status</label>
-          <select class="form-control" id="cm-status">
+          <select class="form-control" id="cm-status" onchange="toggleEncerradoFields()">
             <option value="ativo">Contrato Ativo</option>
             <option value="inativo">Contrato Inativo</option>
+            <option value="pausado">Pausado</option>
             <option value="risco">Em Risco</option>
+            <option value="inadimplente">Inadimplente</option>
+            <option value="renovacao">Em Renovação</option>
             <option value="encerrado">Encerrado</option>
           </select>
         </div>
