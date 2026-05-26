@@ -912,23 +912,32 @@ async function saveClient() {
   const nicho= document.getElementById('cm-nicho').value;
   if (!name || !nicho) { showToast('Nome e nicho são obrigatórios.', 'error'); return; }
 
+  const newStatus = document.getElementById('cm-status').value;
   const data = {
     name, nicho,
-    pais:          document.getElementById('cm-pais').value,
-    status:        document.getElementById('cm-status').value,
-    responsible:   document.getElementById('cm-resp').value,
-    monthly_value: Number(document.getElementById('cm-valor').value) || null,
-    start_date:    document.getElementById('cm-inicio').value || null,
-    renewal_date:  document.getElementById('cm-renovacao').value || null,
-    observations:  document.getElementById('cm-obs').value.trim(),
+    pais:              document.getElementById('cm-pais').value,
+    status:            newStatus,
+    responsible:       document.getElementById('cm-resp').value,
+    monthly_value:     Number(document.getElementById('cm-valor').value) || null,
+    start_date:        document.getElementById('cm-inicio').value || null,
+    renewal_date:      document.getElementById('cm-renovacao').value || null,
+    contract_frequency:document.getElementById('cm-frequency').value,
+    end_date:          document.getElementById('cm-enddate').value || null,
+    end_reason:        document.getElementById('cm-endreason').value.trim() || null,
+    observations:      document.getElementById('cm-obs').value.trim(),
   };
 
   window.DRCache?.clear('clientes');
   if (id) {
     const idx = allClients.findIndex(c => c.id === id);
+    const oldStatus = idx >= 0 ? allClients[idx].status : null;
     if (idx >= 0) allClients[idx] = { ...allClients[idx], ...data };
     if (window.drSupabase) window.drSupabase.from('clients').update(data).eq('id', id).then(()=>{});
     showToast('Cliente atualizado!', 'success');
+    if (newStatus === 'encerrado' && oldStatus !== 'encerrado') {
+      const reason = data.end_reason ? ` — ${data.end_reason}` : '';
+      logActivity({ icon:'×', color:'#6b7280', msg:`Contrato encerrado: ${name}${reason}`, sector:'clientes' });
+    }
   } else {
     const newC = { ...data, id: 'c'+Date.now(), created_at: new Date().toISOString() };
     allClients.push(newC);
