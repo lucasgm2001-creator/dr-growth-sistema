@@ -877,6 +877,13 @@ function closeProfile() {
 }
 
 // ---- Client modal ----
+function toggleEncerradoFields() {
+  const s = document.getElementById('cm-status').value;
+  const show = s === 'encerrado';
+  document.getElementById('cm-enddate-group').style.display  = show ? '' : 'none';
+  document.getElementById('cm-endreason-group').style.display = show ? '' : 'none';
+}
+
 function openClientModal(id) {
   const c = id ? allClients.find(x => x.id === id) : null;
   document.getElementById('cm-title').textContent = c ? 'Editar Cliente' : 'Novo Cliente';
@@ -889,8 +896,12 @@ function openClientModal(id) {
   document.getElementById('cm-valor').value     = c?.monthly_value || '';
   document.getElementById('cm-inicio').value    = c?.start_date || '';
   document.getElementById('cm-renovacao').value = c?.renewal_date || '';
+  document.getElementById('cm-frequency').value = c?.contract_frequency || 'semanal';
+  document.getElementById('cm-enddate').value   = c?.end_date || '';
+  document.getElementById('cm-endreason').value = c?.end_reason || '';
   document.getElementById('cm-obs').value       = c?.observations || '';
   document.getElementById('cm-delete').style.display = c ? 'inline-flex' : 'none';
+  toggleEncerradoFields();
   document.getElementById('client-modal').classList.add('show');
 }
 function closeClientModal() { document.getElementById('client-modal').classList.remove('show'); }
