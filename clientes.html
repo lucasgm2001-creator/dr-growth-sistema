@@ -1152,22 +1152,24 @@ window.migrateLeadToClient = function(lead) {
   const existing = allClients.find(c => c.name === (lead.company || lead.name));
   if (existing) { showToast(`Cliente "${existing.name}" já existe na carteira.`, 'info'); return; }
   const newC = {
-    id: 'c'+Date.now(),
     name:         lead.company || lead.name,
     nicho:        lead.nicho || 'Outros',
-    pais:         lead.country || 'br',
+    country:      lead.country || 'br',
     status:       'ativo',
     responsible:  lead.responsible || firstName,
-    monthly_value: lead.value || null,
+    monthly_value: Number(lead.value) || null,
     start_date:   new Date().toISOString().split('T')[0],
-    renewal_date: null,
     observations: `Migrado do funil. Lead original: ${lead.name}`,
-    lead_id:      String(lead.id),
-    created_at:   new Date().toISOString(),
   };
   window.DRCache?.clear('clientes');
-  allClients.push(newC);
-  if (window.drSupabase) window.drSupabase.from('clients').insert(newC).then(()=>{});
+  if (window.drSupabase) {
+    window.drSupabase.from('clients').insert(newC).select().single().then(({ data: ins, error }) => {
+      if (error) { console.error('[migrateLeadToClient] erro:', error.message, error.code); return; }
+      allClients.push({ ...ins, pais: ins.country });
+    });
+  } else {
+    allClients.push({ ...newC, pais: newC.country, id: 'c'+Date.now(), created_at: new Date().toISOString() });
+  }
   logActivity({ icon:'+', color:'#10B981', msg:`Lead migrado para Clientes: ${newC.name}`, sector:'clientes' });
 };
 
