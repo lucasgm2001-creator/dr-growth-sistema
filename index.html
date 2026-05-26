@@ -194,7 +194,12 @@
       <form id="pw-form" autocomplete="off" onsubmit="submitPwModal(event)">
         <div class="form-group" style="margin-bottom:20px">
           <label for="pw-input">Senha</label>
-          <input type="password" id="pw-input" class="form-control" placeholder="••••••••" required autocomplete="off">
+          <div style="position:relative">
+            <input type="password" id="pw-input" class="form-control" placeholder="••••••••" required autocomplete="off" style="padding-right:42px">
+            <button type="button" onclick="togglePwVisibility()" id="pw-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;line-height:1;display:flex;align-items:center">
+              <svg id="pw-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary btn-full" id="pw-btn">Entrar</button>
       </form>
