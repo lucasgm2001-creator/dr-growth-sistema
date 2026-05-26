@@ -1010,7 +1010,12 @@ async function saveClient() {
     logActivity({ icon:'+', color:'#10B981', msg:`Novo cliente: ${name}`, sector:'clientes' });
     localStorage.setItem('drg_clients_updated', Date.now().toString());
   }
-  closeClientModal(); closeProfile(); refresh();
+  closeClientModal(); closeProfile();
+  if (id) {
+    refresh();
+  } else {
+    loadData();
+  }
 }
 
 async function deleteClient() {
