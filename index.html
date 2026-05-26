@@ -183,6 +183,24 @@
 
   </div>
 
+  <!-- Modal: Senha de perfil -->
+  <div class="modal-overlay" id="pw-modal" onclick="if(event.target===this)closePwModal()">
+    <div class="modal-box" style="max-width:340px">
+      <div class="modal-header">
+        <h3 id="pw-modal-name">Confirmar acesso</h3>
+        <button class="modal-close" onclick="closePwModal()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="modal-msg error" id="pw-error"></div>
+      <form id="pw-form" autocomplete="off" onsubmit="submitPwModal(event)">
+        <div class="form-group" style="margin-bottom:20px">
+          <label for="pw-input">Senha</label>
+          <input type="password" id="pw-input" class="form-control" placeholder="••••••••" required autocomplete="off">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="pw-btn">Entrar</button>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal: Criar Conta -->
   <div class="modal-overlay" id="create-modal" onclick="if(event.target===this)closeCreateModal()">
     <div class="modal-box">
