@@ -250,6 +250,54 @@
     // Garante usuários demo no Supabase (silencioso, uma vez)
     window.addEventListener('load', () => AUTH.ensureDemoUsers());
 
+    // Hashing helper
+    async function sha256hex(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    // Estado do modal de senha
+    let _pwTarget = null;
+
+    function promptPassword(displayName, email, supabasePass, hashHex) {
+      _pwTarget = { email, supabasePass, hashHex };
+      document.getElementById('pw-modal-name').textContent = displayName;
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-error').classList.remove('show');
+      document.getElementById('pw-btn').disabled = false;
+      document.getElementById('pw-btn').textContent = 'Entrar';
+      document.getElementById('pw-modal').classList.add('show');
+      setTimeout(() => document.getElementById('pw-input').focus(), 80);
+    }
+
+    async function submitPwModal(e) {
+      e.preventDefault();
+      if (!_pwTarget) return;
+      const btn   = document.getElementById('pw-btn');
+      const errEl = document.getElementById('pw-error');
+      const typed = document.getElementById('pw-input').value;
+      btn.disabled    = true;
+      btn.textContent = 'Verificando…';
+      errEl.classList.remove('show');
+      const hash = await sha256hex(typed);
+      if (hash !== _pwTarget.hashHex) {
+        errEl.textContent = 'Senha incorreta.';
+        errEl.classList.add('show');
+        btn.disabled    = false;
+        btn.textContent = 'Entrar';
+        document.getElementById('pw-input').value = '';
+        document.getElementById('pw-input').focus();
+        return;
+      }
+      closePwModal();
+      quickLogin(_pwTarget.email, _pwTarget.supabasePass);
+    }
+
+    function closePwModal() {
+      document.getElementById('pw-modal').classList.remove('show');
+      _pwTarget = null;
+    }
+
     // Login rápido via card
     async function quickLogin(email, password) {
       const btn   = document.getElementById('login-btn');
