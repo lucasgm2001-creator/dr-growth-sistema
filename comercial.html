@@ -1243,6 +1243,7 @@ async function onDrop(e, stage) {
   const sa = STAGE_ACTIVITY[stage];
   if (sa) logActivity({ icon: sa.icon, color: sa.color, msg: sa.msg(lead.name), sector: 'comercial' });
   if (stage === 'fechado' && oldStage !== 'fechado') {
+    alert('onDrop stage fechado detectado — lead: ' + (lead.company || lead.name));
     autoCreateClient(lead);
     openCommissionModal(draggedId);
   }
