@@ -394,13 +394,28 @@
     <div class="modal-body">
       <div id="commission-lead-info" style="background:var(--bg-hover);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text-secondary)"></div>
       <input type="hidden" id="commission-lead-id">
-      <div class="form-group">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group" style="margin:0">
+          <label>Valor do Contrato</label>
+          <input type="number" class="form-control" id="commission-contract-value" placeholder="0.00" step="0.01" oninput="calcCommissionAmount()">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>% de Comissão</label>
+          <input type="number" class="form-control" id="commission-percent" placeholder="Ex: 10" step="0.1" min="0" max="100" oninput="calcCommissionAmount()">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
         <label>Valor da Comissão</label>
         <input type="number" class="form-control" id="commission-amount" placeholder="0.00" step="0.01">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Calculado automaticamente (ou ajuste manualmente)</div>
+      </div>
+      <div class="form-group">
+        <label>Vendedor Responsável</label>
+        <select class="form-control" id="commission-seller"></select>
       </div>
       <div class="form-group">
         <label>Observação (opcional)</label>
-        <input type="text" class="form-control" id="commission-notes" placeholder="Ex: 10% sobre contrato de R$5.000…">
+        <input type="text" class="form-control" id="commission-notes" placeholder="Ex: Contrato anual, pagamento à vista…">
       </div>
     </div>
     <div class="modal-footer">
