@@ -534,7 +534,7 @@ async function loadData() {
     window.drSupabase.from('jobs').select('*').order('created_at', { ascending: false }),
     window.drSupabase.from('documents').select('*').order('created_at', { ascending: false }),
   ]);
-  allClients = (c.data || []);
+  allClients = (c.data || []).map(cl => ({ ...cl, pais: cl.pais ?? cl.country ?? 'br' }));
   allJobs    = (j.data || []);
   allDocs    = (d.data || []);
   if (window.applyRoleFilter) allClients = applyRoleFilter(allClients, 'clients');
