@@ -361,33 +361,31 @@ function initMobileSidebar() {
 
   const isMobile = () => window.innerWidth <= 768;
   const KEY      = 'drg_sidebar_state';
-  const CYCLE    = ['semi', 'full', 'closed'];
 
   function getState() {
-    return document.body.getAttribute('data-sidebar') || 'semi';
+    return document.body.getAttribute('data-sidebar') || 'full';
   }
   function setState(state) {
     document.body.setAttribute('data-sidebar', state);
     if (!isMobile()) localStorage.setItem(KEY, state);
   }
 
-  // Aplica estado salvo (ou padrão semi)
-  setState(isMobile() ? 'semi' : (localStorage.getItem(KEY) || 'semi'));
+  // Aplica estado salvo (ou padrão full)
+  setState(isMobile() ? 'full' : (localStorage.getItem(KEY) || 'full'));
 
-  // Toggle: cicla pelos 3 estados no desktop, overlay no mobile
+  // Toggle: alterna entre full e closed no desktop, overlay no mobile
   toggle.addEventListener('click', () => {
     if (isMobile()) {
       sidebar.classList.toggle('open');
       if (overlay) overlay.classList.toggle('show');
       return;
     }
-    const cur = getState();
-    setState(CYCLE[(CYCLE.indexOf(cur) + 1) % CYCLE.length]);
+    setState(getState() === 'full' ? 'closed' : 'full');
   });
 
-  // Clique na faixa fechada → abre semi
+  // Clique na sidebar fechada → abre full
   sidebar.addEventListener('click', () => {
-    if (!isMobile() && getState() === 'closed') setState('semi');
+    if (!isMobile() && getState() === 'closed') setState('full');
   });
 
   if (overlay) overlay.addEventListener('click', () => {
