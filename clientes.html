@@ -479,8 +479,9 @@
   );
 */
 
+console.log('[clientes.html] script iniciado');
 const session = initPage('clientes.html');
-if (!session) throw new Error('Not authenticated');
+if (!session) { console.error('[clientes.html] initPage retornou null — redirecionando'); window.location.href = 'index.html';
 
 // ---- Permission filter ----
 const role = session.role;
