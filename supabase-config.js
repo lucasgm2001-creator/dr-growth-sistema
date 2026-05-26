@@ -181,9 +181,12 @@ CREATE TABLE content_pieces (
 -- Supabase Dashboard → SQL Editor → New query → Cole e execute
 -- =====================================================
 
--- Leads: campo país (necessário para filtros US/BR)
-ALTER TABLE leads   ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
-ALTER TABLE leads   ADD COLUMN IF NOT EXISTS seminteracao_at TIMESTAMPTZ;
+-- Leads: campo país e stage seminteracao
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS country TEXT DEFAULT 'us';
+-- Atualiza constraint de stage para incluir seminteracao (execute se já existe a tabela)
+ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_stage_check;
+ALTER TABLE leads ADD CONSTRAINT leads_stage_check
+  CHECK (stage IN ('novo','contato','seminteracao','reuniao','proposta','fechado','perdido'));
 
 -- Clients: colunas adicionais obrigatórias para o fluxo lead→cliente
 -- (sem estas colunas o autoCreateClient falha com erro 42703)
