@@ -1992,6 +1992,7 @@ function markLeadAsClient() {
   window.DRCache?.clear('comercial');
   if (window.drSupabase) window.drSupabase.from('leads').update({ stage: 'fechado' }).eq('id', lead.id).catch(() => {});
   renderKanban(); renderLeadsTable(leads); updateSubtitle();
+  alert('markLeadAsClient stage fechado detectado — lead: ' + (lead.company || lead.name));
   autoCreateClient(lead);
   closeLeadDaily();
   openCommissionModal(lead.id);
