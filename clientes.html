@@ -491,7 +491,7 @@ function canEditClient() {
 }
 
 // Hide add button for non-admins
-if (role !== 'admin' && role !== 'financeiro') {
+if (role === 'trafego') {
   document.getElementById('btn-new').style.display = 'none';
 }
 // Hide docs tab for Lucas (no financial docs)
