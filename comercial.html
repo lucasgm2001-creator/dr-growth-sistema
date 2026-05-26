@@ -791,16 +791,45 @@ function getCommissions() { return _commissions; }
 
 let pendingCommissionLeadId = null;
 
+function calcCommissionAmount() {
+  const val = parseFloat(document.getElementById('commission-contract-value').value) || 0;
+  const pct = parseFloat(document.getElementById('commission-percent').value) || 0;
+  if (val > 0 && pct > 0) {
+    document.getElementById('commission-amount').value = (val * pct / 100).toFixed(2);
+  }
+}
+
+function _buildSellerSelect(selectEl, defaultSeller) {
+  selectEl.innerHTML = '<option value="">— Selecione o vendedor —</option>';
+  getSellers().forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.short;
+    o.textContent = s.name;
+    selectEl.appendChild(o);
+  });
+  if (defaultSeller) selectEl.value = defaultSeller;
+  if (session.role !== 'admin') {
+    selectEl.disabled = true;
+    selectEl.value = session.name.split(' ')[0];
+  } else {
+    selectEl.disabled = false;
+  }
+}
+
 function openCommissionModal(leadId) {
   const lead = leads.find(l => l.id === leadId);
   if (!lead) return;
   pendingCommissionLeadId = leadId;
   const existing = _commissions.find(c => c.lead_id == leadId);
   document.getElementById('commission-lead-info').innerHTML =
-    `<strong>${lead.name}</strong>${lead.company ? ' · ' + lead.company : ''}<br>Valor fechado: <strong style="color:var(--green)">${lead.value ? fmt.currency(lead.value) : '—'}</strong>`;
+    `<strong>${lead.name}</strong>${lead.company ? ' · ' + lead.company : ''}<br>Estágio: <strong>${STAGE_INFO[lead.stage]?.label || lead.stage}</strong>`;
   document.getElementById('commission-lead-id').value = leadId;
-  document.getElementById('commission-amount').value = existing ? existing.commission_amount : '';
-  document.getElementById('commission-notes').value = existing ? existing.notes : '';
+  document.getElementById('commission-contract-value').value = existing ? (existing.lead_value || lead.value || '') : (lead.value || '');
+  document.getElementById('commission-percent').value = '';
+  document.getElementById('commission-amount').value = existing ? (existing.commission_amount || '') : '';
+  document.getElementById('commission-notes').value = existing ? (existing.notes || '') : '';
+  const defaultSeller = existing ? existing.seller : lead.responsible;
+  _buildSellerSelect(document.getElementById('commission-seller'), defaultSeller);
   document.getElementById('commission-modal').classList.add('show');
 }
 
@@ -810,46 +839,63 @@ function closeCommissionModal() {
 }
 
 async function saveCommission() {
-  const amount = parseFloat(document.getElementById('commission-amount').value) || 0;
-  const notes = document.getElementById('commission-notes').value.trim();
-  const leadId = pendingCommissionLeadId;
+  const contractValue = parseFloat(document.getElementById('commission-contract-value').value) || 0;
+  const amount        = parseFloat(document.getElementById('commission-amount').value) || 0;
+  const notes         = document.getElementById('commission-notes').value.trim();
+  const seller        = document.getElementById('commission-seller').value;
+  const leadId        = pendingCommissionLeadId;
   if (!leadId) return;
   const lead = leads.find(l => l.id == leadId);
   if (!lead) return;
+  if (!seller) { showToast('Selecione o vendedor responsável.', 'error'); return; }
   const entry = {
-    lead_id: leadId,
-    lead_name: lead.name,
-    lead_company: lead.company || '',
-    lead_value: lead.value || 0,
-    seller: lead.responsible,
+    lead_id:           leadId,
+    lead_name:         lead.name,
+    lead_company:      lead.company || '',
+    lead_value:        contractValue || lead.value || 0,
+    seller,
     commission_amount: amount,
     notes,
-    created_at: new Date().toISOString(),
+    created_at:        new Date().toISOString(),
   };
   window.DRCache?.clear('comercial');
   if (window.drSupabase) {
     const existing = _commissions.find(c => c.lead_id == leadId);
     if (existing) {
-      await window.drSupabase.from('commissions').update({ commission_amount: amount, notes }).eq('id', existing.id);
-      Object.assign(existing, { commission_amount: amount, notes });
+      await window.drSupabase.from('commissions').update({
+        commission_amount: amount, notes, seller, lead_value: entry.lead_value,
+      }).eq('id', existing.id);
+      Object.assign(existing, { commission_amount: amount, notes, seller, lead_value: entry.lead_value });
     } else {
       const { data: ins } = await window.drSupabase.from('commissions').insert(entry).select().single();
       if (ins) _commissions.push(ins);
+      else _commissions.push({ ...entry, id: Date.now() });
     }
+  } else {
+    const existing = _commissions.find(c => c.lead_id == leadId);
+    if (existing) Object.assign(existing, { commission_amount: amount, notes, seller, lead_value: entry.lead_value });
+    else _commissions.push({ ...entry, id: Date.now() });
   }
   closeCommissionModal();
   showToast('Comissão registrada!', 'success');
+  renderCommissions();
+  if (leadState.id == leadId) renderLeadDailyCommission();
 }
 
 function editCommission(leadId) {
-  const lead = leads.find(l => l.id == leadId);
-  if (!lead) return;
+  const commission = _commissions.find(c => c.lead_id == leadId);
   const sellerShort = session.name.split(' ')[0];
-  if (session.role !== 'admin' && lead.responsible !== sellerShort) {
+  if (session.role !== 'admin' && commission && commission.seller !== sellerShort) {
     showToast('Você só pode editar suas próprias comissões.', 'error');
     return;
   }
   openCommissionModal(leadId);
+}
+
+function editCommissionFromDiary() {
+  const leadId = leadState.id;
+  if (!leadId) return;
+  editCommission(leadId);
 }
 
 function renderCommissions() {
