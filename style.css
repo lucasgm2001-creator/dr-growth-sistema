@@ -4284,7 +4284,7 @@ body.hall-page { background: transparent; }
    ============================================================ */
 
 :root {
-  --sb-closed: 16px;
+  --sb-closed: 60px;
   --sb-semi:   64px;
 }
 
