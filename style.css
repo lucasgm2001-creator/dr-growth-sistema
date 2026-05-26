@@ -1768,6 +1768,7 @@ tbody td {
   line-height: 1;
 }
 .floor-icon svg { display: block; }
+.elevator-floor.active .floor-icon { color: rgba(255,255,255,0.95); }
 
 .floor-info {
   flex: 1;
