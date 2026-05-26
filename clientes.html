@@ -1067,7 +1067,7 @@ function deleteDoc(id) {
 
 // ---- Helpers ----
 function statusLabel(s) {
-  return { ativo:'Contrato Ativo', inativo:'Contrato Inativo', pausado:'Pausado', risco:'Em Risco', encerrado:'Encerrado' }[s] || s;
+  return { ativo:'Contrato Ativo', inativo:'Contrato Inativo', pausado:'Pausado', risco:'Em Risco', inadimplente:'Inadimplente', renovacao:'Em Renovação', encerrado:'Encerrado' }[s] || s;
 }
 function clientColor(name) {
   const colors = ['#1e3a6f','#244c9c','#10B981','#f97316','#a855f7','#3b82f6','#ef4444'];
