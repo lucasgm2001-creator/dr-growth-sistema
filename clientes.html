@@ -982,6 +982,7 @@ async function saveClient() {
       const reason = data.end_reason ? ` — ${data.end_reason}` : '';
       logActivity({ icon:'×', color:'#6b7280', msg:`Contrato encerrado: ${name}${reason}`, sector:'clientes' });
     }
+    localStorage.setItem('drg_clients_updated', Date.now().toString());
   } else {
     const newC = { ...data, id: 'c'+Date.now(), created_at: new Date().toISOString() };
     allClients.push(newC);
