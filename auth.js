@@ -261,12 +261,13 @@ function renderElevator(currentPage) {
         title="${section.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${section.color}` : ''}">
           <span class="floor-number" style="color:${isActive ? section.color : ''}">${section.floor}</span>
+          <span class="floor-icon">${section.icon}</span>
         </div>
         <div class="floor-info">
           <span class="floor-label">${section.label}</span>
           <span class="floor-desc">${section.desc}</span>
         </div>
-        ${isLocked ? '<span class="floor-lock">🔒</span>' : ''}
+        ${isLocked ? '<span class="floor-lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>' : ''}
         ${isActive ? `<div class="floor-indicator" style="background:${section.color}"></div>` : ''}
       </div>`;
   });
