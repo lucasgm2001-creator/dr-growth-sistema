@@ -659,7 +659,7 @@ async function savePayment() {
   const client = document.getElementById('pay-client').value.trim();
   const amount = Number(document.getElementById('pay-amount').value);
   if (!client || !amount) { showToast('Cliente e valor são obrigatórios.', 'error'); return; }
-  const data = { client_name:client, amount, description:document.getElementById('pay-desc').value.trim(), due_date:document.getElementById('pay-due').value||null, paid_date:document.getElementById('pay-paid').value||null, status:document.getElementById('pay-status').value };
+  const data = { client_name:client, amount, description:document.getElementById('pay-desc').value.trim(), due_date:document.getElementById('pay-due').value||null, paid_date:document.getElementById('pay-paid').value||null, status:document.getElementById('pay-status').value, frequency:document.getElementById('pay-frequency').value };
   window.DRCache?.clear('financeiro');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('payments').update(data).eq('id', id);
