@@ -518,7 +518,7 @@ async function loadData() {
     refresh();
     return;
   }
-  if (!window.drSupabase) return;
+  if (!window.drSupabase) { refresh(); return; }
   const [c, j, d] = await Promise.all([
     window.drSupabase.from('clients').select('*').order('name'),
     window.drSupabase.from('jobs').select('*').order('created_at', { ascending: false }),
