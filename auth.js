@@ -344,54 +344,22 @@ function initMobileSidebar() {
   const overlay = document.getElementById('sidebar-overlay');
   if (!toggle || !sidebar) return;
 
-  const hasElevator = !!document.getElementById('elevator-nav');
-
-  // Páginas sem elevator usam o overlay original
-  if (!hasElevator) {
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('show');
-    });
-    if (overlay) overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
-    });
-    return;
+  function openSidebar() {
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
   }
-
-  const isMobile = () => window.innerWidth <= 768;
-  const KEY      = 'drg_sidebar_state';
-
-  function getState() {
-    return document.body.getAttribute('data-sidebar') || 'full';
-  }
-  function setState(state) {
-    document.body.setAttribute('data-sidebar', state);
-    if (!isMobile()) localStorage.setItem(KEY, state);
-  }
-
-  // Aplica estado salvo (ou padrão full)
-  setState(isMobile() ? 'full' : (localStorage.getItem(KEY) || 'full'));
-
-  // Toggle: alterna entre full e closed no desktop, overlay no mobile
-  toggle.addEventListener('click', () => {
-    if (isMobile()) {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('show');
-      return;
-    }
-    setState(getState() === 'full' ? 'closed' : 'full');
-  });
-
-  // Clique na sidebar fechada → abre full
-  sidebar.addEventListener('click', () => {
-    if (!isMobile() && getState() === 'closed') setState('full');
-  });
-
-  if (overlay) overlay.addEventListener('click', () => {
+  function closeSidebar() {
     sidebar.classList.remove('open');
-    overlay.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+
+  toggle.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
   });
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
 }
 
 // ============================================================
