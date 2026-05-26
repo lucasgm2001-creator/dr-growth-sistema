@@ -1749,6 +1749,15 @@ tbody td {
   letter-spacing: -0.5px;
 }
 
+.floor-icon {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.75);
+  line-height: 1;
+}
+.floor-icon svg { display: block; }
+
 .floor-info {
   flex: 1;
   overflow: hidden;
