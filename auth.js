@@ -349,13 +349,11 @@ function initMobileSidebar() {
   const isMobile = () => window.innerWidth <= 768;
   const KEY = 'drg_sidebar_state';
 
-  // Desktop: set data-sidebar attribute (controls CSS icon-only vs full)
   function setDesktop(state) {
     document.body.setAttribute('data-sidebar', state);
     localStorage.setItem(KEY, state);
   }
 
-  // Mobile: drawer open/close
   function openMobile() {
     sidebar.classList.add('open');
     if (overlay) overlay.classList.add('show');
@@ -367,37 +365,34 @@ function initMobileSidebar() {
     document.body.style.overflow = '';
   }
 
-  // Initialize desktop state (default: closed = icons only)
-  if (!isMobile()) {
-    setDesktop(localStorage.getItem(KEY) || 'closed');
-  }
-
-  // Toggle button
-  toggle.addEventListener('click', () => {
+  function doToggle() {
     if (isMobile()) {
       sidebar.classList.contains('open') ? closeMobile() : openMobile();
     } else {
       const cur = document.body.getAttribute('data-sidebar') || 'closed';
       setDesktop(cur === 'full' ? 'closed' : 'full');
     }
-  });
+  }
 
-  // Overlay closes mobile drawer
+  if (!isMobile()) setDesktop(localStorage.getItem(KEY) || 'closed');
+
+  toggle.addEventListener('click', doToggle);
+
+  // Inner toggle (inside sidebar header — visible only when sidebar is full)
+  const toggleInner = document.getElementById('menu-toggle-inner');
+  if (toggleInner) toggleInner.addEventListener('click', doToggle);
+
   if (overlay) overlay.addEventListener('click', closeMobile);
 
-  // ESC closes
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     isMobile() ? closeMobile() : setDesktop('closed');
   });
 
-  // On resize: switch modes cleanly
   window.addEventListener('resize', () => {
     if (!isMobile()) {
       closeMobile();
-      if (!document.body.getAttribute('data-sidebar')) {
-        setDesktop(localStorage.getItem(KEY) || 'closed');
-      }
+      if (!document.body.getAttribute('data-sidebar')) setDesktop(localStorage.getItem(KEY) || 'closed');
     } else {
       document.body.removeAttribute('data-sidebar');
     }
