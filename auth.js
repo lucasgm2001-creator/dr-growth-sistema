@@ -281,6 +281,7 @@ function renderElevator(currentPage) {
         onclick="location.href='${ADMIN_SECTION.page}'" title="${ADMIN_SECTION.desc}">
         <div class="floor-btn" style="${isActive ? `--floor-color:${ADMIN_SECTION.color}` : ''}">
           <span class="floor-number" style="color:${isActive ? ADMIN_SECTION.color : ''}">${ADMIN_SECTION.floor}</span>
+          <span class="floor-icon">${ADMIN_SECTION.icon}</span>
         </div>
         <div class="floor-info">
           <span class="floor-label">${ADMIN_SECTION.label}</span>
