@@ -1250,13 +1250,26 @@ async function onDrop(e, stage) {
 }
 
 async function autoCreateClient(lead) {
+  console.log('[autoCreateClient] chamado com lead:', lead);
+
   const name = lead.company || lead.name;
-  if (!name) return;
+  if (!name) { console.warn('[autoCreateClient] abortado: lead sem nome e sem empresa'); return; }
+
+  console.log('[autoCreateClient] nome do cliente:', name);
+  console.log('[autoCreateClient] window.drSupabase disponível?', !!window.drSupabase);
+
   if (window.drSupabase) {
-    const { data: existing } = await window.drSupabase.from('clients').select('id').ilike('name', name).limit(1);
+    console.log('[autoCreateClient] verificando duplicata para:', name);
+    const { data: existing, error: checkErr } = await window.drSupabase
+      .from('clients').select('id').ilike('name', name).limit(1);
+
+    if (checkErr) console.error('[autoCreateClient] erro ao checar duplicata:', checkErr);
+    console.log('[autoCreateClient] duplicata encontrada?', existing);
+
     if (existing && existing.length > 0) {
       showToast(`Cliente "${name}" já existe na aba Clientes.`, 'info'); return;
     }
+
     const clientData = {
       name,
       status:        'ativo',
@@ -1267,12 +1280,26 @@ async function autoCreateClient(lead) {
       nicho:         lead.nicho || '',
       observations:  `Migrado do funil. Lead: ${lead.name}`,
     };
-    const { error } = await window.drSupabase.from('clients').insert(clientData);
-    if (error) { console.error('autoCreateClient error', error); return; }
+    console.log('[autoCreateClient] inserindo no Supabase:', clientData);
+
+    const { data: inserted, error } = await window.drSupabase
+      .from('clients').insert(clientData).select().single();
+
+    if (error) {
+      console.error('[autoCreateClient] ERRO no insert:', error);
+      console.error('[autoCreateClient] detalhes:', error.message, error.details, error.hint, error.code);
+      showToast(`Erro ao criar cliente: ${error.message}`, 'error');
+      return;
+    }
+    console.log('[autoCreateClient] insert OK, cliente criado:', inserted);
+  } else {
+    console.warn('[autoCreateClient] Supabase indisponível — cliente NÃO salvo no banco');
   }
-  // Invalida cache de clientes e sinaliza outras abas
+
   window.DRCache?.clear('clientes');
   localStorage.setItem('drg_clients_updated', Date.now().toString());
+  console.log('[autoCreateClient] cache limpo e sinal enviado para outras abas');
+
   showToast(`"${name}" adicionado como Contrato Ativo em Clientes!`, 'success');
   logActivity({ icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/></svg>', color:'#10B981', msg:`Novo cliente: ${name} (via funil fechado)`, sector:'clientes' });
 }
