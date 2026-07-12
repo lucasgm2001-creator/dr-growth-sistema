@@ -325,7 +325,7 @@ function openNewLeadModal(stage = 'novo') {
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-notes').value = '';
   document.getElementById('lead-stage').value = stage;
-  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('lead-responsible').value = 'Lucas';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -344,7 +344,7 @@ function openEditModal(id) {
   document.getElementById('lead-origin').value = lead.origin || '';
   document.getElementById('lead-notes').value = lead.notes || '';
   document.getElementById('lead-stage').value = lead.stage;
-  document.getElementById('lead-responsible').value = lead.responsible || 'Daniel';
+  document.getElementById('lead-responsible').value = lead.responsible || 'Lucas';
   document.getElementById('delete-btn').style.display = 'inline-flex';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -367,7 +367,7 @@ async function saveLead() {
     origin:      document.getElementById('lead-origin').value,
     notes:       document.getElementById('lead-notes').value.trim(),
     stage:       document.getElementById('lead-stage').value,
-    responsible: document.getElementById('lead-responsible').value,
+    responsible: document.getElementById('lead-responsible').value || 'Lucas',
     updated_at:  new Date().toISOString(),
   };
 

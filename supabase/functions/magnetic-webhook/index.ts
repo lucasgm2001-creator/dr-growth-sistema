@@ -53,7 +53,7 @@ function extractContact(body: Record<string, unknown>) {
     company:    company || null,
     origin:     mapSource(source),
     stage:      'novo',
-    responsible: 'Equipe',
+    responsible: 'Lucas',
     notes:      buildNotes(body, formData),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

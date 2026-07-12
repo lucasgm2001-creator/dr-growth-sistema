@@ -98,10 +98,10 @@ Se o formulário tiver outros campos, eles aparecem em **Notas** do lead.
 
 ## Responsável padrão
 
-Leads vindos do Magnetic chegam com responsável **"Equipe"**. Para mudar isso, edite a linha no arquivo `supabase/functions/magnetic-webhook/index.ts`:
+Leads vindos do Magnetic chegam com responsável **"Lucas"**. Para mudar isso, edite a linha no arquivo `supabase/functions/magnetic-webhook/index.ts`:
 
 ```typescript
-responsible: 'Equipe',  // ← mude para o nome desejado, ex: 'Lucas'
+responsible: 'Lucas',  // ← responsável padrão dos novos leads
 ```
 
 E refaça o deploy da Edge Function.

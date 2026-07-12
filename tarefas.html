@@ -284,6 +284,7 @@ function renderTaskItem(t) {
       <div class="task-content">
         <div class="task-title ${t.status==='done'?'done':''}">${t.title}</div>
         ${t.description ? `<div class="text-muted mt-1" style="font-size:12px">${t.description}</div>` : ''}
+        ${t.completion_note ? `<div class="text-muted mt-1" style="font-size:12px"><strong>Situação do lead:</strong> ${t.completion_note}</div>` : ''}
         <div class="task-meta mt-1">
           <span>
             <div class="avatar avatar-sm avatar-${fmt.avatarClass(t.responsible)}" style="display:inline-flex">${fmt.initials(t.responsible)}</div>
@@ -306,10 +307,21 @@ async function toggleStatus(id, event) {
   if (!task) return;
 
   const next = task.status === 'done' ? 'pending' : 'done';
+  let completionNote = task.completion_note || null;
+  if (next === 'done') {
+    completionNote = prompt('Descreva a situação atual do lead:');
+    if (completionNote === null) return;
+    completionNote = completionNote.trim();
+    if (!completionNote) {
+      showToast('Preencha a situação do lead para concluir a tarefa.', 'error');
+      return;
+    }
+  }
   task.status = next;
+  task.completion_note = next === 'done' ? completionNote : null;
   window.DRCache?.clear('tarefas');
   if (window.drSupabase) {
-    await window.drSupabase.from('tasks').update({ status: next }).eq('id', id);
+    await window.drSupabase.from('tasks').update({ status: next, completion_note: task.completion_note }).eq('id', id);
   }
 
   updateKPIs();
@@ -323,7 +335,7 @@ function openModal() {
   document.getElementById('task-id').value = '';
   document.getElementById('task-title').value = '';
   document.getElementById('task-desc').value = '';
-  document.getElementById('task-responsible').value = session.name.split(' ')[0];
+  document.getElementById('task-responsible').value = 'Lucas';
   document.getElementById('task-due').value = '';
   document.getElementById('task-priority').value = 'medium';
   document.getElementById('task-status').value = 'pending';
@@ -338,7 +350,7 @@ function openEditModal(id) {
   document.getElementById('task-id').value = t.id;
   document.getElementById('task-title').value = t.title || '';
   document.getElementById('task-desc').value = t.description || '';
-  document.getElementById('task-responsible').value = t.responsible || 'Daniel';
+  document.getElementById('task-responsible').value = t.responsible || 'Lucas';
   document.getElementById('task-due').value = t.due_date || '';
   document.getElementById('task-priority').value = t.priority || 'medium';
   document.getElementById('task-status').value = t.status || 'pending';
@@ -356,7 +368,7 @@ async function saveTask() {
   const data = {
     title,
     description:  document.getElementById('task-desc').value.trim(),
-    responsible:  document.getElementById('task-responsible').value,
+    responsible:  document.getElementById('task-responsible').value || 'Lucas',
     due_date:     document.getElementById('task-due').value || null,
     priority:     document.getElementById('task-priority').value,
     status:       document.getElementById('task-status').value,

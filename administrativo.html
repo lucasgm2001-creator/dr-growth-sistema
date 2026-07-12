@@ -526,6 +526,7 @@ function renderTasksList(tasks) {
           <div class="task-content">
             <div class="task-title ${t.status==='done'?'done':''}">${t.title}</div>
             ${t.description?`<div class="text-muted mt-1" style="font-size:12px">${t.description}</div>`:''}
+            ${t.completion_note?`<div class="text-muted mt-1" style="font-size:12px"><strong>Situação do lead:</strong> ${t.completion_note}</div>`:''}
             <div class="task-meta mt-1">
               <span><div class="avatar avatar-sm avatar-${fmt.avatarClass(t.responsible.split(' ')[0])}" style="display:inline-flex">${fmt.initials(t.responsible)}</div> ${t.responsible}</span>
               ${t.assigned_by?`<span class="text-muted" style="font-size:11px">Atribuída por: ${t.assigned_by}</span>`:''}
@@ -555,9 +556,18 @@ async function toggleTask(id, e) {
     showToast('Apenas o responsável pode alterar o status desta tarefa.', 'error');
     return;
   }
-  t.status = t.status==='done'?'pending':'done';
+  const newStatus = t.status==='done'?'pending':'done';
+  let completionNote = t.completion_note || null;
+  if (newStatus === 'done') {
+    completionNote = prompt('Descreva a situação atual do lead:');
+    if (completionNote === null) return;
+    completionNote = completionNote.trim();
+    if (!completionNote) { showToast('Preencha a situação do lead para concluir a tarefa.','error'); return; }
+  }
+  t.status = newStatus;
+  t.completion_note = newStatus === 'done' ? completionNote : null;
   window.DRCache?.clear('administrativo');
-  if (window.drSupabase) await window.drSupabase.from('tasks').update({status:t.status}).eq('id',id);
+  if (window.drSupabase) await window.drSupabase.from('tasks').update({status:t.status,completion_note:t.completion_note}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   showToast(t.status==='done'?'Tarefa concluída!':'Tarefa reaberta.','success');
 }
@@ -570,9 +580,17 @@ async function updateTaskStatus(id, newStatus, e) {
     showToast('Apenas o responsável pode alterar o status desta tarefa.', 'error');
     return;
   }
+  let completionNote = t.completion_note || null;
+  if (newStatus === 'done' && t.status !== 'done') {
+    completionNote = prompt('Descreva a situação atual do lead:');
+    if (completionNote === null) return;
+    completionNote = completionNote.trim();
+    if (!completionNote) { showToast('Preencha a situação do lead para concluir a tarefa.','error'); return; }
+  }
   t.status = newStatus;
+  t.completion_note = newStatus === 'done' ? completionNote : null;
   window.DRCache?.clear('administrativo');
-  if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus}).eq('id',id);
+  if (window.drSupabase) await window.drSupabase.from('tasks').update({status:newStatus,completion_note:t.completion_note}).eq('id',id);
   updateTaskKPIs(); filterTasks();
   const labels = { pending:'Pendente', in_progress:'Em andamento', done:'Concluído' };
   showToast(`Status: ${labels[newStatus]}`, 'success');
@@ -659,7 +677,7 @@ function openEditTask(id) {
   document.getElementById('task-id').value=t.id;
   document.getElementById('task-title').value=t.title||'';
   document.getElementById('task-desc').value=t.description||'';
-  document.getElementById('task-resp').value=t.responsible||'Daniel';
+  document.getElementById('task-resp').value=t.responsible||'Lucas Moraes';
   document.getElementById('task-due').value=t.due_date||'';
   document.getElementById('task-priority').value=t.priority||'medium';
   document.getElementById('task-status').value=t.status||'pending';
@@ -673,7 +691,7 @@ async function saveTask() {
   const id=document.getElementById('task-id').value;
   const title=document.getElementById('task-title').value.trim();
   if (!title) { showToast('Título é obrigatório.','error'); return; }
-  const data={title,description:document.getElementById('task-desc').value.trim(),responsible:document.getElementById('task-resp').value,assigned_by:session.name,due_date:document.getElementById('task-due').value||null,priority:document.getElementById('task-priority').value,status:document.getElementById('task-status').value};
+  const data={title,description:document.getElementById('task-desc').value.trim(),responsible:document.getElementById('task-resp').value||'Lucas Moraes',assigned_by:session.name,due_date:document.getElementById('task-due').value||null,priority:document.getElementById('task-priority').value,status:document.getElementById('task-status').value};
   window.DRCache?.clear('administrativo');
   if (id) {
     if (window.drSupabase) await window.drSupabase.from('tasks').update(data).eq('id',id);

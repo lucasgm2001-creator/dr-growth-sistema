@@ -383,7 +383,7 @@ function openModal() {
   ['lead-name','lead-company','lead-email','lead-phone','lead-value','lead-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('lead-origin').value = '';
   document.getElementById('lead-stage').value = 'novo';
-  document.getElementById('lead-responsible').value = session.name.split(' ')[0];
+  document.getElementById('lead-responsible').value = 'Lucas';
   document.getElementById('delete-btn').style.display = 'none';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -401,7 +401,7 @@ function openEditModal(id) {
   document.getElementById('lead-origin').value = l.origin || '';
   document.getElementById('lead-notes').value = l.notes || '';
   document.getElementById('lead-stage').value = l.stage;
-  document.getElementById('lead-responsible').value = l.responsible || 'Daniel';
+  document.getElementById('lead-responsible').value = l.responsible || 'Lucas';
   document.getElementById('delete-btn').style.display = 'inline-flex';
   document.getElementById('lead-modal').classList.add('show');
 }
@@ -421,7 +421,7 @@ async function saveLead() {
     origin: document.getElementById('lead-origin').value,
     notes: document.getElementById('lead-notes').value.trim(),
     stage: document.getElementById('lead-stage').value,
-    responsible: document.getElementById('lead-responsible').value,
+    responsible: document.getElementById('lead-responsible').value || 'Lucas',
   };
 
   window.DRCache?.clear('leads');

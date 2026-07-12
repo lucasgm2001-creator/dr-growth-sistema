@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS leads (
   phone        TEXT,
   stage        TEXT DEFAULT 'novo' CHECK (stage IN ('novo','contato','reuniao','proposta','fechado','perdido')),
   value        NUMERIC(12,2),
-  responsible  TEXT,
+  responsible  TEXT DEFAULT 'Lucas',
   origin       TEXT,
   notes        TEXT,
   country      TEXT DEFAULT 'br',
@@ -43,12 +43,18 @@ CREATE TABLE IF NOT EXISTS tasks (
   id           BIGSERIAL PRIMARY KEY,
   title        TEXT NOT NULL,
   description  TEXT,
-  responsible  TEXT,
+  responsible  TEXT DEFAULT 'Lucas',
   due_date     DATE,
   priority     TEXT DEFAULT 'medium' CHECK (priority IN ('high','medium','low')),
   status       TEXT DEFAULT 'pending' CHECK (status IN ('pending','in_progress','done')),
+  completion_note TEXT,
   created_at   TIMESTAMPTZ DEFAULT now()
 );
+
+-- Mantém Lucas como responsável quando integrações não informarem outro nome.
+ALTER TABLE leads ALTER COLUMN responsible SET DEFAULT 'Lucas';
+ALTER TABLE tasks ALTER COLUMN responsible SET DEFAULT 'Lucas';
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS completion_note TEXT;
 
 -- ---- Tabela: clients ----
 CREATE TABLE IF NOT EXISTS clients (
